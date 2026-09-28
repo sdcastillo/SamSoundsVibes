@@ -1,2 +1,4 @@
 publisher/local.env
 publisher/tokens.json
+publisher/__pycache__/
+__pycache__/
