@@ -12,7 +12,7 @@
     h1 { margin: 0 0 8px; color: #ff4dff; font-size: 2rem; }
     .lede { color: #c9c9c9; margin-top: 0; }
     label { display: block; font-weight: 700; margin: 18px 0 6px; }
-    textarea, input[type="url"] { width: 100%; box-sizing: border-box; background: #1a0229; color: #fff; border: 1px solid #8a2be2; border-radius: 10px; padding: 12px; font: inherit; }
+    textarea, input[type="url"], input[type="text"], input[type="password"] { width: 100%; box-sizing: border-box; background: #1a0229; color: #fff; border: 1px solid #8a2be2; border-radius: 10px; padding: 12px; font: inherit; }
     textarea { min-height: 140px; resize: vertical; }
     .counts { color: #9ad; font-size: 0.9rem; }
     fieldset { border: 1px solid #3a2350; border-radius: 12px; margin: 18px 0; padding: 8px 14px 14px; }
@@ -31,12 +31,25 @@
   <main>
     <p><a href="../">← SamSoundsVibes</a></p>
     <h1>Mission Control</h1>
-    <p class="lede">Write one post. One button opens it on the accounts from your workbook.</p>
+    <p class="lede">Write one post. Publish sends it to Bluesky when this page is opened from the local server. The other accounts open a ready-to-send composer.</p>
     <div class="note">
-      X and Bluesky get the full caption. Facebook and LinkedIn share the link.
-      Instagram, YouTube, Substack, and SoundCloud do not offer a prefilled composer, so the caption is copied and the site opens for you to paste.
-      Passwords stay out of this page.
+      Run <code>python3 publisher/server.py</code> and open http://127.0.0.1:8787/.
+      Bluesky connects with an app password from Bluesky settings, not your login password.
+      X, Facebook, Instagram, LinkedIn, and YouTube do not accept a password from this app. They need a developer app on their site before a token can be stored.
+      Substack and SoundCloud have no posting connection, so those still open in the browser.
     </div>
+
+    <fieldset>
+      <legend>Bluesky connection</legend>
+      <p id="bsky-status">Checking the local server…</p>
+      <label for="bsky-handle">Handle</label>
+      <input id="bsky-handle" type="text" value="supersam7.bsky.social" autocomplete="username">
+      <label for="bsky-password">App password</label>
+      <input id="bsky-password" type="password" autocomplete="off" placeholder="xxxx-xxxx-xxxx-xxxx">
+      <div class="actions">
+        <button id="connect-bsky" type="button">Connect Bluesky</button>
+      </div>
+    </fieldset>
 
     <label for="text">Post</label>
     <textarea id="text" placeholder="What do you want to say?">New recording is up. Have a listen.</textarea>
@@ -105,19 +118,84 @@
       copyMessage();
     });
 
+    document.querySelector("#connect-bsky").addEventListener("click", connectBluesky);
+    refreshBluesky();
+
     document.querySelector("#publish").addEventListener("click", function () {
-      const items = MissionControl.plan(text.value, link.value, selectedIds());
+      const ids = selectedIds();
+      const items = MissionControl.plan(text.value, link.value, ids);
       log.replaceChildren();
       if (!items.length) {
         addResult("Choose at least one account.");
         return;
       }
-      items.forEach(function (item) {
-        window.open(item.url, "_blank", "noopener");
-        addResult(resultLine(item));
+      postDirect(ids).then(function (direct) {
+        const posted = new Set(direct.filter(function (row) { return row.ok; }).map(function (row) { return row.id; }));
+        direct.forEach(function (row) {
+          addResult("Bluesky: " + (row.ok ? "posted. " + row.detail : row.detail));
+        });
+        items.forEach(function (item) {
+          if (posted.has(item.id)) return;
+          window.open(item.url, "_blank", "noopener");
+          addResult(resultLine(item));
+        });
+        copyMessage();
       });
-      copyMessage();
     });
+
+    function serverOrigin() {
+      if (location.port === "8787") return "";
+      return "http://127.0.0.1:8787";
+    }
+
+    function refreshBluesky() {
+      fetch(serverOrigin() + "/api/status").then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        const bluesky = data.bluesky || {};
+        document.querySelector("#bsky-status").textContent = bluesky.connected
+          ? "Connected as " + bluesky.handle + "."
+          : "Local server is running. Bluesky is not connected yet.";
+      }).catch(function () {
+        document.querySelector("#bsky-status").textContent = "Local server is off. Start it with python3 publisher/server.py and open http://127.0.0.1:8787/.";
+      });
+    }
+
+    function connectBluesky() {
+      fetch(serverOrigin() + "/api/bluesky/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          identifier: document.querySelector("#bsky-handle").value,
+          appPassword: document.querySelector("#bsky-password").value
+        })
+      }).then(function (response) {
+        return response.json().then(function (data) {
+          return { ok: response.ok, data: data };
+        });
+      }).then(function (result) {
+        document.querySelector("#bsky-password").value = "";
+        document.querySelector("#bsky-status").textContent = result.ok
+          ? "Connected as " + result.data.handle + "."
+          : result.data.error;
+      }).catch(function () {
+        document.querySelector("#bsky-status").textContent = "Could not reach the local server.";
+      });
+    }
+
+    function postDirect(ids) {
+      return fetch(serverOrigin() + "/api/publish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: text.value, link: link.value, accounts: ids })
+      }).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        return data.results || [];
+      }).catch(function () {
+        return [];
+      });
+    }
 
     function resultLine(item) {
       if (item.mode === "composer") return item.name + ": composer opened.";
