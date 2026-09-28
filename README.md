@@ -131,6 +131,7 @@ Interested in vibe coding? Are you an artist or musician looking to build your d
 **Reach out!** Let's create something that resonates.
 
 - 🎵 **Music & Vibes** - [@SamSoundsVibes](https://twitter.com/SamSoundsVibes)
+- **X** - [X](https://x.com/SamCast65215624)
 - 💻 **Tech & Data** - [LinkedIn](https://linkedin.com/in/samdcastillo)
 - 🎸 **Creative Projects** - [GitHub](https://github.com/sdcastillo)
 
@@ -140,8 +141,15 @@ Interested in vibe coding? Are you an artist or musician looking to build your d
 
 ---
 
+## Support
+
+People can send money to support Sam Castillo's work through the Predictive Model checkout already published on [predictiveinsightsai.com/about](https://www.predictiveinsightsai.com/about).
+
+[Predictive Model](https://checkout.stripe.com/c/pay/prctbl_1Spf8VALClB2KATRct5jYX21/prctblitm_ToGphThftXGMCr#fidkdWxOYHwnPyd1blppbHNgWjA0V0BMTm9ESUZpRzdORFFXNTdjQzFDRmtXa1Bwa2hKd2AwUVJJNkdvQ19uXERURHMxMVc9UnNVSlRRbDdKM1JmRnRCPXJUNUxPV1VUS09LbVxhcUg0aWA3NTVvdjdTQW9gQid4JSUl)
+
 ## Connect
 
+- [X](https://x.com/SamCast65215624)
 - Website: https://www.predictiveinsightsai.com
 - YouTube: https://youtube.com/@PredictiveAnalyst
 - GitHub: https://github.com/sdcastillo
