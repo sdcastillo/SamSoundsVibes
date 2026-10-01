@@ -131,9 +131,90 @@ Interested in vibe coding? Are you an artist or musician looking to build your d
 **Reach out!** Let's create something that resonates.
 
 - 🎵 **Music & Vibes** - [@SamSoundsVibes](https://twitter.com/SamSoundsVibes)
+- **X** - [X](https://x.com/SamCast65215624)
 - 💻 **Tech & Data** - [LinkedIn](https://linkedin.com/in/samdcastillo)
 - 🎸 **Creative Projects** - [GitHub](https://github.com/sdcastillo)
 
 ---
 
 *Built with Lovable. Inspired by vibration. Created with vibes. Recorded with passion.* 🌊🎸🎵✨
+
+---
+
+## Support
+
+People can send money on X to support the work. [X Money is turned on for this account, and people who use X can send money there](https://x.com/SamCast65215624).
+
+People can send money to support Sam Castillo's work through the Predictive Model checkout already published on [predictiveinsightsai.com/about](https://www.predictiveinsightsai.com/about).
+
+[Predictive Model](https://checkout.stripe.com/c/pay/prctbl_1Spf8VALClB2KATRct5jYX21/prctblitm_ToGphThftXGMCr#fidkdWxOYHwnPyd1blppbHNgWjA0V0BMTm9ESUZpRzdORFFXNTdjQzFDRmtXa1Bwa2hKd2AwUVJJNkdvQ19uXERURHMxMVc9UnNVSlRRbDdKM1JmRnRCPXJUNUxPV1VUS09LbVxhcUg0aWA3NTVvdjdTQW9gQid4JSUl)
+
+## Connect
+
+- [X](https://x.com/SamCast65215624)
+- Website: https://www.predictiveinsightsai.com
+- YouTube: https://youtube.com/@PredictiveAnalyst
+- GitHub: https://github.com/sdcastillo
+- LinkedIn: https://www.linkedin.com/in/samdcastillo
+- RPubs: https://rpubs.com/samdcastillo
+- About page: https://sdcastillo.github.io/about
+- This project on GitHub Pages: https://sdcastillo.github.io/SamSoundsVibes/
+- Music site: https://sam-sounds-vibes.pages.dev/
+
+## Other projects
+
+Original repositories under https://github.com/sdcastillo. Each line follows that repo's own description or README. Forks of other people's projects are not listed here.
+
+### Public sites
+
+- [website](https://github.com/sdcastillo/website) — PredictiveAnalyst site
+- [TempLandingPage](https://github.com/sdcastillo/TempLandingPage) — materials for a website before launch
+- [project-images](https://github.com/sdcastillo/project-images) — images for the website
+- [integrity-care-solutions](https://github.com/sdcastillo/integrity-care-solutions) — site for Integrity Care Solutions, Inc., a Northampton, Massachusetts nonprofit for trade-skills training and reentry support
+
+### Actuarial study and predictive analytics
+
+- [Actuarial-R-Tutorials](https://github.com/sdcastillo/Actuarial-R-Tutorials) — R tutorials for actuaries
+- [calcconnect](https://github.com/sdcastillo/calcconnect) — website for math, using AI to prove math theorems
+- [Central_Limit_Theorem](https://github.com/sdcastillo/Central_Limit_Theorem) — a Shiny app of the central limit theorem
+- [Consumer-Health-Cost-Ideas](https://github.com/sdcastillo/Consumer-Health-Cost-Ideas) — ideas about helping people get treatment for less money
+- [Data-Visualization](https://github.com/sdcastillo/Data-Visualization) — slides for a 2019 SOA Predictive Analytics and Futurism Symposium presentation
+- [Identifying-Actionable-Treatment-Variation-in-Episodes-of-Low-Back-Pain](https://github.com/sdcastillo/Identifying-Actionable-Treatment-Variation-in-Episodes-of-Low-Back-Pain) — source code from a BCBSMA project on low-back-pain episodes
+- [Jupyter-Contest](https://github.com/sdcastillo/Jupyter-Contest) — Jupyter notebook contest submission for the SOA Predictive Analytics and Futurism Section
+- [Loss-Development-Triangles](https://github.com/sdcastillo/Loss-Development-Triangles) — code and data for merging data into actuarial loss development triangles with R
+- [MAS-I](https://github.com/sdcastillo/MAS-I) — study notes and code for Modern Actuarial Statistics I
+- [PA-R-Study-Manual](https://github.com/sdcastillo/PA-R-Study-Manual) — online study guide for the SOA predictive analytics exam
+- [Predictive-Modeling-App](https://github.com/sdcastillo/Predictive-Modeling-App) — R Shiny app for exploring and modeling `ExamPAData` datasets
+- [Prior-Weights-with-XGboost](https://github.com/sdcastillo/Prior-Weights-with-XGboost) — a method of adding prior weights to XGBoost
+- [QuantumData](https://github.com/sdcastillo/QuantumData) — datasets for actuaries practicing predictive analytics
+- [SOA-PA-Exam](https://github.com/sdcastillo/SOA-PA-Exam) — study notes for the June 2019 SOA Predictive Analytics exam
+
+### Machine learning and data projects
+
+- [Bitcoin-Anomaly-Detection](https://github.com/sdcastillo/Bitcoin-Anomaly-Detection) — Bitcoin price anomaly detection using R and Shiny
+- [Building-a-Vector-Space-Model-for-Movies-by-IMDB-Plot-Keywords](https://github.com/sdcastillo/Building-a-Vector-Space-Model-for-Movies-by-IMDB-Plot-Keywords) — movie and actor comparison by cosine similarity and Euclidean distance
+- [Clustering](https://github.com/sdcastillo/Clustering) — explanation, simulations, and comparisons of clustering methods
+- [IMDB-Movie-Network-Analysis](https://github.com/sdcastillo/IMDB-Movie-Network-Analysis) — a network of recommended movies from IMDb
+- [ISLR](https://github.com/sdcastillo/ISLR) — companion to *An Introduction to Statistical Learning*
+- [Kaggle-Advanced-Regression](https://github.com/sdcastillo/Kaggle-Advanced-Regression) — a Kaggle competition submission
+- [Kaggle-Zillow-Competition](https://github.com/sdcastillo/Kaggle-Zillow-Competition) — competition to predict home prices
+- [ml-playground](https://github.com/sdcastillo/ml-playground) — machine learning tutorials and a Shiny app
+- [Texas_car_crashes](https://github.com/sdcastillo/Texas_car_crashes) — Texas crash-data cleaning and principal components analysis, with notes on road safety in Austin
+- [Time-Series-Stock-Anomaly-Detection](https://github.com/sdcastillo/Time-Series-Stock-Anomaly-Detection) — a Shiny app for detecting abnormal stock-price fluctuations
+- [Umass2017-S525-IE-Project](https://github.com/sdcastillo/Umass2017-S525-IE-Project) — University of Massachusetts Amherst 2017, Stats 525
+
+### Math
+
+- [AI-from-Linear-Algebra](https://github.com/sdcastillo/AI-from-Linear-Algebra) — SciLab linear algebra example of R code
+- [mathematics_p_vs_np](https://github.com/sdcastillo/mathematics_p_vs_np) — P vs NP presentation (PDF, PowerPoint, and Beamer source)
+- [Riemann](https://github.com/sdcastillo/Riemann) — presentation on P vs NP and the Riemann zeta hypothesis
+- [Research-Texts](https://github.com/sdcastillo/Research-Texts) — a collection of textbooks, research papers, and tutorials
+
+### Local AI and other code
+
+- [Architecture](https://github.com/sdcastillo/Architecture) — notes on prompting Perplexity for architecture and construction runoffs
+- [autonomous-access-control](https://github.com/sdcastillo/autonomous-access-control) — security data and AI alarm access-control systems
+- [dolphin_grok_hybrid](https://github.com/sdcastillo/dolphin_grok_hybrid) — Dolphin-Mistral FastAPI app with Grok integration
+- [ethical-self-hosted-llm](https://github.com/sdcastillo/ethical-self-hosted-llm) — field notes on a Hetzner, Tailscale, Nginx, and Ollama build for a local LLM
+- [grok-dolphin-hybrid](https://github.com/sdcastillo/grok-dolphin-hybrid) — Grok plus Dolphin-Mistral hybrid with IMDb-style prompt levels
+- [LocalTextToSpeech](https://github.com/sdcastillo/LocalTextToSpeech) — local text-to-speech script using Kokoro
