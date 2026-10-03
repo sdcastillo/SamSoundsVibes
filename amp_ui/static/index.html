@@ -11,7 +11,7 @@
     <p><a href="https://sdcastillo.github.io/SamSoundsVibes/">← SamSoundsVibes</a></p>
     <header>
       <h1>Guitar Amp</h1>
-      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start — no device picking required.</p>
+      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start. Playback goes to the Logitech headset — no device picking required.</p>
     </header>
 
     <section class="status-bar" aria-live="polite">
@@ -70,17 +70,17 @@
       <input id="input-device" type="text" placeholder="defaults to filter above">
 
       <label for="output-device">Output device (optional)</label>
-      <input id="output-device" type="text" placeholder="defaults to filter above">
+      <input id="output-device" type="text" placeholder="ALSA name; skips the headset sink">
 
       <label for="pw-sink">PipeWire sink (optional)</label>
-      <input id="pw-sink" type="text" placeholder="e.g. Logi — mixes with other apps">
+      <input id="pw-sink" type="text" placeholder="Leave empty for the Logitech headset">
 
       <label for="music-source">Music source (optional)</label>
       <input id="music-source" type="text" placeholder="PipeWire monitor for channel 2">
     </details>
 
     <p class="note">
-      Auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Sliders update live while the amp runs.
+      Input auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Playback defaults to the Logitech Logi USB Headset. Sliders update live while the amp runs.
       OBS can capture <code>processed_guitar.monitor</code> when PipeWire is available.
     </p>
   </main>

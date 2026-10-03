@@ -34,7 +34,7 @@ Open **http://127.0.0.1:8790/** in a browser **on the same machine** while the t
 
 Optional bind/port: `python3 -m amp_ui --host 127.0.0.1 --port 8790` or env `AMP_UI_HOST` / `AMP_UI_PORT`.
 
-- **Start amp** — auto-detects a Focusrite Scarlett on ALSA (prefers **Scarlett Solo**, e.g. USB `1235:8211`), opens input/output, and starts the OBS `processed_guitar` tap when PipeWire is available. No device fields needed for a normal Solo setup.
+- **Start amp** — auto-detects a Focusrite Scarlett on ALSA for **input** (prefers **Scarlett Solo**, e.g. USB `1235:8211`) and plays back through the Logitech headset PipeWire sink `alsa_output.usb-Logitech_Logi_USB_Headset_000000000000-00.analog-stereo`. No device fields needed. Also starts the OBS `processed_guitar` tap when PipeWire is available.
 - **Sliders** — drive, delay (ms), feedback, wet mix, and volume update live over WebSocket (REST fallback).
 - **Advanced** (collapsed) — device list, manual filters, PipeWire sink, and background music source.
 
@@ -44,15 +44,16 @@ Optional fields match the CLI:
 |----------|----------|
 | Device name filter | `--device` |
 | Input / output | `--input-device`, `--output-device` |
-| PipeWire sink | `--pw-sink` |
+| PipeWire sink | `--pw-sink` (default: Logitech headset sink above; set this to override) |
 | Background music | `--music-source` |
 
 ## CLI
 
 ```bash
 python3 direct_alsa_guitar_amp_fast.py --list-devices
-python3 direct_alsa_guitar_amp_fast.py --drive 18 --delay-ms 380   # auto Scarlett Solo
-python3 direct_alsa_guitar_amp_fast.py --device Scarlett --drive 18   # manual filter still works
+python3 direct_alsa_guitar_amp_fast.py --drive 18 --delay-ms 380   # Scarlett Solo in, Logitech headset out
+python3 direct_alsa_guitar_amp_fast.py --pw-sink SomeOtherSink      # override the headset sink
+python3 direct_alsa_guitar_amp_fast.py --output-device Scarlett     # direct ALSA out; skips the headset sink
 ```
 
 ## Architecture
@@ -81,5 +82,5 @@ Starting the amp in cloud will fail at device open unless a virtual audio device
   - Use the **PR branch** or merge [PR #2](https://github.com/sdcastillo/SamSoundsVibes/pull/2): `git fetch origin cursor/browser-amp-ui-97ad && git checkout cursor/browser-amp-ui-97ad`.
   - Confirm the port: look for `Guitar Amp UI → http://127.0.0.1:8790/` in the terminal. Test with `curl -s http://127.0.0.1:8790/api/status`.
 - **No Scarlett found** — confirm USB (`lsusb` should show `1235:8211`), install `libportaudio2`, run `--list-devices`, or open **Advanced** and set a device filter.
-- **Silent output** — check monitor routing, `--pw-sink` vs direct output, and Scarlett direct monitor.
+- **Silent output** — confirm the Logitech headset sink is present (`pactl list short sinks`), or override with `--pw-sink` / `--output-device`. Scarlett direct monitor should stay off.
 - **Gate too aggressive** — set `AMP_UI_GATE_OFF=1` or `AMP_GATE_OFF=1` in the environment before starting the server (same as CLI).
