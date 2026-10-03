@@ -2,13 +2,22 @@
 """Local browser UI for the guitar amp. Bind to localhost only."""
 
 import json
+import os
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
+REPO_ROOT = ROOT.parent
 STATIC = ROOT / "static"
-HOST = "127.0.0.1"
-PORT = 8790
+
+
+def _env_host():
+    return os.environ.get("AMP_UI_HOST", "127.0.0.1").strip() or "127.0.0.1"
+
+
+def _env_port():
+    return int(os.environ.get("AMP_UI_PORT", "8790"))
+
 
 try:
     from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -19,8 +28,17 @@ except ImportError as error:
     print("Install amp UI deps: pip install -r requirements-amp-ui.txt", file=sys.stderr)
     raise SystemExit(1) from error
 
-sys.path.insert(0, str(ROOT.parent))
-from guitar_amp_engine import AmpSession, list_devices_json, validate_params
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+try:
+    from guitar_amp_engine import AmpSession, list_devices_json, validate_params
+except ImportError as error:
+    print(
+        "Missing guitar_amp_engine.py — run from the SamSoundsVibes repo root "
+        f"(expected {REPO_ROOT / 'guitar_amp_engine.py'}).",
+        file=sys.stderr,
+    )
+    raise SystemExit(1) from error
 
 app = FastAPI(title="SamSounds Guitar Amp")
 session = AmpSession()
@@ -132,8 +150,17 @@ app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
 def main():
-    print(f"Guitar Amp UI at http://{HOST}:{PORT}/")
-    uvicorn.run(app, host=HOST, port=PORT, log_level="info")
+    import argparse
+
+    parser = argparse.ArgumentParser(description="SamSounds guitar amp browser UI")
+    parser.add_argument("--host", default=_env_host(), help="Bind address (default 127.0.0.1 or AMP_UI_HOST)")
+    parser.add_argument("--port", type=int, default=_env_port(), help="Port (default 8790 or AMP_UI_PORT)")
+    args = parser.parse_args()
+    url_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
+    print(f"Guitar Amp UI → http://{url_host}:{args.port}/")
+    print(f"Repo root: {REPO_ROOT}")
+    print("Leave this terminal open. Use Ctrl+C to stop.")
+    uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
 
 if __name__ == "__main__":
