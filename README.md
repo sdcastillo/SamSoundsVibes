@@ -12,7 +12,7 @@ This project represents my journey of discovering how technology can amplify cre
 
 ## 🎸 Who Am I? A Guitarist & Builder
 
-I'm a musician with serious chops on the guitar. I'm fucking great at guitar, and I don't say that lightly—every note, every riff, every nuance in this project comes from years of dedication to the craft. The guitar recordings you hear throughout SamSoundsVibes are 100% me, played with passion and precision.
+I'm a musician with serious chops on the guitar. I'm great at guitar, and I don't say that lightly—every note, every riff, every nuance in this project comes from years of dedication to the craft. The guitar recordings you hear throughout SamSoundsVibes are 100% me, played with passion and precision.
 
 My background spans data science, artificial intelligence, and creative coding, which has uniquely positioned me to think about music not just as sound, but as a multidimensional experience. I'm not just another developer who dabbles in music—I'm a serious musician who happens to code brilliantly.
 
