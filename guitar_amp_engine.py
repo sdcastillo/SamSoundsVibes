@@ -92,50 +92,76 @@ def auto_select_scarlett(direction, min_channels=1, prefer_substrings=None):
     return pool[0][2]
 
 
-def _use_auto_device(config):
-    device = config.get("device")
-    if config.get("input_device") or config.get("output_device"):
-        return False
-    if device is None:
+# Playback default. Scarlett Solo stays the input; this PipeWire sink is the output
+# unless the caller sets pw_sink or an ALSA output_device.
+DEFAULT_PW_SINK = "alsa_output.usb-Logitech_Logi_USB_Headset_000000000000-00.analog-stereo"
+
+
+def _blank(value):
+    if value is None:
         return True
-    text = str(device).strip()
-    return not text or text.lower() == "auto"
+    return not str(value).strip()
+
+
+def effective_pw_sink(config):
+    """PipeWire playback sink, or None when the user chose direct ALSA output.
+
+    Default is the Logitech Logi USB Headset. A non-empty pw_sink overrides it.
+    A non-empty output_device with no pw_sink uses ALSA and skips the headset.
+    """
+    raw = config.get("pw_sink")
+    if not _blank(raw):
+        return str(raw).strip()
+    if not _blank(config.get("output_device")):
+        return None
+    return DEFAULT_PW_SINK
+
+
+def _use_input_auto(config):
+    """True when input should auto-detect a Scarlett Solo (output is independent)."""
+    if not _blank(config.get("input_device")):
+        return False
+    device = config.get("device")
+    if _blank(device):
+        return True
+    return str(device).strip().lower() == "auto"
 
 
 def resolve_audio_devices(config):
-    """Return (input_index, output_index, meta) from explicit filters or Scarlett auto-detect."""
-    pw_sink = config.get("pw_sink") or None
-    meta = {"auto_detected": False, "device": config.get("device"), "input_device": None, "output_device": None}
+    """Return (input_index, output_index, meta).
 
-    if _use_auto_device(config):
+    Input is an explicit ALSA filter or Scarlett Solo auto-detect.
+    Output index is None when playback goes to a PipeWire sink (the default).
+    """
+    pw_sink = effective_pw_sink(config)
+    meta = {
+        "auto_detected": False,
+        "device": config.get("device"),
+        "input_device": None,
+        "output_device": None,
+        "pw_sink": pw_sink,
+    }
+
+    if _use_input_auto(config):
         meta["auto_detected"] = True
         meta["device"] = "auto"
         input_device = auto_select_scarlett("input", 1)
-        input_info = sd.query_devices(input_device)
-        meta["input_device"] = input_info["name"]
-        if pw_sink:
-            meta["output_device"] = None
-            return input_device, None, meta
-        prefer = []
-        lower = input_info["name"].lower()
-        if "solo" in lower:
-            prefer.append("solo")
-        if "scarlett" in lower:
-            prefer.append("scarlett")
-        output_device = auto_select_scarlett("output", 1, prefer_substrings=prefer)
-        output_info = sd.query_devices(output_device)
-        meta["output_device"] = output_info["name"]
-        return input_device, output_device, meta
+        meta["input_device"] = sd.query_devices(input_device)["name"]
+    else:
+        device_query = config.get("device")
+        device_query = str(device_query).strip() if not _blank(device_query) else "Scarlett"
+        meta["device"] = device_query
+        input_query = config.get("input_device")
+        input_query = str(input_query).strip() if not _blank(input_query) else device_query
+        meta["input_device"] = input_query
+        input_device = choose_device(input_query, 1, "input")
 
-    device_query = config.get("device") or "Scarlett"
-    meta["device"] = device_query
-    input_query = config.get("input_device") or device_query
-    output_query = config.get("output_device") or device_query
-    meta["input_device"] = input_query
-    meta["output_device"] = output_query if not pw_sink else output_query
-    input_device = choose_device(input_query, 1, "input")
-    output_device = None if pw_sink else choose_device(output_query, 1, "output")
-    return input_device, output_device, meta
+    if pw_sink:
+        return input_device, None, meta
+
+    output_query = str(config.get("output_device")).strip()
+    meta["output_device"] = output_query
+    return input_device, choose_device(output_query, 1, "output"), meta
 
 
 class FastAmp:
@@ -688,8 +714,8 @@ class AmpSession:
         validate_params(config["feedback"], config["mix"], config["volume"])
         rate = int(config.get("rate", 48000))
         blocksize = int(config.get("blocksize", 512))
-        pw_sink = config.get("pw_sink") or None
         input_device, output_device, dev_meta = resolve_audio_devices(config)
+        pw_sink = dev_meta["pw_sink"]
         input_info = sd.query_devices(input_device)
         if "scarlett" in input_info["name"].lower():
             input_channels = 2
