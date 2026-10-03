@@ -72,7 +72,7 @@
     } else if (status && status.error) {
       runDetail.textContent = status.error;
     } else {
-      runDetail.textContent = running ? "" : "Scarlett Solo auto-detect when you start";
+      runDetail.textContent = running ? "" : "Scarlett Solo in → Logitech headset when you start";
     }
     applyParamsToUi(status && status.params);
     applyMeters(status && status.meters);
