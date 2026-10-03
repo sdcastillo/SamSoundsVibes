@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guitar Amp | SamSoundsVibes</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <main>
+    <p><a href="https://sdcastillo.github.io/SamSoundsVibes/">← SamSoundsVibes</a></p>
+    <header>
+      <h1>Guitar Amp</h1>
+      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start — no device picking required.</p>
+    </header>
+
+    <section class="status-bar" aria-live="polite">
+      <span id="run-state" class="pill stopped">Stopped</span>
+      <span id="run-detail" class="detail"></span>
+      <span id="ws-state" class="detail">Connecting…</span>
+    </section>
+
+    <section class="panel knobs">
+      <h2>Amp</h2>
+      <div class="control" data-param="drive">
+        <div class="control-head"><span>Drive</span><output id="out-drive">18</output></div>
+        <input type="range" id="drive" min="0" max="40" step="0.5" value="18">
+      </div>
+      <div class="control" data-param="delay_ms">
+        <div class="control-head"><span>Delay (ms)</span><output id="out-delay_ms">380</output></div>
+        <input type="range" id="delay_ms" min="50" max="800" step="5" value="380">
+      </div>
+      <div class="control" data-param="feedback">
+        <div class="control-head"><span>Feedback</span><output id="out-feedback">0.35</output></div>
+        <input type="range" id="feedback" min="0" max="0.9" step="0.01" value="0.35">
+      </div>
+      <div class="control" data-param="mix">
+        <div class="control-head"><span>Wet mix</span><output id="out-mix">0.30</output></div>
+        <input type="range" id="mix" min="0" max="1" step="0.01" value="0.30">
+      </div>
+      <div class="control" data-param="volume">
+        <div class="control-head"><span>Volume</span><output id="out-volume">0.35</output></div>
+        <input type="range" id="volume" min="0" max="4" step="0.05" value="0.35">
+      </div>
+
+      <div class="meters">
+        <div class="meter"><span>Mic in</span><meter id="meter-mic" min="0" max="1" value="0"></meter></div>
+        <div class="meter"><span>Inst in</span><meter id="meter-inst" min="0" max="1" value="0"></meter></div>
+        <div class="meter"><span>Gate</span><meter id="meter-gate" min="0" max="1" value="0"></meter></div>
+        <div class="meter"><span>Out</span><meter id="meter-out" min="0" max="1" value="0"></meter></div>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="start">Start amp</button>
+        <button type="button" id="stop" class="secondary" disabled>Stop</button>
+      </div>
+      <p id="error" class="error" hidden></p>
+    </section>
+
+    <details class="panel advanced">
+      <summary>Advanced (other interfaces / PipeWire)</summary>
+      <label for="device-list">Sound devices (refresh to scan)</label>
+      <select id="device-list" size="6"></select>
+      <button type="button" id="refresh-devices" class="secondary">Refresh devices</button>
+
+      <label for="device">Device name filter</label>
+      <input id="device" type="text" placeholder="Leave empty for Scarlett auto-detect" autocomplete="off">
+
+      <label for="input-device">Input device (optional)</label>
+      <input id="input-device" type="text" placeholder="defaults to filter above">
+
+      <label for="output-device">Output device (optional)</label>
+      <input id="output-device" type="text" placeholder="defaults to filter above">
+
+      <label for="pw-sink">PipeWire sink (optional)</label>
+      <input id="pw-sink" type="text" placeholder="e.g. Logi — mixes with other apps">
+
+      <label for="music-source">Music source (optional)</label>
+      <input id="music-source" type="text" placeholder="PipeWire monitor for channel 2">
+    </details>
+
+    <p class="note">
+      Auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Sliders update live while the amp runs.
+      OBS can capture <code>processed_guitar.monitor</code> when PipeWire is available.
+    </p>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
