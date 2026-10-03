@@ -61,12 +61,19 @@ def api_status():
 async def api_start(payload: dict):
     if session.running:
         return JSONResponse(status_code=409, content={"error": "Amp is already running."})
+    def _optional_str(key):
+        value = payload.get(key)
+        if value is None:
+            return None
+        text = str(value).strip()
+        return text or None
+
     config = {
-        "device": str(payload.get("device") or "Scarlett"),
-        "input_device": payload.get("input_device"),
-        "output_device": payload.get("output_device"),
-        "pw_sink": payload.get("pw_sink") or None,
-        "music_source": payload.get("music_source") or None,
+        "device": _optional_str("device"),
+        "input_device": _optional_str("input_device"),
+        "output_device": _optional_str("output_device"),
+        "pw_sink": _optional_str("pw_sink"),
+        "music_source": _optional_str("music_source"),
         "rate": int(payload.get("rate") or 48000),
         "blocksize": int(payload.get("blocksize") or 512),
         "drive": float(payload.get("drive") if payload.get("drive") is not None else 18.0),

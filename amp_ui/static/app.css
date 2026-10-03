@@ -42,16 +42,6 @@ h2 {
 
 .lede { color: var(--muted); margin-top: 0; }
 
-.grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 820px) {
-  .grid { grid-template-columns: 1fr 1fr; }
-}
-
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
@@ -168,4 +158,24 @@ meter {
   color: var(--danger);
   font-weight: 600;
   margin-top: 12px;
+}
+
+.advanced {
+  margin-top: 18px;
+}
+
+.advanced summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--accent2);
+  margin-bottom: 8px;
+  list-style: none;
+}
+
+.advanced summary::-webkit-details-marker {
+  display: none;
+}
+
+.advanced[open] summary {
+  margin-bottom: 12px;
 }

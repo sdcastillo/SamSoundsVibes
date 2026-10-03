@@ -7,6 +7,7 @@
   const startBtn = document.querySelector("#start");
   const stopBtn = document.querySelector("#stop");
   const deviceList = document.querySelector("#device-list");
+  const advanced = document.querySelector(".advanced");
 
   let ws = null;
   let paramTimer = null;
@@ -64,13 +65,14 @@
     startBtn.disabled = running;
     stopBtn.disabled = !running;
     if (status && status.config && status.config.input_name) {
+      const auto = status.config.auto_detected ? " (auto)" : "";
       runDetail.textContent = running
-        ? status.config.input_name + " → " + status.config.output_label
+        ? status.config.input_name + " → " + status.config.output_label + auto
         : status.error || "";
     } else if (status && status.error) {
       runDetail.textContent = status.error;
     } else {
-      runDetail.textContent = "";
+      runDetail.textContent = running ? "" : "Scarlett Solo auto-detect when you start";
     }
     applyParamsToUi(status && status.params);
     applyMeters(status && status.meters);
@@ -99,27 +101,45 @@
     });
   }
 
-  deviceList.addEventListener("dblclick", function () {
-    const name = deviceList.value;
-    if (!name) return;
-    const filter = name.split(" ")[0];
-    document.querySelector("#device").value = filter;
-  });
+  function readAdvancedStartBody(body) {
+    if (!advanced || !advanced.open) {
+      return body;
+    }
+    const device = document.querySelector("#device").value.trim();
+    const inputDevice = document.querySelector("#input-device").value.trim();
+    const outputDevice = document.querySelector("#output-device").value.trim();
+    const pwSink = document.querySelector("#pw-sink").value.trim();
+    const musicSource = document.querySelector("#music-source").value.trim();
+    if (device) body.device = device;
+    if (inputDevice) body.input_device = inputDevice;
+    if (outputDevice) body.output_device = outputDevice;
+    if (pwSink) body.pw_sink = pwSink;
+    if (musicSource) body.music_source = musicSource;
+    return body;
+  }
 
-  document.querySelector("#refresh-devices").addEventListener("click", function () {
-    refreshDevices().catch(function (err) {
-      showError(err.message);
+  if (deviceList) {
+    deviceList.addEventListener("dblclick", function () {
+      const name = deviceList.value;
+      if (!name) return;
+      advanced.open = true;
+      const filter = name.split(" ")[0];
+      document.querySelector("#device").value = filter;
     });
-  });
+  }
+
+  const refreshBtn = document.querySelector("#refresh-devices");
+  if (refreshBtn) {
+    refreshBtn.addEventListener("click", function () {
+      refreshDevices().catch(function (err) {
+        showError(err.message);
+      });
+    });
+  }
 
   startBtn.addEventListener("click", function () {
     showError("");
-    const body = readParams();
-    body.device = document.querySelector("#device").value.trim();
-    body.input_device = document.querySelector("#input-device").value.trim() || null;
-    body.output_device = document.querySelector("#output-device").value.trim() || null;
-    body.pw_sink = document.querySelector("#pw-sink").value.trim() || null;
-    body.music_source = document.querySelector("#music-source").value.trim() || null;
+    const body = readAdvancedStartBody(readParams());
     api("/api/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -193,7 +213,6 @@
   }
 
   readParams();
-  refreshDevices().catch(function () {});
   api("/api/status")
     .then(applyStatus)
     .catch(function () {});

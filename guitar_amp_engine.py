@@ -41,17 +41,101 @@ def list_devices_json():
     return rows
 
 
+def _is_alsa_device(device, api_names):
+    return api_names[device["hostapi"]]["name"].lower() == "alsa"
+
+
+def _channel_count(device, direction):
+    return device["max_input_channels"] if direction == "input" else device["max_output_channels"]
+
+
 def choose_device(query, channels, direction):
     api_names = sd.query_hostapis()
     candidates = []
     for index, device in enumerate(sd.query_devices()):
-        count = device["max_input_channels"] if direction == "input" else device["max_output_channels"]
-        api = api_names[device["hostapi"]]["name"].lower()
-        if query.lower() in device["name"].lower() and count >= channels and api == "alsa":
+        count = _channel_count(device, direction)
+        if query.lower() in device["name"].lower() and count >= channels and _is_alsa_device(device, api_names):
             candidates.append(index)
     if not candidates:
         raise RuntimeError(f"No ALSA {direction} device matching '{query}'. Use --list-devices.")
     return candidates[0]
+
+
+def auto_select_scarlett(direction, min_channels=1, prefer_substrings=None):
+    """Pick a Focusrite Scarlett ALSA device (Solo preferred, then any Scarlett with 2+ channels)."""
+    api_names = sd.query_hostapis()
+    prefer = [s.lower() for s in (prefer_substrings or []) if s]
+    solo = []
+    stereo = []
+    for index, device in enumerate(sd.query_devices()):
+        if not _is_alsa_device(device, api_names):
+            continue
+        name = device["name"]
+        lower = name.lower()
+        if "scarlett" not in lower:
+            continue
+        count = _channel_count(device, direction)
+        if count < min_channels:
+            continue
+        prefer_boost = sum(1 for token in prefer if token in lower)
+        if "solo" in lower:
+            solo.append((prefer_boost, count, index))
+        elif count >= 2:
+            stereo.append((prefer_boost, count, index))
+    pool = solo if solo else stereo
+    if not pool:
+        raise RuntimeError(
+            "No Focusrite Scarlett ALSA device found. Plug in your interface (e.g. Scarlett Solo 3rd Gen) "
+            "or use --list-devices / Advanced device fields."
+        )
+    pool.sort(key=lambda row: (-row[0], -row[1], row[2]))
+    return pool[0][2]
+
+
+def _use_auto_device(config):
+    device = config.get("device")
+    if config.get("input_device") or config.get("output_device"):
+        return False
+    if device is None:
+        return True
+    text = str(device).strip()
+    return not text or text.lower() == "auto"
+
+
+def resolve_audio_devices(config):
+    """Return (input_index, output_index, meta) from explicit filters or Scarlett auto-detect."""
+    pw_sink = config.get("pw_sink") or None
+    meta = {"auto_detected": False, "device": config.get("device"), "input_device": None, "output_device": None}
+
+    if _use_auto_device(config):
+        meta["auto_detected"] = True
+        meta["device"] = "auto"
+        input_device = auto_select_scarlett("input", 1)
+        input_info = sd.query_devices(input_device)
+        meta["input_device"] = input_info["name"]
+        if pw_sink:
+            meta["output_device"] = None
+            return input_device, None, meta
+        prefer = []
+        lower = input_info["name"].lower()
+        if "solo" in lower:
+            prefer.append("solo")
+        if "scarlett" in lower:
+            prefer.append("scarlett")
+        output_device = auto_select_scarlett("output", 1, prefer_substrings=prefer)
+        output_info = sd.query_devices(output_device)
+        meta["output_device"] = output_info["name"]
+        return input_device, output_device, meta
+
+    device_query = config.get("device") or "Scarlett"
+    meta["device"] = device_query
+    input_query = config.get("input_device") or device_query
+    output_query = config.get("output_device") or device_query
+    meta["input_device"] = input_query
+    meta["output_device"] = output_query if not pw_sink else output_query
+    input_device = choose_device(input_query, 1, "input")
+    output_device = None if pw_sink else choose_device(output_query, 1, "output")
+    return input_device, output_device, meta
 
 
 class FastAmp:
@@ -604,8 +688,8 @@ class AmpSession:
         validate_params(config["feedback"], config["mix"], config["volume"])
         rate = int(config.get("rate", 48000))
         blocksize = int(config.get("blocksize", 512))
-        input_query = config.get("input_device") or config["device"]
-        input_device = choose_device(input_query, 1, "input")
+        pw_sink = config.get("pw_sink") or None
+        input_device, output_device, dev_meta = resolve_audio_devices(config)
         input_info = sd.query_devices(input_device)
         if "scarlett" in input_info["name"].lower():
             input_channels = 2
@@ -613,14 +697,11 @@ class AmpSession:
             input_channels = 2
         else:
             input_channels = 1
-        pw_sink = config.get("pw_sink") or None
         if pw_sink:
             output_label = f"PipeWire sink matching '{pw_sink}'"
             output_channels = 2
             output_device = None
         else:
-            output_query = config.get("output_device") or config["device"]
-            output_device = choose_device(output_query, 1, "output")
             output_info = sd.query_devices(output_device)
             output_channels = 2 if output_info["max_output_channels"] >= 2 else 1
             output_label = f"{output_info['name']} ({output_channels} ch)"
@@ -633,9 +714,10 @@ class AmpSession:
             config["volume"],
         )
         stored = {
-            "device": config["device"],
-            "input_device": input_query,
-            "output_device": config.get("output_device") or config["device"],
+            "device": dev_meta["device"],
+            "auto_detected": dev_meta["auto_detected"],
+            "input_device": dev_meta["input_device"],
+            "output_device": dev_meta["output_device"],
             "pw_sink": pw_sink,
             "music_source": config.get("music_source"),
             "rate": rate,

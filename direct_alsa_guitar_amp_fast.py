@@ -9,8 +9,8 @@ import sounddevice as sd
 from guitar_amp_engine import (
     FastAmp,
     MusicBus,
-    choose_device,
     list_devices,
+    resolve_audio_devices,
     validate_params,
 )
 
@@ -18,7 +18,11 @@ from guitar_amp_engine import (
 def main():
     parser = argparse.ArgumentParser(description='Fast direct-ALSA guitar amp: distortion + multi-tap delay')
     parser.add_argument('--list-devices', action='store_true')
-    parser.add_argument('--device', default='Scarlett', help='ALSA name used for input and output unless overridden')
+    parser.add_argument(
+        '--device',
+        default=None,
+        help='ALSA name substring for in/out (default: auto-detect Focusrite Scarlett Solo)',
+    )
     parser.add_argument('--input-device', default=None, help='ALSA input name; defaults to --device')
     parser.add_argument('--output-device', default=None, help='ALSA output name; defaults to --device')
     parser.add_argument('--pw-sink', default=None, help='PipeWire sink name or substring; mixes with other apps')
@@ -41,8 +45,13 @@ def main():
         parser.error(str(error))
 
     try:
-        input_query = args.input_device or args.device
-        input_device = choose_device(input_query, 1, 'input')
+        dev_config = {
+            'device': args.device,
+            'input_device': args.input_device,
+            'output_device': args.output_device,
+            'pw_sink': args.pw_sink,
+        }
+        input_device, output_device, _dev_meta = resolve_audio_devices(dev_config)
         input_info = sd.query_devices(input_device)
         if 'scarlett' in input_info['name'].lower():
             input_channels = 2
@@ -53,9 +62,8 @@ def main():
         if args.pw_sink:
             output_label = f"PipeWire sink matching '{args.pw_sink}'"
             output_channels = 2
+            output_device = None
         else:
-            output_query = args.output_device or args.device
-            output_device = choose_device(output_query, 1, 'output')
             output_info = sd.query_devices(output_device)
             output_channels = 2 if output_info['max_output_channels'] >= 2 else 1
             output_label = f"{output_info['name']} ({output_channels} ch)"

@@ -34,9 +34,9 @@ Open **http://127.0.0.1:8790/** in a browser **on the same machine** while the t
 
 Optional bind/port: `python3 -m amp_ui --host 127.0.0.1 --port 8790` or env `AMP_UI_HOST` / `AMP_UI_PORT`.
 
-- **Start amp** — opens ALSA input/output (or PipeWire sink if set) and starts the OBS `processed_guitar` tap when PipeWire is available.
+- **Start amp** — auto-detects a Focusrite Scarlett on ALSA (prefers **Scarlett Solo**, e.g. USB `1235:8211`), opens input/output, and starts the OBS `processed_guitar` tap when PipeWire is available. No device fields needed for a normal Solo setup.
 - **Sliders** — drive, delay (ms), feedback, wet mix, and volume update live over WebSocket (REST fallback).
-- **Devices** — refresh lists PortAudio devices; double-click a row to copy a name fragment into the device filter.
+- **Advanced** (collapsed) — device list, manual filters, PipeWire sink, and background music source.
 
 Optional fields match the CLI:
 
@@ -47,11 +47,12 @@ Optional fields match the CLI:
 | PipeWire sink | `--pw-sink` |
 | Background music | `--music-source` |
 
-## CLI (unchanged)
+## CLI
 
 ```bash
 python3 direct_alsa_guitar_amp_fast.py --list-devices
-python3 direct_alsa_guitar_amp_fast.py --device Scarlett --drive 18 --delay-ms 380
+python3 direct_alsa_guitar_amp_fast.py --drive 18 --delay-ms 380   # auto Scarlett Solo
+python3 direct_alsa_guitar_amp_fast.py --device Scarlett --drive 18   # manual filter still works
 ```
 
 ## Architecture
@@ -79,6 +80,6 @@ Starting the amp in cloud will fail at device open unless a virtual audio device
   - Install **PortAudio**: `sudo apt install libportaudio2`. Without it, Python raises `OSError: PortAudio library not found` and the server never starts.
   - Use the **PR branch** or merge [PR #2](https://github.com/sdcastillo/SamSoundsVibes/pull/2): `git fetch origin cursor/browser-amp-ui-97ad && git checkout cursor/browser-amp-ui-97ad`.
   - Confirm the port: look for `Guitar Amp UI → http://127.0.0.1:8790/` in the terminal. Test with `curl -s http://127.0.0.1:8790/api/status`.
-- **No device matching filter** — run `--list-devices` or refresh devices in the UI; use a substring of the ALSA name.
+- **No Scarlett found** — confirm USB (`lsusb` should show `1235:8211`), install `libportaudio2`, run `--list-devices`, or open **Advanced** and set a device filter.
 - **Silent output** — check monitor routing, `--pw-sink` vs direct output, and Scarlett direct monitor.
 - **Gate too aggressive** — set `AMP_UI_GATE_OFF=1` or `AMP_GATE_OFF=1` in the environment before starting the server (same as CLI).
