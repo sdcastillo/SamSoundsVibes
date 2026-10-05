@@ -7,10 +7,13 @@ import time
 import sounddevice as sd
 
 from guitar_amp_engine import (
+    DEFAULT_PW_SINK,
     FastAmp,
     MusicBus,
+    _is_auto_pw_sink,
     list_devices,
     resolve_audio_devices,
+    resolve_pipewire_sink,
     validate_params,
 )
 
@@ -21,14 +24,22 @@ def main():
     parser.add_argument(
         '--device',
         default=None,
-        help='ALSA name substring for in/out (default: auto-detect Focusrite Scarlett Solo)',
+        help='ALSA input name substring (default: auto-detect Focusrite Scarlett Solo)',
     )
     parser.add_argument('--input-device', default=None, help='ALSA input name; defaults to --device')
-    parser.add_argument('--output-device', default=None, help='ALSA output name; defaults to --device')
-    parser.add_argument('--pw-sink', default=None, help='PipeWire sink name or substring; mixes with other apps')
+    parser.add_argument(
+        '--output-device',
+        default=None,
+        help='Direct ALSA output name; skips the default auto PipeWire sink',
+    )
+    parser.add_argument(
+        '--pw-sink',
+        default=None,
+        help=f'PipeWire playback sink (default: {DEFAULT_PW_SINK} = Scarlett out / system default / first real sink)',
+    )
     parser.add_argument('--music-source', default=None, help='PipeWire source for headset channel 2 (background music)')
     parser.add_argument('--rate', type=int, default=48000)
-    parser.add_argument('--blocksize', type=int, default=512)
+    parser.add_argument('--blocksize', type=int, default=256)
     parser.add_argument('--drive', type=float, default=18.0)
     parser.add_argument('--delay-ms', type=float, default=380.0)
     parser.add_argument('--feedback', type=float, default=0.35)
@@ -51,7 +62,8 @@ def main():
             'output_device': args.output_device,
             'pw_sink': args.pw_sink,
         }
-        input_device, output_device, _dev_meta = resolve_audio_devices(dev_config)
+        input_device, output_device, dev_meta = resolve_audio_devices(dev_config)
+        pw_sink = dev_meta['pw_sink']
         input_info = sd.query_devices(input_device)
         if 'scarlett' in input_info['name'].lower():
             input_channels = 2
@@ -59,8 +71,14 @@ def main():
             input_channels = 2
         else:
             input_channels = 1
-        if args.pw_sink:
-            output_label = f"PipeWire sink matching '{args.pw_sink}'"
+        if pw_sink:
+            resolved = resolve_pipewire_sink(pw_sink)
+            if resolved:
+                output_label = f"PipeWire: {resolved}"
+            elif _is_auto_pw_sink(pw_sink):
+                output_label = "PipeWire: auto (system default / Scarlett out)"
+            else:
+                output_label = f"PipeWire sink matching '{pw_sink}' (fallback if missing)"
             output_channels = 2
             output_device = None
         else:
@@ -83,10 +101,10 @@ def main():
             threading.Thread(target=music.run, daemon=True).start()
             print('Channel 1 (left ear): guitar')
             print('Channel 2 (right ear): background music')
-        if args.pw_sink:
+        if pw_sink:
             output_thread = threading.Thread(
                 target=amp.pump_pipewire,
-                args=(args.rate, args.blocksize, output_channels, args.pw_sink),
+                args=(args.rate, args.blocksize, output_channels, pw_sink, music),
                 daemon=True,
             )
         else:

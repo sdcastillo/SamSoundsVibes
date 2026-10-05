@@ -11,7 +11,7 @@
     <p><a href="https://sdcastillo.github.io/SamSoundsVibes/">← SamSoundsVibes</a></p>
     <header>
       <h1>Guitar Amp</h1>
-      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start — no device picking required.</p>
+      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start. Playback goes to the system default sink (or Scarlett out if present) — no device picking required.</p>
     </header>
 
     <section class="status-bar" aria-live="polite">
@@ -42,6 +42,18 @@
         <div class="control-head"><span>Volume</span><output id="out-volume">0.35</output></div>
         <input type="range" id="volume" min="0" max="4" step="0.05" value="0.35">
       </div>
+      <div class="control" data-param="wah_freq">
+        <div class="control-head"><span>Wah freq (Hz)</span><output id="out-wah_freq">900</output></div>
+        <input type="range" id="wah_freq" min="250" max="2200" step="5" value="900">
+      </div>
+      <div class="control" data-param="wah_q">
+        <div class="control-head"><span>Wah Q</span><output id="out-wah_q">5.00</output></div>
+        <input type="range" id="wah_q" min="0.5" max="12" step="0.1" value="5">
+      </div>
+      <div class="control" data-param="wah_mix">
+        <div class="control-head"><span>Wah mix</span><output id="out-wah_mix">0.00</output></div>
+        <input type="range" id="wah_mix" min="0" max="1" step="0.01" value="0">
+      </div>
 
       <div class="meters">
         <div class="meter"><span>Mic in</span><meter id="meter-mic" min="0" max="1" value="0"></meter></div>
@@ -57,6 +69,41 @@
       <p id="error" class="error" hidden></p>
     </section>
 
+    <section class="panel xy-pad-panel" aria-label="X-Y MIDI touchpad">
+      <div class="xy-pad-header">
+        <h2>X–Y touchpad</h2>
+        <p class="xy-pad-lede">Drag with finger or mouse (like an Intech ZONA / Kaoss pad). Maps two axes to live amp params over Tailscale.</p>
+      </div>
+
+      <div class="xy-pad-toolbar">
+        <label class="xy-map-label" for="xy-map">Mapping</label>
+        <select id="xy-map" aria-label="Axis mapping">
+          <option value="drive_mix" selected>X: Drive · Y: Wet mix</option>
+          <option value="delay_feedback">X: Delay · Y: Feedback</option>
+          <option value="drive_delay">X: Drive · Y: Delay</option>
+          <option value="wah_eq">X: Wah freq · Y: Wah mix</option>
+        </select>
+        <button type="button" id="xy-hold" class="secondary xy-hold" aria-pressed="false" title="Freeze current X/Y">Hold</button>
+      </div>
+
+      <div class="xy-pad-wrap">
+        <div id="xy-pad" class="xy-pad" role="application" tabindex="0"
+             aria-label="Two-axis touchpad. Horizontal and vertical position set amp parameters.">
+          <div class="xy-grid" aria-hidden="true"></div>
+          <div class="xy-axis-label xy-axis-x" id="xy-label-x">Drive →</div>
+          <div class="xy-axis-label xy-axis-y" id="xy-label-y">↑ Wet</div>
+          <div id="xy-cursor" class="xy-cursor" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="xy-readout" aria-live="polite">
+        <span><strong>X</strong> <output id="xy-out-x">0.50</output> <span class="xy-cc" id="xy-cc-x">CC12 · 64</span></span>
+        <span><strong>Y</strong> <output id="xy-out-y">0.50</output> <span class="xy-cc" id="xy-cc-y">CC13 · 64</span></span>
+        <span class="xy-map-doc" id="xy-map-doc">X→drive · Y→wet mix</span>
+      </div>
+      <p class="xy-hint">MIDI-style CC12/CC13 shown for reference (Kaoss/ZONA convention). Values drive the amp over WebSocket — no separate MIDI stack required. Hold freezes the last position.</p>
+    </section>
+
     <details class="panel advanced">
       <summary>Advanced (other interfaces / PipeWire)</summary>
       <label for="device-list">Sound devices (refresh to scan)</label>
@@ -70,17 +117,17 @@
       <input id="input-device" type="text" placeholder="defaults to filter above">
 
       <label for="output-device">Output device (optional)</label>
-      <input id="output-device" type="text" placeholder="defaults to filter above">
+      <input id="output-device" type="text" placeholder="ALSA name; skips the auto PipeWire sink">
 
       <label for="pw-sink">PipeWire sink (optional)</label>
-      <input id="pw-sink" type="text" placeholder="e.g. Logi — mixes with other apps">
+      <input id="pw-sink" type="text" placeholder="Leave empty for auto (system default / Scarlett out)">
 
       <label for="music-source">Music source (optional)</label>
       <input id="music-source" type="text" placeholder="PipeWire monitor for channel 2">
     </details>
 
     <p class="note">
-      Auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Sliders update live while the amp runs.
+      Input auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Playback defaults to the system default PipeWire sink (Scarlett/Focusrite out if present; never requires a Logitech headset). Sliders update live while the amp runs.
       OBS can capture <code>processed_guitar.monitor</code> when PipeWire is available.
     </p>
   </main>

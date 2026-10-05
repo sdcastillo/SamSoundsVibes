@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local browser UI for the guitar amp. Bind to localhost only."""
+"""Local browser UI for the guitar amp. Default bind 0.0.0.0 (override with AMP_UI_HOST)."""
 
 import json
 import os
@@ -12,7 +12,7 @@ STATIC = ROOT / "static"
 
 
 def _env_host():
-    return os.environ.get("AMP_UI_HOST", "127.0.0.1").strip() or "127.0.0.1"
+    return os.environ.get("AMP_UI_HOST", "0.0.0.0").strip() or "0.0.0.0"
 
 
 def _env_port():
@@ -75,15 +75,25 @@ async def api_start(payload: dict):
         "pw_sink": _optional_str("pw_sink"),
         "music_source": _optional_str("music_source"),
         "rate": int(payload.get("rate") or 48000),
-        "blocksize": int(payload.get("blocksize") or 512),
+        "blocksize": int(payload.get("blocksize") or 256),
         "drive": float(payload.get("drive") if payload.get("drive") is not None else 18.0),
         "delay_ms": float(payload.get("delay_ms") if payload.get("delay_ms") is not None else 380.0),
         "feedback": float(payload.get("feedback") if payload.get("feedback") is not None else 0.35),
         "mix": float(payload.get("mix") if payload.get("mix") is not None else 0.30),
         "volume": float(payload.get("volume") if payload.get("volume") is not None else 0.35),
+        "wah_freq": float(payload.get("wah_freq") if payload.get("wah_freq") is not None else 900.0),
+        "wah_q": float(payload.get("wah_q") if payload.get("wah_q") is not None else 5.0),
+        "wah_mix": float(payload.get("wah_mix") if payload.get("wah_mix") is not None else 0.0),
     }
     try:
-        validate_params(config["feedback"], config["mix"], config["volume"])
+        validate_params(
+            config["feedback"],
+            config["mix"],
+            config["volume"],
+            wah_mix=config["wah_mix"],
+            wah_q=config["wah_q"],
+            wah_freq=config["wah_freq"],
+        )
         session.start(config)
     except (ValueError, RuntimeError) as error:
         return JSONResponse(status_code=400, content={"error": str(error)})
@@ -107,6 +117,9 @@ async def api_params(payload: dict):
             feedback=payload.get("feedback"),
             mix=payload.get("mix"),
             volume=payload.get("volume"),
+            wah_freq=payload.get("wah_freq"),
+            wah_q=payload.get("wah_q"),
+            wah_mix=payload.get("wah_mix"),
         )
     except (ValueError, RuntimeError) as error:
         return JSONResponse(status_code=400, content={"error": str(error)})
@@ -137,6 +150,9 @@ async def ws_control(websocket: WebSocket):
                             feedback=message.get("feedback"),
                             mix=message.get("mix"),
                             volume=message.get("volume"),
+                            wah_freq=message.get("wah_freq"),
+                            wah_q=message.get("wah_q"),
+                            wah_mix=message.get("wah_mix"),
                         )
                     except (ValueError, RuntimeError) as error:
                         await websocket.send_json({"type": "error", "error": str(error)})
@@ -160,7 +176,7 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="SamSounds guitar amp browser UI")
-    parser.add_argument("--host", default=_env_host(), help="Bind address (default 127.0.0.1 or AMP_UI_HOST)")
+    parser.add_argument("--host", default=_env_host(), help="Bind address (default 0.0.0.0 or AMP_UI_HOST)")
     parser.add_argument("--port", type=int, default=_env_port(), help="Port (default 8790 or AMP_UI_PORT)")
     args = parser.parse_args()
     url_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host

@@ -92,60 +92,121 @@ def auto_select_scarlett(direction, min_channels=1, prefer_substrings=None):
     return pool[0][2]
 
 
-def _use_auto_device(config):
-    device = config.get("device")
-    if config.get("input_device") or config.get("output_device"):
-        return False
-    if device is None:
+# Playback default. Scarlett Solo stays the preferred input; PipeWire output is
+# auto-picked unless the caller sets pw_sink or an ALSA output_device.
+# "@auto" → Scarlett/Focusrite out if present, else system default sink, else
+# first non-dummy sink (never prefers a missing Logitech headset).
+AUTO_PW_SINK = "@auto"
+DEFAULT_PW_SINK = AUTO_PW_SINK
+
+# Substrings that mark non-playback / virtual sinks we should not prefer.
+_UNUSABLE_SINK_MARKERS = (
+    "dummy",
+    "null",
+    "auto_null",
+    "processed_guitar",
+    ".monitor",
+)
+
+
+def _blank(value):
+    if value is None:
         return True
-    text = str(device).strip()
-    return not text or text.lower() == "auto"
+    return not str(value).strip()
+
+
+def _is_auto_pw_sink(query):
+    if _blank(query):
+        return True
+    lowered = str(query).strip().lower()
+    return lowered in (AUTO_PW_SINK, "@default", "auto", "default")
+
+
+def _looks_like_logitech_sink(query):
+    lowered = str(query or "").lower()
+    return "logitech" in lowered or "logi_usb" in lowered or "logi usb" in lowered
+
+
+def effective_pw_sink(config):
+    """PipeWire playback sink query, or None when the user chose direct ALSA output.
+
+    Default is AUTO_PW_SINK (Scarlett out / system default / first real sink).
+    A non-empty pw_sink overrides it. A non-empty output_device with no pw_sink
+    uses ALSA and skips PipeWire playback.
+    """
+    raw = config.get("pw_sink")
+    if not _blank(raw):
+        return str(raw).strip()
+    if not _blank(config.get("output_device")):
+        return None
+    return DEFAULT_PW_SINK
+
+
+def _use_input_auto(config):
+    """True when input should auto-detect a Scarlett Solo (output is independent)."""
+    if not _blank(config.get("input_device")):
+        return False
+    device = config.get("device")
+    if _blank(device):
+        return True
+    return str(device).strip().lower() == "auto"
 
 
 def resolve_audio_devices(config):
-    """Return (input_index, output_index, meta) from explicit filters or Scarlett auto-detect."""
-    pw_sink = config.get("pw_sink") or None
-    meta = {"auto_detected": False, "device": config.get("device"), "input_device": None, "output_device": None}
+    """Return (input_index, output_index, meta).
 
-    if _use_auto_device(config):
+    Input is an explicit ALSA filter or Scarlett Solo auto-detect.
+    Output index is None when playback goes to a PipeWire sink (the default).
+    """
+    pw_sink = effective_pw_sink(config)
+    meta = {
+        "auto_detected": False,
+        "device": config.get("device"),
+        "input_device": None,
+        "output_device": None,
+        "pw_sink": pw_sink,
+    }
+
+    if _use_input_auto(config):
         meta["auto_detected"] = True
         meta["device"] = "auto"
         input_device = auto_select_scarlett("input", 1)
-        input_info = sd.query_devices(input_device)
-        meta["input_device"] = input_info["name"]
-        if pw_sink:
-            meta["output_device"] = None
-            return input_device, None, meta
-        prefer = []
-        lower = input_info["name"].lower()
-        if "solo" in lower:
-            prefer.append("solo")
-        if "scarlett" in lower:
-            prefer.append("scarlett")
-        output_device = auto_select_scarlett("output", 1, prefer_substrings=prefer)
-        output_info = sd.query_devices(output_device)
-        meta["output_device"] = output_info["name"]
-        return input_device, output_device, meta
+        meta["input_device"] = sd.query_devices(input_device)["name"]
+    else:
+        device_query = config.get("device")
+        device_query = str(device_query).strip() if not _blank(device_query) else "Scarlett"
+        meta["device"] = device_query
+        input_query = config.get("input_device")
+        input_query = str(input_query).strip() if not _blank(input_query) else device_query
+        meta["input_device"] = input_query
+        input_device = choose_device(input_query, 1, "input")
 
-    device_query = config.get("device") or "Scarlett"
-    meta["device"] = device_query
-    input_query = config.get("input_device") or device_query
-    output_query = config.get("output_device") or device_query
-    meta["input_device"] = input_query
-    meta["output_device"] = output_query if not pw_sink else output_query
-    input_device = choose_device(input_query, 1, "input")
-    output_device = None if pw_sink else choose_device(output_query, 1, "output")
-    return input_device, output_device, meta
+    if pw_sink:
+        return input_device, None, meta
+
+    output_query = str(config.get("output_device")).strip()
+    meta["output_device"] = output_query
+    return input_device, choose_device(output_query, 1, "output"), meta
 
 
 class FastAmp:
-    def __init__(self, rate, delay_ms, feedback, mix, drive, volume):
+    def __init__(self, rate, delay_ms, feedback, mix, drive, volume, wah_freq=900.0, wah_q=5.0, wah_mix=0.0):
         self.rate = rate
         self.drive = drive
         self.feedback = feedback
         self.mix = mix
         self.volume = volume
+        self.wah_freq = float(wah_freq)
+        self.wah_q = float(wah_q)
+        self.wah_mix = float(wah_mix)
+        self._wah_x1 = np.float32(0.0)
+        self._wah_x2 = np.float32(0.0)
+        self._wah_y1 = np.float32(0.0)
+        self._wah_y2 = np.float32(0.0)
+        self._wah_coeffs = None
+        self._wah_coeff_key = None
         self._set_delay_ms(delay_ms)
+        self._update_wah_coeffs(force=True)
         self.ring_size = self.delay_frames * 5 + 4096
         self.ring = np.zeros(self.ring_size, dtype=np.float32)
         self.write = 0
@@ -177,6 +238,17 @@ class FastAmp:
             new_ms = float(kwargs["delay_ms"])
             if abs(new_ms - self.delay_ms) > 0.01:
                 self._set_delay_ms(new_ms)
+        wah_changed = False
+        if "wah_freq" in kwargs and kwargs["wah_freq"] is not None:
+            self.wah_freq = float(kwargs["wah_freq"])
+            wah_changed = True
+        if "wah_q" in kwargs and kwargs["wah_q"] is not None:
+            self.wah_q = float(kwargs["wah_q"])
+            wah_changed = True
+        if "wah_mix" in kwargs and kwargs["wah_mix"] is not None:
+            self.wah_mix = float(kwargs["wah_mix"])
+        if wah_changed:
+            self._update_wah_coeffs(force=True)
 
     def params_snapshot(self):
         return {
@@ -185,7 +257,63 @@ class FastAmp:
             "feedback": self.feedback,
             "mix": self.mix,
             "volume": self.volume,
+            "wah_freq": self.wah_freq,
+            "wah_q": self.wah_q,
+            "wah_mix": self.wah_mix,
         }
+
+    def _update_wah_coeffs(self, force=False):
+        """RBJ constant-peak-gain bandpass for wah / sweeping EQ."""
+        freq = float(np.clip(self.wah_freq, 120.0, min(12000.0, self.rate * 0.45)))
+        q = float(np.clip(self.wah_q, 0.4, 16.0))
+        key = (round(freq, 2), round(q, 3))
+        if not force and key == self._wah_coeff_key and self._wah_coeffs is not None:
+            return
+        w0 = 2.0 * np.pi * freq / float(self.rate)
+        cos_w0 = np.cos(w0)
+        sin_w0 = np.sin(w0)
+        alpha = sin_w0 / (2.0 * q)
+        b0 = alpha
+        b1 = 0.0
+        b2 = -alpha
+        a0 = 1.0 + alpha
+        a1 = -2.0 * cos_w0
+        a2 = 1.0 - alpha
+        inv_a0 = 1.0 / a0
+        self._wah_coeffs = (
+            np.float32(b0 * inv_a0),
+            np.float32(b1 * inv_a0),
+            np.float32(b2 * inv_a0),
+            np.float32(a1 * inv_a0),
+            np.float32(a2 * inv_a0),
+        )
+        self._wah_coeff_key = key
+
+    def _apply_wah(self, source):
+        mix = float(np.clip(self.wah_mix, 0.0, 1.0))
+        if mix <= 1e-4:
+            return source
+        self._update_wah_coeffs()
+        b0, b1, b2, a1, a2 = self._wah_coeffs
+        x1 = self._wah_x1
+        x2 = self._wah_x2
+        y1 = self._wah_y1
+        y2 = self._wah_y2
+        out = np.empty_like(source)
+        # Per-sample biquad so XY sweeps stay stable mid-block.
+        for i, x0 in enumerate(source):
+            y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+            out[i] = y0
+            x2, x1 = x1, x0
+            y2, y1 = y1, y0
+        self._wah_x1 = np.float32(x1)
+        self._wah_x2 = np.float32(x2)
+        self._wah_y1 = np.float32(y1)
+        self._wah_y2 = np.float32(y2)
+        # Mild makeup so high-Q sweeps stay audible into the drive stage.
+        wet = out * np.float32(1.35)
+        dry = source
+        return (np.float32(1.0 - mix) * dry + np.float32(mix) * wet).astype(np.float32, copy=False)
 
     def source(self, indata):
         if indata.shape[1] < 2:
@@ -210,13 +338,22 @@ class FastAmp:
         return source
 
     def render(self, indata, frames):
-        source = self.source(indata)
+        source = self.source(indata).astype(np.float32, copy=False)
+        # Cheap rumble scrub: subtract a 64-sample boxcar (~1.3 ms @ 48 kHz). Vectorized, no per-sample Python.
+        if source.shape[0] >= 8:
+            kernel = np.float32(1.0 / 64.0)
+            pad = np.pad(source, (63, 0), mode="edge")
+            low = np.convolve(pad, np.full(64, kernel, dtype=np.float32), mode="valid")
+            source = source - low
         peak = np.float32(np.max(np.abs(source)))
         coeff = np.float32(0.9 if peak > self.gate else 0.06)
         self.gate += (peak - self.gate) * coeff
         self.meters["gate"] = float(self.gate)
         if os.environ.get("AMP_GATE_OFF") != "1":
-            source = source * np.clip((self.gate - np.float32(0.02)) / np.float32(0.03), 0.0, 1.0)
+            # Slightly gentler open so quiet notes are less chopped (Warmath / clean DI).
+            source = source * np.clip((self.gate - np.float32(0.015)) / np.float32(0.04), 0.0, 1.0)
+        # Wah / resonant EQ before drive (Cry Baby-style into the amp).
+        source = self._apply_wah(source)
         driven = source * self.drive
         clipped = np.tanh(driven + 0.25 * driven * np.abs(driven))
         distorted = np.tanh(clipped * np.float32(3.5)).astype(np.float32)
@@ -383,9 +520,11 @@ class FastAmp:
                 print("OBS capture stopped; retrying.", flush=True)
                 time.sleep(0.4)
 
-    def pump_pipewire(self, rate, blocksize, channels, sink_query):
+    def pump_pipewire(self, rate, blocksize, channels, sink_query, music=None):
         silence = np.zeros((blocksize, channels), dtype=np.float32)
         frame_bytes = blocksize * channels * 4
+        # Match block time (~5.3 ms @ 256/48k); keep a little headroom for USB.
+        pw_latency = "12ms" if blocksize <= 256 else "20ms"
         while self.running:
             sink = wait_for_sink(sink_query, self)
             if sink is None:
@@ -403,7 +542,7 @@ class FastAmp:
                 "--format",
                 "f32",
                 "--latency",
-                "20ms",
+                pw_latency,
                 "--volume",
                 "1",
                 "--target",
@@ -424,9 +563,19 @@ class FastAmp:
                     try:
                         result = self.pending.get(timeout=0.1)
                     except queue.Empty:
+                        ears = None
                         block = silence
                     else:
                         ears = self.as_ears(result, blocksize)
+                        if music is not None:
+                            bed = music.take(blocksize)
+                            ears = np.column_stack(
+                                (
+                                    ears[:, 0] + np.float32(0.35) * bed,
+                                    ears[:, 1] + np.float32(0.35) * bed,
+                                )
+                            ).astype(np.float32)
+                        self.publish_obs(ears)
                         if channels > 1:
                             block = ears[:, :2]
                         else:
@@ -458,6 +607,93 @@ class FastAmp:
                 time.sleep(0.4)
 
 
+def list_pipewire_sink_names():
+    result = subprocess.run(["pactl", "list", "short", "sinks"], capture_output=True, text=True, check=False)
+    names = []
+    for line in result.stdout.splitlines():
+        parts = line.split()
+        if len(parts) >= 2:
+            names.append(parts[1])
+    return names
+
+
+def _is_usable_playback_sink(name):
+    lowered = name.lower()
+    return not any(marker in lowered for marker in _UNUSABLE_SINK_MARKERS)
+
+
+def _rank_sink_name(name):
+    lowered = name.lower()
+    if "pro-output" in lowered:
+        return 0
+    if "analog" in lowered:
+        return 1
+    if "iec958" in lowered:
+        return 2
+    return 3
+
+
+def _match_sink_among(names, query):
+    if _blank(query):
+        return None
+    for name in names:
+        if name == query:
+            return name
+    query_l = str(query).lower()
+    matches = [name for name in names if query_l in name.lower()]
+    if not matches:
+        return None
+    matches.sort(key=_rank_sink_name)
+    return matches[0]
+
+
+def _system_default_sink():
+    result = subprocess.run(["pactl", "get-default-sink"], capture_output=True, text=True, check=False)
+    name = (result.stdout or "").strip()
+    return name or None
+
+
+def pick_playback_sink(query=None):
+    """Choose a live PipeWire playback sink.
+
+    Explicit query (including leftover Logitech strings): match if present.
+    If missing — especially a dead Logitech headset — fall back instead of
+    failing. Auto / default order: Scarlett/Focusrite out → system default →
+    first non-dummy sink.
+    """
+    names = list_pipewire_sink_names()
+    usable = [name for name in names if _is_usable_playback_sink(name)]
+
+    if not _is_auto_pw_sink(query):
+        hit = _match_sink_among(names, query)
+        if hit and _is_usable_playback_sink(hit):
+            return hit
+        if hit:
+            # Matched a null/dummy sink name; ignore and auto-pick.
+            pass
+        elif _looks_like_logitech_sink(query):
+            # Soften: dead Logitech preference must not block routing.
+            pass
+        else:
+            # Explicit non-Logitech query with no match: still try auto so a
+            # stale Advanced field does not hang pump_pipewire forever.
+            pass
+
+    for token in ("scarlett solo", "scarlett", "focusrite"):
+        preferred = [name for name in usable if token in name.lower()]
+        if preferred:
+            preferred.sort(key=_rank_sink_name)
+            return preferred[0]
+
+    default = _system_default_sink()
+    if default and default in names and _is_usable_playback_sink(default):
+        return default
+    if usable:
+        usable_sorted = sorted(usable, key=_rank_sink_name)
+        return usable_sorted[0]
+    return None
+
+
 def wait_for_sink(query, amp):
     announced = False
     while amp.running:
@@ -465,39 +701,22 @@ def wait_for_sink(query, amp):
         if sink:
             return sink
         if not announced:
-            print(f"Waiting for PipeWire sink matching '{query}'.", flush=True)
+            if _is_auto_pw_sink(query):
+                print("Waiting for a usable PipeWire playback sink.", flush=True)
+            else:
+                print(
+                    f"Waiting for PipeWire sink matching '{query}' "
+                    "(will use system default / Scarlett if that device is gone).",
+                    flush=True,
+                )
             announced = True
         time.sleep(0.4)
     return None
 
 
 def resolve_pipewire_sink(query):
-    result = subprocess.run(["pactl", "list", "short", "sinks"], capture_output=True, text=True, check=False)
-    names = []
-    for line in result.stdout.splitlines():
-        parts = line.split()
-        if len(parts) >= 2:
-            names.append(parts[1])
-    for name in names:
-        if name == query:
-            return name
-    query_l = query.lower()
-    matches = [name for name in names if query_l in name.lower()]
-    if not matches:
-        return None
-
-    def rank(name):
-        lowered = name.lower()
-        if "pro-output" in lowered:
-            return 0
-        if "analog" in lowered:
-            return 1
-        if "iec958" in lowered:
-            return 2
-        return 3
-
-    matches.sort(key=rank)
-    return matches[0]
+    """Resolve a sink query, with auto-pick and soft fallback for missing devices."""
+    return pick_playback_sink(query)
 
 
 class MusicBus:
@@ -635,9 +854,15 @@ def _drain_stderr(proc):
             print(line, file=sys.stderr, flush=True)
 
 
-def validate_params(feedback, mix, volume):
+def validate_params(feedback, mix, volume, wah_mix=None, wah_q=None, wah_freq=None):
     if not 0.0 <= feedback <= 0.9 or not 0.0 <= mix <= 1.0 or not 0.0 <= volume <= 4.0:
         raise ValueError("feedback must be 0-0.9; mix must be 0-1; volume must be 0-4")
+    if wah_mix is not None and not 0.0 <= float(wah_mix) <= 1.0:
+        raise ValueError("wah_mix must be 0-1")
+    if wah_q is not None and not 0.4 <= float(wah_q) <= 16.0:
+        raise ValueError("wah_q must be 0.4-16")
+    if wah_freq is not None and not 120.0 <= float(wah_freq) <= 12000.0:
+        raise ValueError("wah_freq must be 120-12000 Hz")
 
 
 class AmpSession:
@@ -673,11 +898,14 @@ class AmpSession:
         with self._lock:
             if not self.amp:
                 raise RuntimeError("Amp is not running.")
-            validate_params(
-                kwargs.get("feedback", self.amp.feedback),
-                kwargs.get("mix", self.amp.mix),
-                kwargs.get("volume", self.amp.volume),
-            )
+            # Treat explicit None as "leave unchanged" (WS/REST often pass all keys).
+            feedback = kwargs["feedback"] if kwargs.get("feedback") is not None else self.amp.feedback
+            mix = kwargs["mix"] if kwargs.get("mix") is not None else self.amp.mix
+            volume = kwargs["volume"] if kwargs.get("volume") is not None else self.amp.volume
+            wah_mix = kwargs["wah_mix"] if kwargs.get("wah_mix") is not None else self.amp.wah_mix
+            wah_q = kwargs["wah_q"] if kwargs.get("wah_q") is not None else self.amp.wah_q
+            wah_freq = kwargs["wah_freq"] if kwargs.get("wah_freq") is not None else self.amp.wah_freq
+            validate_params(feedback, mix, volume, wah_mix=wah_mix, wah_q=wah_q, wah_freq=wah_freq)
             self.amp.apply_params(**kwargs)
 
     def start(self, config):
@@ -687,9 +915,9 @@ class AmpSession:
             self._error = None
         validate_params(config["feedback"], config["mix"], config["volume"])
         rate = int(config.get("rate", 48000))
-        blocksize = int(config.get("blocksize", 512))
-        pw_sink = config.get("pw_sink") or None
+        blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 256)
         input_device, output_device, dev_meta = resolve_audio_devices(config)
+        pw_sink = dev_meta["pw_sink"]
         input_info = sd.query_devices(input_device)
         if "scarlett" in input_info["name"].lower():
             input_channels = 2
@@ -698,7 +926,13 @@ class AmpSession:
         else:
             input_channels = 1
         if pw_sink:
-            output_label = f"PipeWire sink matching '{pw_sink}'"
+            resolved = resolve_pipewire_sink(pw_sink)
+            if resolved:
+                output_label = f"PipeWire: {resolved}"
+            elif _is_auto_pw_sink(pw_sink):
+                output_label = "PipeWire: auto (system default / Scarlett out)"
+            else:
+                output_label = f"PipeWire sink matching '{pw_sink}' (fallback if missing)"
             output_channels = 2
             output_device = None
         else:
@@ -712,6 +946,9 @@ class AmpSession:
             config["mix"],
             config["drive"],
             config["volume"],
+            wah_freq=float(config.get("wah_freq", 900.0)),
+            wah_q=float(config.get("wah_q", 5.0)),
+            wah_mix=float(config.get("wah_mix", 0.0)),
         )
         stored = {
             "device": dev_meta["device"],
@@ -757,7 +994,7 @@ class AmpSession:
             threads.append(
                 threading.Thread(
                     target=amp.pump_pipewire,
-                    args=(rate, blocksize, output_channels, pw_sink),
+                    args=(rate, blocksize, output_channels, pw_sink, music),
                     daemon=True,
                 )
             )

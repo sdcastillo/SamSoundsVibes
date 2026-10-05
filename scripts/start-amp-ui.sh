@@ -15,7 +15,8 @@ if ! python3 -c "import fastapi, uvicorn, sounddevice, numpy" 2>/dev/null; then
   python3 -m pip install -r requirements-amp-ui.txt
 fi
 
-HOST="${AMP_UI_HOST:-127.0.0.1}"
+HOST="${AMP_UI_HOST:-0.0.0.0}"
 PORT="${AMP_UI_PORT:-8790}"
-echo "Starting server on http://${HOST}:${PORT}/ (open in browser on this machine)"
+# Optional: AMP_BLOCKSIZE=512 for more stability; AMP_GATE_OFF=1 to disable the gate.
+echo "Starting server on http://${HOST}:${PORT}/ (Tailscale peers: use this machine's Tailscale IP)"
 exec python3 -m amp_ui --host "$HOST" --port "$PORT"

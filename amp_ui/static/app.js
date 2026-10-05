@@ -1,5 +1,5 @@
 (function () {
-  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume"];
+  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix"];
   const runState = document.querySelector("#run-state");
   const runDetail = document.querySelector("#run-detail");
   const wsState = document.querySelector("#ws-state");
@@ -22,6 +22,12 @@
     errorEl.textContent = message;
   }
 
+  function formatParam(name, value) {
+    const n = Number(value);
+    if (name === "delay_ms" || name === "wah_freq") return String(Math.round(n));
+    return n.toFixed(2);
+  }
+
   function readParams() {
     const out = {};
     PARAMS.forEach(function (name) {
@@ -29,7 +35,7 @@
       out[name] = parseFloat(el.value);
       const label = document.querySelector("#out-" + name);
       if (label) {
-        label.textContent = name === "delay_ms" ? String(out[name]) : out[name].toFixed(2);
+        label.textContent = formatParam(name, out[name]);
       }
     });
     return out;
@@ -43,7 +49,7 @@
       el.value = params[name];
       const label = document.querySelector("#out-" + name);
       if (label) {
-        label.textContent = name === "delay_ms" ? String(params[name]) : Number(params[name]).toFixed(2);
+        label.textContent = formatParam(name, params[name]);
       }
     });
   }
@@ -72,10 +78,11 @@
     } else if (status && status.error) {
       runDetail.textContent = status.error;
     } else {
-      runDetail.textContent = running ? "" : "Scarlett Solo auto-detect when you start";
+      runDetail.textContent = running ? "" : "Scarlett Solo in → system default sink when you start";
     }
     applyParamsToUi(status && status.params);
     applyMeters(status && status.meters);
+    if (typeof syncXyFromParams === "function") syncXyFromParams();
   }
 
   async function api(path, options) {
@@ -168,6 +175,235 @@
     });
   });
 
+
+  /* —— X–Y touchpad —— */
+  const XY_MAPS = {
+    drive_mix: {
+      doc: "X→drive · Y→wet mix",
+      xLabel: "Drive →",
+      yLabel: "↑ Wet",
+      x: { param: "drive", min: 0, max: 40 },
+      y: { param: "mix", min: 0, max: 1 },
+    },
+    delay_feedback: {
+      doc: "X→delay · Y→feedback",
+      xLabel: "Delay →",
+      yLabel: "↑ Fbk",
+      x: { param: "delay_ms", min: 50, max: 800 },
+      y: { param: "feedback", min: 0, max: 0.9 },
+    },
+    drive_delay: {
+      doc: "X→drive · Y→delay",
+      xLabel: "Drive →",
+      yLabel: "↑ Delay",
+      x: { param: "drive", min: 0, max: 40 },
+      y: { param: "delay_ms", min: 50, max: 800 },
+    },
+    wah_eq: {
+      doc: "X→wah freq · Y→wah mix (Q from slider)",
+      xLabel: "Wah Hz →",
+      yLabel: "↑ Wah",
+      x: { param: "wah_freq", min: 250, max: 2200, scale: "log" },
+      y: { param: "wah_mix", min: 0, max: 1 },
+    },
+  };
+
+  let xyNorm = { x: 0.5, y: 0.5 };
+  let xyActive = false;
+  let xyHold = false;
+  let xyPointerId = null;
+
+  function currentXyMap() {
+    const key = (document.querySelector("#xy-map") || {}).value || "drive_mix";
+    return XY_MAPS[key] || XY_MAPS.drive_mix;
+  }
+
+  function clamp01(v) {
+    return Math.max(0, Math.min(1, v));
+  }
+
+  function lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  function unlerp(a, b, v) {
+    if (b === a) return 0.5;
+    return clamp01((v - a) / (b - a));
+  }
+
+  function axisValue(axis, t) {
+    if (axis.scale === "log") {
+      const lo = Math.log(axis.min);
+      const hi = Math.log(axis.max);
+      return Math.exp(lo + (hi - lo) * t);
+    }
+    return lerp(axis.min, axis.max, t);
+  }
+
+  function axisNorm(axis, value) {
+    if (axis.scale === "log") {
+      const lo = Math.log(axis.min);
+      const hi = Math.log(axis.max);
+      if (hi === lo) return 0.5;
+      return clamp01((Math.log(Math.max(axis.min, value)) - lo) / (hi - lo));
+    }
+    return unlerp(axis.min, axis.max, value);
+  }
+
+  function setParamValue(name, value) {
+    const el = document.querySelector("#" + name);
+    if (!el) return;
+    el.value = value;
+    const label = document.querySelector("#out-" + name);
+    if (label) {
+      label.textContent = formatParam(name, value);
+    }
+  }
+
+  function updateXyReadout() {
+    const map = currentXyMap();
+    const xVal = axisValue(map.x, xyNorm.x);
+    const yVal = axisValue(map.y, xyNorm.y);
+    const ccX = Math.round(xyNorm.x * 127);
+    const ccY = Math.round(xyNorm.y * 127);
+    const outX = document.querySelector("#xy-out-x");
+    const outY = document.querySelector("#xy-out-y");
+    const ccXe = document.querySelector("#xy-cc-x");
+    const ccYe = document.querySelector("#xy-cc-y");
+    const doc = document.querySelector("#xy-map-doc");
+    const lx = document.querySelector("#xy-label-x");
+    const ly = document.querySelector("#xy-label-y");
+    if (outX) outX.textContent = formatParam(map.x.param, xVal);
+    if (outY) outY.textContent = formatParam(map.y.param, yVal);
+    if (ccXe) ccXe.textContent = "CC12 · " + ccX;
+    if (ccYe) ccYe.textContent = "CC13 · " + ccY;
+    if (doc) doc.textContent = map.doc;
+    if (lx) lx.textContent = map.xLabel;
+    if (ly) ly.textContent = map.yLabel;
+  }
+
+  function placeXyCursor() {
+    const cursor = document.querySelector("#xy-cursor");
+    if (!cursor) return;
+    // CSS: left/top as %; y grows upward for musical feel (bottom = 0)
+    cursor.style.left = (xyNorm.x * 100) + "%";
+    cursor.style.top = ((1 - xyNorm.y) * 100) + "%";
+  }
+
+  function applyXyToParams(push) {
+    const map = currentXyMap();
+    let xVal = axisValue(map.x, xyNorm.x);
+    let yVal = axisValue(map.y, xyNorm.y);
+    if (map.x.param === "delay_ms" || map.x.param === "wah_freq") xVal = Math.round(xVal);
+    if (map.y.param === "delay_ms" || map.y.param === "wah_freq") yVal = Math.round(yVal);
+    setParamValue(map.x.param, xVal);
+    setParamValue(map.y.param, yVal);
+    updateXyReadout();
+    placeXyCursor();
+    if (push) {
+      clearTimeout(paramTimer);
+      paramTimer = setTimeout(pushParams, 30);
+    }
+  }
+
+  function syncXyFromParams() {
+    if (xyActive || xyHold) return;
+    const map = currentXyMap();
+    const params = readParams();
+    xyNorm.x = axisNorm(map.x, params[map.x.param]);
+    xyNorm.y = axisNorm(map.y, params[map.y.param]);
+    updateXyReadout();
+    placeXyCursor();
+  }
+
+  function xyFromClient(clientX, clientY) {
+    const pad = document.querySelector("#xy-pad");
+    const rect = pad.getBoundingClientRect();
+    if (rect.width < 1 || rect.height < 1) return;
+    xyNorm.x = clamp01((clientX - rect.left) / rect.width);
+    xyNorm.y = clamp01(1 - (clientY - rect.top) / rect.height);
+  }
+
+  function initXyPad() {
+    const pad = document.querySelector("#xy-pad");
+    const mapSelect = document.querySelector("#xy-map");
+    const holdBtn = document.querySelector("#xy-hold");
+    if (!pad) return;
+
+    function onPointerDown(event) {
+      if (xyHold) return;
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      xyActive = true;
+      xyPointerId = event.pointerId;
+      pad.classList.add("is-active");
+      try { pad.setPointerCapture(event.pointerId); } catch (e) {}
+      xyFromClient(event.clientX, event.clientY);
+      applyXyToParams(true);
+      event.preventDefault();
+    }
+
+    function onPointerMove(event) {
+      if (!xyActive || event.pointerId !== xyPointerId) return;
+      xyFromClient(event.clientX, event.clientY);
+      applyXyToParams(true);
+      event.preventDefault();
+    }
+
+    function onPointerUp(event) {
+      if (event.pointerId !== xyPointerId) return;
+      xyActive = false;
+      xyPointerId = null;
+      pad.classList.remove("is-active");
+      try { pad.releasePointerCapture(event.pointerId); } catch (e) {}
+      event.preventDefault();
+    }
+
+    pad.addEventListener("pointerdown", onPointerDown);
+    pad.addEventListener("pointermove", onPointerMove);
+    pad.addEventListener("pointerup", onPointerUp);
+    pad.addEventListener("pointercancel", onPointerUp);
+    // Block iOS Safari scroll/zoom while dragging the pad
+    pad.addEventListener("touchstart", function (e) { e.preventDefault(); }, { passive: false });
+    pad.addEventListener("touchmove", function (e) { e.preventDefault(); }, { passive: false });
+
+    if (mapSelect) {
+      mapSelect.addEventListener("change", function () {
+        syncXyFromParams();
+        updateXyReadout();
+      });
+    }
+
+    if (holdBtn) {
+      holdBtn.addEventListener("click", function () {
+        xyHold = !xyHold;
+        holdBtn.setAttribute("aria-pressed", xyHold ? "true" : "false");
+        holdBtn.textContent = xyHold ? "Held" : "Hold";
+        if (xyHold) {
+          xyActive = false;
+          pad.classList.remove("is-active");
+        }
+      });
+    }
+
+    // Keyboard nudge for accessibility / desktop
+    pad.addEventListener("keydown", function (event) {
+      if (xyHold) return;
+      const step = event.shiftKey ? 0.05 : 0.02;
+      let handled = true;
+      if (event.key === "ArrowLeft") xyNorm.x = clamp01(xyNorm.x - step);
+      else if (event.key === "ArrowRight") xyNorm.x = clamp01(xyNorm.x + step);
+      else if (event.key === "ArrowDown") xyNorm.y = clamp01(xyNorm.y - step);
+      else if (event.key === "ArrowUp") xyNorm.y = clamp01(xyNorm.y + step);
+      else handled = false;
+      if (handled) {
+        applyXyToParams(true);
+        event.preventDefault();
+      }
+    });
+
+    syncXyFromParams();
+  }
+
   function pushParams() {
     const payload = { type: "params", ...readParams() };
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -213,6 +449,7 @@
   }
 
   readParams();
+  initXyPad();
   api("/api/status")
     .then(applyStatus)
     .catch(function () {});
