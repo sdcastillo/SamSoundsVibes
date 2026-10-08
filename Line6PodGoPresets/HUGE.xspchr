@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspchr" GUID="846ecf8f-a250-415b-83c2-76c650f0f92d">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="5.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" CHURCH_TIME="15.30000019073486" CHURCH_PRE-DELAY="100.0"
+                CHURCH_COLOR="5.0" CHURCH_MOD="5.0" CHURCH_MIX="71.0" CHURCH_HPF="22.0"
+                CHURCH_MOD_RATE="0.1000000014901161" CHURCH_SIZE="65.0" CHURCH_L_DECAY="8.0"
+                CHURCH_M_DECAY="0.0" CHURCH_H_DECAY="-4.0" CHURCH_X-MODE="0.0"
+                CHURCH_TIME_A="8.0" CHURCH_PRE-DELAY_A="100.0" CHURCH_COLOR_A="0.0"
+                CHURCH_MOD_A="25.0" CHURCH_MIX_A="100.0" CHURCH_HPF_A="22.0"
+                CHURCH_MOD_RATE_A="0.1000000014901161" CHURCH_SIZE_A="65.0" CHURCH_L_DECAY_A="4.0"
+                CHURCH_M_DECAY_A="0.0" CHURCH_H_DECAY_A="-4.0" CHURCH_X-MODE_A="0.0"
+                CHURCH_TIME_B="8.0" CHURCH_PRE-DELAY_B="100.0" CHURCH_COLOR_B="0.0"
+                CHURCH_MOD_B="25.0" CHURCH_MIX_B="100.0" CHURCH_HPF_B="22.0"
+                CHURCH_MOD_RATE_B="0.1000000014901161" CHURCH_SIZE_B="65.0" CHURCH_L_DECAY_B="4.0"
+                CHURCH_M_DECAY_B="0.0" CHURCH_H_DECAY_B="-4.0" CHURCH_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

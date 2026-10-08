@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspchm" GUID="361c79f7-4fe9-4478-a52c-b710a9176c9e">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="4.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" CHAMBER_TIME="1.0" CHAMBER_PRE-DELAY="0.0"
+                CHAMBER_COLOR="-2.000000238418579" CHAMBER_MOD="24.0" CHAMBER_MIX="77.0"
+                CHAMBER_HPF="22.0" CHAMBER_MOD_RATE="0.2000000029802322" CHAMBER_SIZE="100.0"
+                CHAMBER_L_DECAY="0.0" CHAMBER_M_DECAY="-1.0" CHAMBER_H_DECAY="-1.0"
+                CHAMBER_X-MODE="0.0" CHAMBER_TIME_A="3.0" CHAMBER_PRE-DELAY_A="0.0"
+                CHAMBER_COLOR_A="0.0" CHAMBER_MOD_A="5.0" CHAMBER_MIX_A="100.0"
+                CHAMBER_HPF_A="22.0" CHAMBER_MOD_RATE_A="0.2000000029802322"
+                CHAMBER_SIZE_A="100.0" CHAMBER_L_DECAY_A="0.0" CHAMBER_M_DECAY_A="-1.0"
+                CHAMBER_H_DECAY_A="-1.0" CHAMBER_X-MODE_A="0.0" CHAMBER_TIME_B="3.0"
+                CHAMBER_PRE-DELAY_B="0.0" CHAMBER_COLOR_B="0.0" CHAMBER_MOD_B="5.0"
+                CHAMBER_MIX_B="100.0" CHAMBER_HPF_B="22.0" CHAMBER_MOD_RATE_B="0.2000000029802322"
+                CHAMBER_SIZE_B="100.0" CHAMBER_L_DECAY_B="0.0" CHAMBER_M_DECAY_B="-1.0"
+                CHAMBER_H_DECAY_B="-1.0" CHAMBER_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

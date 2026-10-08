@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspspr" GUID="32eef839-13f8-45e9-aeda-e937cfe2a6f5">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="7.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" SPRING_TIME="4.0" SPRING_PRE-DELAY="10.0" SPRING_COLOR="9.0"
+                SPRING_MOD="0.0" SPRING_MIX="78.0" SPRING_HPF="300.0" SPRING_MOD_RATE="0.1000000014901161"
+                SPRING_HI_DAMP="40.0" SPRING_WIDTH="0.0" SPRING_X-MODE="0.0"
+                SPRING_TIME_A="2.0" SPRING_PRE-DELAY_A="0.0" SPRING_COLOR_A="0.0"
+                SPRING_MOD_A="25.0" SPRING_MIX_A="100.0" SPRING_HPF_A="300.0"
+                SPRING_MOD_RATE_A="0.1000000014901161" SPRING_HI_DAMP_A="40.0"
+                SPRING_WIDTH_A="0.0" SPRING_X-MODE_A="0.0" SPRING_TIME_B="2.0"
+                SPRING_PRE-DELAY_B="0.0" SPRING_COLOR_B="0.0" SPRING_MOD_B="25.0"
+                SPRING_MIX_B="100.0" SPRING_HPF_B="300.0" SPRING_MOD_RATE_B="0.1000000014901161"
+                SPRING_HI_DAMP_B="40.0" SPRING_WIDTH_B="0.0" SPRING_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

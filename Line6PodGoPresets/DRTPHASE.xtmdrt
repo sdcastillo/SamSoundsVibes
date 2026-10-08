@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmdrt" GUID="343e548e-9e0a-40e9-91c4-e96938ec0256">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="13.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" DIRTY_TIME="683.5208129882812"
+                DIRTY_TIME_ts="9.0" DIRTY_FEEDBACK="57.0" DIRTY_FILTER="11670.0"
+                DIRTY_MOD="71.0" DIRTY_MIX="68.0" DIRTY_DIRT="22.0" DIRTY_SPEED="7.0"
+                DIRTY_X-MODE="0.0" DIRTY_TIME_A="500.0" DIRTY_TIME_ts_A="9.0"
+                DIRTY_FEEDBACK_A="50.0" DIRTY_FILTER_A="5000.0" DIRTY_MOD_A="50.0"
+                DIRTY_MIX_A="100.0" DIRTY_DIRT_A="15.0" DIRTY_SPEED_A="3.0" DIRTY_X-MODE_A="0.0"
+                DIRTY_TIME_B="500.0" DIRTY_TIME_ts_B="9.0" DIRTY_FEEDBACK_B="50.0"
+                DIRTY_FILTER_B="5000.0" DIRTY_MOD_B="50.0" DIRTY_MIX_B="100.0"
+                DIRTY_DIRT_B="15.0" DIRTY_SPEED_B="3.0" DIRTY_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

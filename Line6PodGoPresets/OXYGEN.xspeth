@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspeth" GUID="061b35f4-1db1-4edf-be07-59e3076bb200">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="13.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" ETHEREAL_TIME="12.30000019073486" ETHEREAL_PRE-DELAY="0.0"
+                ETHEREAL_COLOR="1.0" ETHEREAL_MOD="25.0" ETHEREAL_MIX="83.0"
+                ETHEREAL_MOD_RATE="0.1000000014901161" ETHEREAL_HPF="22.0" ETHEREAL_X-MODE="0.0"
+                ETHEREAL_TIME_A="8.0" ETHEREAL_PRE-DELAY_A="0.0" ETHEREAL_COLOR_A="0.0"
+                ETHEREAL_MOD_A="25.0" ETHEREAL_MIX_A="100.0" ETHEREAL_MOD_RATE_A="0.1000000014901161"
+                ETHEREAL_HPF_A="22.0" ETHEREAL_X-MODE_A="0.0" ETHEREAL_TIME_B="8.0"
+                ETHEREAL_PRE-DELAY_B="0.0" ETHEREAL_COLOR_B="0.0" ETHEREAL_MOD_B="25.0"
+                ETHEREAL_MIX_B="100.0" ETHEREAL_MOD_RATE_B="0.1000000014901161"
+                ETHEREAL_HPF_B="22.0" ETHEREAL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

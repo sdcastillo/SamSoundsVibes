@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmsbk" GUID="c52472f7-2796-48c6-853a-35e5357f282c">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="14.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" SLAPBACK_TIME="65.71219635009766"
+                SLAPBACK_FEEDBACK="84.0" SLAPBACK_FILTER="10.0" SLAPBACK_MOD="10.0"
+                SLAPBACK_MIX="64.0" SLAPBACK_RATE="4.950000286102295" SLAPBACK_X-MODE="0.0"
+                SLAPBACK_TIME_A="90.0" SLAPBACK_FEEDBACK_A="20.0" SLAPBACK_FILTER_A="5.0"
+                SLAPBACK_MOD_A="3.0" SLAPBACK_MIX_A="100.0" SLAPBACK_RATE_A="3.0"
+                SLAPBACK_X-MODE_A="0.0" SLAPBACK_TIME_B="90.0" SLAPBACK_FEEDBACK_B="20.0"
+                SLAPBACK_FILTER_B="5.0" SLAPBACK_MOD_B="3.0" SLAPBACK_MIX_B="100.0"
+                SLAPBACK_RATE_B="3.0" SLAPBACK_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmdua" GUID="69b05c9b-87c0-4205-a3cc-0c5eb32e38bf">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="6.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" DUAL_TIME="651.0"
+                DUAL_TIME_ts="9.0" DUAL_FEEDBACK="27.0" DUAL_FILTER="9770.0"
+                DUAL_MOD="100.0" DUAL_MIX="69.0" DUAL_TIME_2="14.0" DUAL_FDBK_2="80.0"
+                DUAL_MODE="1.0" DUAL_X-MODE="0.0" DUAL_TIME_A="500.0" DUAL_TIME_ts_A="6.0"
+                DUAL_FEEDBACK_A="50.0" DUAL_FILTER_A="10000.0" DUAL_MOD_A="50.0"
+                DUAL_MIX_A="100.0" DUAL_TIME_2_A="14.0" DUAL_FDBK_2_A="50.0"
+                DUAL_MODE_A="0.0" DUAL_X-MODE_A="0.0" DUAL_TIME_B="500.0" DUAL_TIME_ts_B="6.0"
+                DUAL_FEEDBACK_B="50.0" DUAL_FILTER_B="10000.0" DUAL_MOD_B="50.0"
+                DUAL_MIX_B="100.0" DUAL_TIME_2_B="14.0" DUAL_FDBK_2_B="50.0"
+                DUAL_MODE_B="0.0" DUAL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmswl" GUID="7a2257a7-9df9-4e37-81c3-7afb86f20fa8">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="9.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" SWELL_TIME="799.0"
+                SWELL_TIME_ts="9.0" SWELL_FEEDBACK="52.0" SWELL_FILTER="7640.0"
+                SWELL_MOD="-36.0" SWELL_MIX="90.0" SWELL_SWL_TIME="800.0" SWELL_SWL_TIME_ts="9.0"
+                SWELL_SWL_SENS="-50.0" SWELL_X-MODE="0.0" SWELL_TIME_A="500.0"
+                SWELL_TIME_ts_A="9.0" SWELL_FEEDBACK_A="50.0" SWELL_FILTER_A="10000.0"
+                SWELL_MOD_A="-60.0" SWELL_MIX_A="100.0" SWELL_SWL_TIME_A="250.0"
+                SWELL_SWL_TIME_ts_A="9.0" SWELL_SWL_SENS_A="-50.0" SWELL_X-MODE_A="0.0"
+                SWELL_TIME_B="500.0" SWELL_TIME_ts_B="9.0" SWELL_FEEDBACK_B="50.0"
+                SWELL_FILTER_B="10000.0" SWELL_MOD_B="-60.0" SWELL_MIX_B="100.0"
+                SWELL_SWL_TIME_B="250.0" SWELL_SWL_TIME_ts_B="9.0" SWELL_SWL_SENS_B="-50.0"
+                SWELL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmptc" GUID="f15b150d-5674-447f-b3cf-3cc63ec15bca">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="11.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" PITCH_TIME="343.0"
+                PITCH_TIME_ts="9.0" PITCH_FEEDBACK="0.0" PITCH_FILTER="0.0" PITCH_MOD="12.5"
+                PITCH_MIX="70.0" PITCH_LEVEL_2="5.0" PITCH_TIME_2="686.0" PITCH_TIME_2_ts="10.0"
+                PITCH_FDBK_2="0.0" PITCH_FILTER_2="-5.0" PITCH_PITCH_2="-7.0"
+                PITCH_PAN_2="-1.0" PITCH_LEVEL_3="5.0" PITCH_TIME_3="500.0" PITCH_TIME_3_ts="4.0"
+                PITCH_FDBK_3="50.0" PITCH_FILTER_3="-5.0" PITCH_PITCH_3="7.0"
+                PITCH_PAN_3="1.0" PITCH_EQ_GAIN="-5.0" PITCH_EQ_FREQ="500.0"
+                PITCH_X-MODE="0.0" PITCH_TIME_A="500.0" PITCH_TIME_ts_A="9.0"
+                PITCH_FEEDBACK_A="50.0" PITCH_FILTER_A="0.0" PITCH_MOD_A="7.0"
+                PITCH_MIX_A="100.0" PITCH_LEVEL_2_A="0.0" PITCH_TIME_2_A="700.0"
+                PITCH_TIME_2_ts_A="10.0" PITCH_FDBK_2_A="50.0" PITCH_FILTER_2_A="-5.0"
+                PITCH_PITCH_2_A="-12.0" PITCH_PAN_2_A="-1.0" PITCH_LEVEL_3_A="0.0"
+                PITCH_TIME_3_A="250.0" PITCH_TIME_3_ts_A="4.0" PITCH_FDBK_3_A="50.0"
+                PITCH_FILTER_3_A="-5.0" PITCH_PITCH_3_A="7.0" PITCH_PAN_3_A="1.0"
+                PITCH_EQ_GAIN_A="-5.0" PITCH_EQ_FREQ_A="500.0" PITCH_X-MODE_A="0.0"
+                PITCH_TIME_B="500.0" PITCH_TIME_ts_B="9.0" PITCH_FEEDBACK_B="50.0"
+                PITCH_FILTER_B="0.0" PITCH_MOD_B="7.0" PITCH_MIX_B="100.0" PITCH_LEVEL_2_B="0.0"
+                PITCH_TIME_2_B="700.0" PITCH_TIME_2_ts_B="10.0" PITCH_FDBK_2_B="50.0"
+                PITCH_FILTER_2_B="-5.0" PITCH_PITCH_2_B="-12.0" PITCH_PAN_2_B="-1.0"
+                PITCH_LEVEL_3_B="0.0" PITCH_TIME_3_B="250.0" PITCH_TIME_3_ts_B="4.0"
+                PITCH_FDBK_3_B="50.0" PITCH_FILTER_3_B="-5.0" PITCH_PITCH_3_B="7.0"
+                PITCH_PAN_3_B="1.0" PITCH_EQ_GAIN_B="-5.0" PITCH_EQ_FREQ_B="500.0"
+                PITCH_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

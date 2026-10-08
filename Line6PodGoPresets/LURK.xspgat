@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspgat" GUID="c73ecd81-eedc-4a2a-ab25-2f9c13184b12">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="9.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" GATE_TIME="0.2066666930913925" GATE_PRE-DELAY="110.0"
+                GATE_COLOR="-4.0" GATE_MOD="15.00000095367432" GATE_MIX="81.0"
+                GATE_HPF="60.0" GATE_MOD_RATE="0.5" GATE_SIZE="100.0" GATE_X-MODE="0.0"
+                GATE_TIME_A="0.4000000059604645" GATE_PRE-DELAY_A="0.0" GATE_COLOR_A="0.0"
+                GATE_MOD_A="25.0" GATE_MIX_A="100.0" GATE_HPF_A="60.0" GATE_MOD_RATE_A="0.5"
+                GATE_SIZE_A="30.0" GATE_X-MODE_A="0.0" GATE_TIME_B="0.4000000059604645"
+                GATE_PRE-DELAY_B="0.0" GATE_COLOR_B="0.0" GATE_MOD_B="25.0" GATE_MIX_B="100.0"
+                GATE_HPF_B="60.0" GATE_MOD_RATE_B="0.5" GATE_SIZE_B="30.0" GATE_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

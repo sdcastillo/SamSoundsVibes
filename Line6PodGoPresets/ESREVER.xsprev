@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xsprev" GUID="900ef894-b3af-4c9e-9a60-76340c4c74f4">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="10.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" REVERSE_TIME="72.0" REVERSE_PRE-DELAY="420.0"
+                REVERSE_COLOR="-2.0" REVERSE_MOD="60.0" REVERSE_MIX="90.0" REVERSE_TYPE="1.0"
+                REVERSE_SIZE="150.0" REVERSE_MOD_RATE="0.5" REVERSE_HPF="22.0"
+                REVERSE_X-MODE="0.0" REVERSE_TIME_A="50.0" REVERSE_PRE-DELAY_A="0.0"
+                REVERSE_COLOR_A="3.0" REVERSE_MOD_A="30.0" REVERSE_MIX_A="100.0"
+                REVERSE_TYPE_A="1.0" REVERSE_SIZE_A="120.0" REVERSE_MOD_RATE_A="0.5"
+                REVERSE_HPF_A="22.0" REVERSE_X-MODE_A="0.0" REVERSE_TIME_B="50.0"
+                REVERSE_PRE-DELAY_B="0.0" REVERSE_COLOR_B="3.0" REVERSE_MOD_B="30.0"
+                REVERSE_MIX_B="100.0" REVERSE_TYPE_B="1.0" REVERSE_SIZE_B="120.0"
+                REVERSE_MOD_RATE_B="0.5" REVERSE_HPF_B="22.0" REVERSE_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

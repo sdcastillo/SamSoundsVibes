@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspblm" GUID="e3b22b0e-c092-4a98-b329-3ca4dbfb1401">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="14.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" BLOOM_TIME="4.5" BLOOM_PRE-DELAY="19.0" BLOOM_COLOR="5.0"
+                BLOOM_MOD="72.0" BLOOM_MIX="88.0" BLOOM_DIFFUSION="100.0" BLOOM_MOD_RATE="0.1000000014901161"
+                BLOOM_X-MODE="0.0" BLOOM_TIME_A="6.0" BLOOM_PRE-DELAY_A="30.0"
+                BLOOM_COLOR_A="0.0" BLOOM_MOD_A="20.0" BLOOM_MIX_A="100.0" BLOOM_DIFFUSION_A="50.0"
+                BLOOM_MOD_RATE_A="0.25" BLOOM_X-MODE_A="0.0" BLOOM_TIME_B="6.0"
+                BLOOM_PRE-DELAY_B="30.0" BLOOM_COLOR_B="0.0" BLOOM_MOD_B="20.0"
+                BLOOM_MIX_B="100.0" BLOOM_DIFFUSION_B="50.0" BLOOM_MOD_RATE_B="0.25"
+                BLOOM_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

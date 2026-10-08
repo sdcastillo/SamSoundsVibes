@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspsh1" GUID="9bef126d-3e94-407d-8e07-2e6cbb3c2d3a">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="0.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" SHIMMER_1_TIME="5.0" SHIMMER_1_COLOR="-8.0"
+                SHIMMER_1_MOD="50.0" SHIMMER_1_MIX="73.0" SHIMMER_1_SHIFT="9.75"
+                SHIMMER_1_MOD_RATE="0.2000000029802322" SHIMMER_1_SIZE="80.0"
+                SHIMMER_1_MODE="2.0" SHIMMER_1_X-MODE="0.0" SHIMMER_1_TIME_A="10.0"
+                SHIMMER_1_COLOR_A="2.0" SHIMMER_1_MOD_A="50.0" SHIMMER_1_MIX_A="100.0"
+                SHIMMER_1_SHIFT_A="12.0" SHIMMER_1_MOD_RATE_A="0.2000000029802322"
+                SHIMMER_1_SIZE_A="80.0" SHIMMER_1_MODE_A="2.0" SHIMMER_1_X-MODE_A="0.0"
+                SHIMMER_1_TIME_B="10.0" SHIMMER_1_COLOR_B="2.0" SHIMMER_1_MOD_B="50.0"
+                SHIMMER_1_MIX_B="100.0" SHIMMER_1_SHIFT_B="12.0" SHIMMER_1_MOD_RATE_B="0.2000000029802322"
+                SHIMMER_1_SIZE_B="80.0" SHIMMER_1_MODE_B="2.0" SHIMMER_1_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmdig" GUID="b88db605-c2b0-4e94-a49d-5b314f998d67">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="3.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" DIGITAL_TIME="475.2081909179688"
+                DIGITAL_TIME_ts="9.0" DIGITAL_FEEDBACK="58.99999618530273" DIGITAL_FILTER="7614.615234375"
+                DIGITAL_MOD="1.0" DIGITAL_MIX="61.0" DIGITAL_X-MODE="0.0" DIGITAL_TIME_A="500.0"
+                DIGITAL_TIME_ts_A="9.0" DIGITAL_FEEDBACK_A="50.0" DIGITAL_FILTER_A="20000.0"
+                DIGITAL_MOD_A="0.0" DIGITAL_MIX_A="100.0" DIGITAL_X-MODE_A="0.0"
+                DIGITAL_TIME_B="500.0" DIGITAL_TIME_ts_B="9.0" DIGITAL_FEEDBACK_B="50.0"
+                DIGITAL_FILTER_B="20000.0" DIGITAL_MOD_B="0.0" DIGITAL_MIX_B="100.0"
+                DIGITAL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

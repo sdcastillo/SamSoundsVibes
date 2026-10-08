@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xsphal" GUID="8fb413d6-0dc1-4b3f-b251-166d63229b7d">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="2.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" HALL_TIME="9.0" HALL_PRE-DELAY="310.0" HALL_COLOR="0.0"
+                HALL_MOD="6.0" HALL_MIX="85.0" HALL_HPF="22.0" HALL_MOD_RATE="0.2000000029802322"
+                HALL_SIZE="150.0" HALL_L_DECAY="8.0" HALL_M_DECAY="10.0" HALL_H_DECAY="0.0"
+                HALL_X-MODE="0.0" HALL_TIME_A="5.0" HALL_PRE-DELAY_A="0.0" HALL_COLOR_A="0.0"
+                HALL_MOD_A="20.0" HALL_MIX_A="100.0" HALL_HPF_A="22.0" HALL_MOD_RATE_A="0.2000000029802322"
+                HALL_SIZE_A="100.0" HALL_L_DECAY_A="1.0" HALL_M_DECAY_A="0.0"
+                HALL_H_DECAY_A="0.0" HALL_X-MODE_A="0.0" HALL_TIME_B="5.0" HALL_PRE-DELAY_B="0.0"
+                HALL_COLOR_B="0.0" HALL_MOD_B="20.0" HALL_MIX_B="100.0" HALL_HPF_B="22.0"
+                HALL_MOD_RATE_B="0.2000000029802322" HALL_SIZE_B="100.0" HALL_L_DECAY_B="1.0"
+                HALL_M_DECAY_B="0.0" HALL_H_DECAY_B="0.0" HALL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xtmhrm" GUID="b21d316d-c5d8-4b87-a522-516d8559845c">
+  <Model Type="Stomp" GUID="063668e9-2af7-4a21-a554-abb1ff51a913">
+    <Parameters Algo="12.0" expression_enable="0.0" bpm_mode="0.0" BPMSync="0.0"
+                bpm="55.0" CabSim="0.0" cab_model_A="0.0" cab_model_B="0.0" HARM_TIME="349.0"
+                HARM_TIME_ts="9.0" HARM_FEEDBACK="52.0" HARM_FILTER="-14.0" HARM_MOD="4.0"
+                HARM_MIX="51.0" HARM_OCTAVE="0.0" HARM_KEY="0.0" HARM_LEVEL_2="0.0"
+                HARM_TIME_2="500.0" HARM_TIME_2_ts="10.0" HARM_FDBK_2="50.0"
+                HARM_FILTER_2="-10.0" HARM_INTRVL_2="6.0" HARM_OCTAVE_2="0.0"
+                HARM_PAN_2="-1.0" HARM_LEVEL_3="0.0" HARM_TIME_3="500.0" HARM_TIME_3_ts="4.0"
+                HARM_FDBK_3="50.0" HARM_FILTER_3="-20.0" HARM_INTRVL_3="6.0"
+                HARM_OCTAVE_3="0.0" HARM_PAN_3="1.0" HARM_EQ_GAIN="-5.0" HARM_EQ_FREQ="500.0"
+                HARM_A4_FREQ="440.0" HARM_X-MODE="0.0" HARM_TIME_A="500.0" HARM_TIME_ts_A="9.0"
+                HARM_FEEDBACK_A="50.0" HARM_FILTER_A="-14.0" HARM_MOD_A="6.0"
+                HARM_MIX_A="100.0" HARM_OCTAVE_A="0.0" HARM_KEY_A="0.0" HARM_LEVEL_2_A="0.0"
+                HARM_TIME_2_A="500.0" HARM_TIME_2_ts_A="10.0" HARM_FDBK_2_A="50.0"
+                HARM_FILTER_2_A="-10.0" HARM_INTRVL_2_A="6.0" HARM_OCTAVE_2_A="0.0"
+                HARM_PAN_2_A="-1.0" HARM_LEVEL_3_A="0.0" HARM_TIME_3_A="500.0"
+                HARM_TIME_3_ts_A="4.0" HARM_FDBK_3_A="50.0" HARM_FILTER_3_A="-20.0"
+                HARM_INTRVL_3_A="6.0" HARM_OCTAVE_3_A="0.0" HARM_PAN_3_A="1.0"
+                HARM_EQ_GAIN_A="-5.0" HARM_EQ_FREQ_A="500.0" HARM_A4_FREQ_A="440.0"
+                HARM_X-MODE_A="0.0" HARM_TIME_B="500.0" HARM_TIME_ts_B="9.0"
+                HARM_FEEDBACK_B="50.0" HARM_FILTER_B="-14.0" HARM_MOD_B="6.0"
+                HARM_MIX_B="100.0" HARM_OCTAVE_B="0.0" HARM_KEY_B="0.0" HARM_LEVEL_2_B="0.0"
+                HARM_TIME_2_B="500.0" HARM_TIME_2_ts_B="10.0" HARM_FDBK_2_B="50.0"
+                HARM_FILTER_2_B="-10.0" HARM_INTRVL_2_B="6.0" HARM_OCTAVE_2_B="0.0"
+                HARM_PAN_2_B="-1.0" HARM_LEVEL_3_B="0.0" HARM_TIME_3_B="500.0"
+                HARM_TIME_3_ts_B="4.0" HARM_FDBK_3_B="50.0" HARM_FILTER_3_B="-20.0"
+                HARM_INTRVL_3_B="6.0" HARM_OCTAVE_3_B="0.0" HARM_PAN_3_B="1.0"
+                HARM_EQ_GAIN_B="-5.0" HARM_EQ_FREQ_B="500.0" HARM_A4_FREQ_B="440.0"
+                HARM_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

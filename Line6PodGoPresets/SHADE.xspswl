@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspswl" GUID="eb376eee-a812-407b-8fba-d9b6f66fa010">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="8.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" SWELL_TIME="2.0" SWELL_PRE-DELAY="1330.0" SWELL_COLOR="2.0"
+                SWELL_MOD="15.0" SWELL_MIX="84.0" SWELL_HPF="22.0" SWELL_MOD_RATE="0.2000000029802322"
+                SWELL_SWELL_DEPTH="-90.0" SWELL_SWELL_SENS="100.0" SWELL_X-MODE="0.0"
+                SWELL_TIME_A="3.0" SWELL_PRE-DELAY_A="300.0" SWELL_COLOR_A="0.0"
+                SWELL_MOD_A="25.0" SWELL_MIX_A="100.0" SWELL_HPF_A="22.0" SWELL_MOD_RATE_A="0.2000000029802322"
+                SWELL_SWELL_DEPTH_A="-90.0" SWELL_SWELL_SENS_A="80.0" SWELL_X-MODE_A="0.0"
+                SWELL_TIME_B="3.0" SWELL_PRE-DELAY_B="300.0" SWELL_COLOR_B="0.0"
+                SWELL_MOD_B="25.0" SWELL_MIX_B="100.0" SWELL_HPF_B="22.0" SWELL_MOD_RATE_B="0.2000000029802322"
+                SWELL_SWELL_DEPTH_B="-90.0" SWELL_SWELL_SENS_B="80.0" SWELL_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

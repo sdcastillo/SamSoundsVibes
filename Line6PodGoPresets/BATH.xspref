@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspref" GUID="62d6dacc-ea3a-403f-b90c-4a1d95bdc8cb">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="11.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" EARLY_REF_TIME="0.6000000238418579" EARLY_REF_PRE-DELAY="0.0"
+                EARLY_REF_COLOR="-6.0" EARLY_REF_MOD="27.0" EARLY_REF_MIX="70.0"
+                EARLY_REF_SIZE="50.0" EARLY_REF_HPF="80.0" EARLY_REF_MOD_RATE="7.0"
+                EARLY_REF_X-MODE="0.0" EARLY_REF_TIME_A="0.800000011920929" EARLY_REF_PRE-DELAY_A="0.0"
+                EARLY_REF_COLOR_A="0.0" EARLY_REF_MOD_A="10.0" EARLY_REF_MIX_A="100.0"
+                EARLY_REF_SIZE_A="50.0" EARLY_REF_HPF_A="22.0" EARLY_REF_MOD_RATE_A="0.2000000029802322"
+                EARLY_REF_X-MODE_A="0.0" EARLY_REF_TIME_B="0.800000011920929"
+                EARLY_REF_PRE-DELAY_B="0.0" EARLY_REF_COLOR_B="0.0" EARLY_REF_MOD_B="10.0"
+                EARLY_REF_MIX_B="100.0" EARLY_REF_SIZE_B="50.0" EARLY_REF_HPF_B="22.0"
+                EARLY_REF_MOD_RATE_B="0.2000000029802322" EARLY_REF_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

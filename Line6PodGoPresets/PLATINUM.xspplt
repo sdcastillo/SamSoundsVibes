@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspplt" GUID="8f74960c-4345-45d1-a204-530600d82a0d">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="6.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" PLATE_TIME="2.0" PLATE_PRE-DELAY="10.0" PLATE_COLOR="1.0"
+                PLATE_MOD="0.0" PLATE_MIX="47.0" PLATE_HPF="22.0" PLATE_MOD_RATE="0.1000000014901161"
+                PLATE_SIZE="100.0" PLATE_L_DECAY="0.0" PLATE_M_DECAY="1.0" PLATE_H_DECAY="0.0"
+                PLATE_X-MODE="0.0" PLATE_TIME_A="2.0" PLATE_PRE-DELAY_A="0.0"
+                PLATE_COLOR_A="0.0" PLATE_MOD_A="25.0" PLATE_MIX_A="100.0" PLATE_HPF_A="22.0"
+                PLATE_MOD_RATE_A="0.1000000014901161" PLATE_SIZE_A="100.0" PLATE_L_DECAY_A="0.0"
+                PLATE_M_DECAY_A="1.0" PLATE_H_DECAY_A="0.0" PLATE_X-MODE_A="0.0"
+                PLATE_TIME_B="2.0" PLATE_PRE-DELAY_B="0.0" PLATE_COLOR_B="0.0"
+                PLATE_MOD_B="25.0" PLATE_MIX_B="100.0" PLATE_HPF_B="22.0" PLATE_MOD_RATE_B="0.1000000014901161"
+                PLATE_SIZE_B="100.0" PLATE_L_DECAY_B="0.0" PLATE_M_DECAY_B="1.0"
+                PLATE_H_DECAY_B="0.0" PLATE_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xspmag" GUID="d87c5c61-0020-4636-bf1e-1723e60f4235">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="15.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" MAGNETIC_TIME="5.0" MAGNETIC_PRE-DELAY="160.0"
+                MAGNETIC_COLOR="-3.0" MAGNETIC_MOD="36.0" MAGNETIC_MIX="86.0"
+                MAGNETIC_MOD_RATE="50.0" MAGNETIC_MOD_COLOR="-8.0" MAGNETIC_X-MODE="0.0"
+                MAGNETIC_TIME_A="4.0" MAGNETIC_PRE-DELAY_A="0.0" MAGNETIC_COLOR_A="0.0"
+                MAGNETIC_MOD_A="30.0" MAGNETIC_MIX_A="100.0" MAGNETIC_MOD_RATE_A="50.0"
+                MAGNETIC_MOD_COLOR_A="-8.0" MAGNETIC_X-MODE_A="0.0" MAGNETIC_TIME_B="4.0"
+                MAGNETIC_PRE-DELAY_B="0.0" MAGNETIC_COLOR_B="0.0" MAGNETIC_MOD_B="30.0"
+                MAGNETIC_MIX_B="100.0" MAGNETIC_MOD_RATE_B="50.0" MAGNETIC_MOD_COLOR_B="-8.0"
+                MAGNETIC_X-MODE_B="0.0"/>
+  </Model>
+</Preset>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset Version="1" Format="xsprom" GUID="a9ae16e7-ba9e-4ac4-91fd-cb86667fc6d0">
+  <Model Type="Stomp" GUID="3889d7a5-4131-4c1d-b94e-6d37dcedefc4">
+    <Parameters Algo="3.0" expression_enable="0.0" CabSim="0.0" cab_model_A="0.0"
+                cab_model_B="0.0" ROOM_TIME="0.2000000029802322" ROOM_PRE-DELAY="0.0"
+                ROOM_COLOR="-2.0" ROOM_MOD="25.0" ROOM_MIX="65.0" ROOM_HPF="22.0"
+                ROOM_MOD_RATE="0.1000000014901161" ROOM_SIZE="60.0" ROOM_L_DECAY="0.0"
+                ROOM_M_DECAY="1.0" ROOM_H_DECAY="-2.0" ROOM_X-MODE="0.0" ROOM_TIME_A="0.5"
+                ROOM_PRE-DELAY_A="0.0" ROOM_COLOR_A="0.0" ROOM_MOD_A="25.0" ROOM_MIX_A="100.0"
+                ROOM_HPF_A="22.0" ROOM_MOD_RATE_A="0.1000000014901161" ROOM_SIZE_A="60.0"
+                ROOM_L_DECAY_A="0.0" ROOM_M_DECAY_A="1.0" ROOM_H_DECAY_A="-2.0"
+                ROOM_X-MODE_A="0.0" ROOM_TIME_B="0.5" ROOM_PRE-DELAY_B="0.0"
+                ROOM_COLOR_B="0.0" ROOM_MOD_B="25.0" ROOM_MIX_B="100.0" ROOM_HPF_B="22.0"
+                ROOM_MOD_RATE_B="0.1000000014901161" ROOM_SIZE_B="60.0" ROOM_L_DECAY_B="0.0"
+                ROOM_M_DECAY_B="1.0" ROOM_H_DECAY_B="-2.0" ROOM_X-MODE_B="0.0"/>
+  </Model>
+</Preset>
