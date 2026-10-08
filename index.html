@@ -15,6 +15,10 @@
         audio { width: 100%; height: 35px; }
         video { width: 100%; border-radius: 6px; background: #000; }
         .stats { display: flex; justify-content: center; gap: 30px; margin-top: 20px; font-weight: bold; }
+        .amp-shots { max-width: 1100px; margin: 0 auto 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        .amp-shots figure { margin: 0; text-align: center; }
+        .amp-shots img { width: 100%; height: auto; border-radius: 12px; display: block; border: 1px solid #3a2158; }
+        .amp-shots figcaption { color: #c9c9c9; font-size: 0.9em; margin-top: 8px; }
         .portraits { max-width: 900px; margin: 0 auto 30px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .portrait { margin: 0; text-align: center; }
         .portrait img { width: 100%; height: auto; border-radius: 12px; display: block; }
@@ -23,7 +27,7 @@
         .diagram { margin: 0; text-align: center; }
         .diagram img { width: 100%; height: auto; border-radius: 12px; display: block; background: #fff; }
         .diagram figcaption { color: #c9c9c9; font-size: 0.95em; margin-top: 8px; }
-        @media (max-width: 700px) { .portraits { grid-template-columns: 1fr; } }
+        @media (max-width: 700px) { .portraits, .amp-shots { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -39,6 +43,21 @@
         </div>
         <p><a href="amplifier/" style="color:#00ffff">How the guitar amp turns a signal into sound</a></p>
     </section>
+
+    <div class="amp-shots">
+        <figure>
+            <img src="amp-ui-tuner.png" alt="Guitar amp screen showing the tuner and the factory preset list, with EPIC RTM 1 selected">
+            <figcaption>Tuner and the 128 factory presets</figcaption>
+        </figure>
+        <figure>
+            <img src="amp-ui-knobs.png" alt="Guitar amp knobs for drive, delay, feedback, wet mix, volume, and wah">
+            <figcaption>Drive, delay, and wah</figcaption>
+        </figure>
+        <figure>
+            <img src="amp-ui-touchpad.png" alt="X-Y touchpad mapping delay and feedback, with the Hold button">
+            <figcaption>X-Y touchpad</figcaption>
+        </figure>
+    </div>
 
     <div class="portraits">
         <figure class="portrait">
