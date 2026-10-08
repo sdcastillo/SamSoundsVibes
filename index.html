@@ -19,6 +19,10 @@
         .portrait { margin: 0; text-align: center; }
         .portrait img { width: 100%; height: auto; border-radius: 12px; display: block; }
         .portrait figcaption { color: #c9c9c9; font-size: 0.95em; margin-top: 8px; }
+        .diagrams { max-width: 1100px; margin: 0 auto 36px; display: grid; gap: 28px; }
+        .diagram { margin: 0; text-align: center; }
+        .diagram img { width: 100%; height: auto; border-radius: 12px; display: block; background: #fff; }
+        .diagram figcaption { color: #c9c9c9; font-size: 0.95em; margin-top: 8px; }
         @media (max-width: 700px) { .portraits { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -44,6 +48,25 @@
         <figure class="portrait">
             <img src="sam-castillo-spacesuit.jpg" alt="Sam Castillo smiling beside a NASA spacesuit in a museum exhibit">
             <figcaption>Sam Castillo at the Apollo spacesuit exhibit</figcaption>
+        </figure>
+    </div>
+
+    <div class="diagrams">
+        <figure class="diagram">
+            <img src="electrical_engineering3.jpeg" alt="Diagram: a held guitar note is a Fourier series, and drive rewrites that series before the tuner reads the clean string">
+            <figcaption>A held note is a Fourier series</figcaption>
+        </figure>
+        <figure class="diagram">
+            <img src="electrical_engineering1.jpeg" alt="Diagram: cabinet sound as convolution of the distorted guitar with an impulse response, computed with an FFT and overlap-add">
+            <figcaption>Convolution: the cabinet as an impulse response</figcaption>
+        </figure>
+        <figure class="diagram">
+            <img src="electrical_engineering4.jpeg" alt="Diagram: wah, tone stack, delay, feedback, and Haas stereo width as short digital filters">
+            <figcaption>Guitar effects as DSP building blocks</figcaption>
+        </figure>
+        <figure class="diagram">
+            <img src="electrical_engineering2.jpeg" alt="Diagram: float samples travel through PipeWire to the headset, which turns them back into air pressure">
+            <figcaption>Back into the room</figcaption>
         </figure>
     </div>
 
