@@ -92,10 +92,10 @@ def auto_select_scarlett(direction, min_channels=1, prefer_substrings=None):
     return pool[0][2]
 
 
-# Playback default. Scarlett Solo stays the preferred input; PipeWire output is
-# auto-picked unless the caller sets pw_sink or an ALSA output_device.
-# "@auto" → Scarlett/Focusrite out if present, else system default sink, else
-# first non-dummy sink (never prefers a missing Logitech headset).
+# Playback default. Scarlett Solo stays the preferred input. PipeWire output
+# follows the system default sink (the Logitech headset when that is the
+# default). A missing headset does not block playback: fall through to
+# Scarlett/Focusrite, then any other real sink.
 AUTO_PW_SINK = "@auto"
 DEFAULT_PW_SINK = AUTO_PW_SINK
 
@@ -130,7 +130,7 @@ def _looks_like_logitech_sink(query):
 def effective_pw_sink(config):
     """PipeWire playback sink query, or None when the user chose direct ALSA output.
 
-    Default is AUTO_PW_SINK (Scarlett out / system default / first real sink).
+    Default is AUTO_PW_SINK (system default sink, else Scarlett, else any real sink).
     A non-empty pw_sink overrides it. A non-empty output_device with no pw_sink
     uses ALSA and skips PipeWire playback.
     """
@@ -189,8 +189,132 @@ def resolve_audio_devices(config):
     return input_device, choose_device(output_query, 1, "output"), meta
 
 
+_NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+# Standard guitar, low E to high E. MIDI note numbers.
+_GUITAR_STRINGS = (
+    {"name": "E2", "midi": 40},
+    {"name": "A2", "midi": 45},
+    {"name": "D3", "midi": 50},
+    {"name": "G3", "midi": 55},
+    {"name": "B3", "midi": 59},
+    {"name": "E4", "midi": 64},
+)
+
+
+def _idle_tuner():
+    return {
+        "active": False,
+        "hz": 0.0,
+        "cents": 0.0,
+        "note": "",
+        "octave": 0,
+        "midi": 0,
+        "clarity": 0.0,
+        "string": -1,
+    }
+
+
+def estimate_pitch(samples, rate):
+    """Fundamental frequency of one guitar note, or None when the frame is not a clear pitch.
+
+    Uses the McLeod pitch method: normalized autocorrelation, then the earliest
+    strong peak so a guitar's harmonics do not read as a higher note.
+    """
+    frame = np.asarray(samples, dtype=np.float64)
+    if frame.size < 512:
+        return None
+    frame = frame - float(np.mean(frame))
+    rms = float(np.sqrt(np.mean(frame * frame)))
+    if rms < 0.008:
+        return None
+    frame = frame * np.hanning(frame.size)
+    size = int(frame.size)
+    fft_n = 1
+    while fft_n < size * 2:
+        fft_n *= 2
+    spectrum = np.fft.rfft(frame, fft_n)
+    acf = np.fft.irfft(spectrum * np.conjugate(spectrum), fft_n)[:size]
+    squares = frame * frame
+    cumulative = np.cumsum(squares)
+    lags = np.arange(size)
+    left = np.empty(size, dtype=np.float64)
+    left[0] = cumulative[-1]
+    if size > 1:
+        left[1:] = cumulative[-2::-1]
+    right = cumulative[-1] - np.concatenate((np.zeros(1), cumulative[:-1]))
+    nsdf = (2.0 * acf) / (left + right + 1e-12)
+    min_lag = max(2, int(rate / 520.0))
+    max_lag = min(size - 2, int(rate / 70.0))
+    if max_lag <= min_lag + 2:
+        return None
+    peaks = []
+    for lag in range(min_lag + 1, max_lag):
+        height = nsdf[lag]
+        if height >= 0.45 and height >= nsdf[lag - 1] and height > nsdf[lag + 1]:
+            peaks.append(lag)
+    if not peaks:
+        return None
+    best = max(float(nsdf[lag]) for lag in peaks)
+    if best < 0.55:
+        return None
+    chosen = peaks[0]
+    for lag in peaks:
+        if float(nsdf[lag]) >= best * 0.9:
+            chosen = lag
+            break
+    center = float(nsdf[chosen])
+    left_y = float(nsdf[chosen - 1])
+    right_y = float(nsdf[chosen + 1])
+    denom = left_y - 2.0 * center + right_y
+    shift = 0.0 if abs(denom) < 1e-9 else 0.5 * (left_y - right_y) / denom
+    if shift < -0.5 or shift > 0.5:
+        shift = 0.0
+    period = chosen + shift
+    if period < 1.0:
+        return None
+    hz = float(rate) / period
+    midi_float = 69.0 + 12.0 * np.log2(hz / 440.0)
+    midi = int(np.clip(int(round(midi_float)), 0, 127))
+    cents = float((midi_float - midi) * 100.0)
+    octave = midi // 12 - 1
+    string_index = -1
+    nearest = min(_GUITAR_STRINGS, key=lambda item: abs(item["midi"] - midi_float))
+    if abs(nearest["midi"] - midi_float) <= 0.55:
+        string_index = _GUITAR_STRINGS.index(nearest)
+    return {
+        "active": True,
+        "hz": round(hz, 2),
+        "cents": round(cents, 1),
+        "note": _NOTE_NAMES[midi % 12],
+        "octave": octave,
+        "midi": midi,
+        "clarity": round(best, 3),
+        "string": string_index,
+    }
+
+
 class FastAmp:
-    def __init__(self, rate, delay_ms, feedback, mix, drive, volume, wah_freq=900.0, wah_q=5.0, wah_mix=0.0):
+    def __init__(
+        self,
+        rate,
+        delay_ms,
+        feedback,
+        mix,
+        drive,
+        volume,
+        wah_freq=900.0,
+        wah_q=5.0,
+        wah_mix=0.0,
+        bass=0.5,
+        mid=0.5,
+        treble=0.5,
+        presence=0.5,
+        ir="",
+        ir_mix=0.0,
+        low_cut=80.0,
+        high_cut=8000.0,
+        preset="",
+    ):
         self.rate = rate
         self.drive = drive
         self.feedback = feedback
@@ -199,14 +323,37 @@ class FastAmp:
         self.wah_freq = float(wah_freq)
         self.wah_q = float(wah_q)
         self.wah_mix = float(wah_mix)
+        self.bass = float(bass)
+        self.mid = float(mid)
+        self.treble = float(treble)
+        self.presence = float(presence)
+        self.ir = ""
+        self.ir_mix = float(ir_mix)
+        self.low_cut = float(low_cut)
+        self.high_cut = float(high_cut)
+        self.preset = str(preset or "")
         self._wah_x1 = np.float32(0.0)
         self._wah_x2 = np.float32(0.0)
         self._wah_y1 = np.float32(0.0)
         self._wah_y2 = np.float32(0.0)
         self._wah_coeffs = None
         self._wah_coeff_key = None
+        self._tone_coeffs = None
+        self._tone_state = [(np.float32(0.0), np.float32(0.0), np.float32(0.0), np.float32(0.0)) for _ in range(4)]
+        # Cabinet FFT bank is published as one tuple. The audio thread owns the
+        # overlap tail so a preset change cannot replace it mid-block.
+        self._cab_bank = ("", None, {})
+        self._cab_tail = None
+        self._cab_tail_name = ""
+        self._render_error = None
+        self._hp_x = np.float32(0.0)
+        self._hp_y = np.float32(0.0)
+        self._lp_y = np.float32(0.0)
         self._set_delay_ms(delay_ms)
         self._update_wah_coeffs(force=True)
+        self._update_tone_coeffs()
+        if ir:
+            self._set_ir(ir)
         self.ring_size = self.delay_frames * 5 + 4096
         self.ring = np.zeros(self.ring_size, dtype=np.float32)
         self.write = 0
@@ -219,6 +366,13 @@ class FastAmp:
         self.obs_pending = queue.Queue(maxsize=8)
         self.running = True
         self.meters = {"mic": 0.0, "inst": 0.0, "gate": 0.0, "out": 0.0}
+        self._tune_len = 16384
+        self._tune_buf = np.zeros(self._tune_len, dtype=np.float32)
+        self._tune_pos = 0
+        self._tune_fill = 0
+        self._tune_since = 0
+        self._tune_hold = 0
+        self.tuner = _idle_tuner()
 
     def _set_delay_ms(self, delay_ms):
         self.delay_ms = float(delay_ms)
@@ -249,6 +403,23 @@ class FastAmp:
             self.wah_mix = float(kwargs["wah_mix"])
         if wah_changed:
             self._update_wah_coeffs(force=True)
+        tone_changed = False
+        for name in ("bass", "mid", "treble", "presence"):
+            if name in kwargs and kwargs[name] is not None:
+                setattr(self, name, float(kwargs[name]))
+                tone_changed = True
+        if tone_changed:
+            self._update_tone_coeffs()
+        if "low_cut" in kwargs and kwargs["low_cut"] is not None:
+            self.low_cut = float(kwargs["low_cut"])
+        if "high_cut" in kwargs and kwargs["high_cut"] is not None:
+            self.high_cut = float(kwargs["high_cut"])
+        if "ir_mix" in kwargs and kwargs["ir_mix"] is not None:
+            self.ir_mix = float(kwargs["ir_mix"])
+        if "ir" in kwargs and kwargs["ir"] is not None:
+            self._set_ir(kwargs["ir"])
+        if "preset" in kwargs and kwargs["preset"] is not None:
+            self.preset = str(kwargs["preset"])
 
     def params_snapshot(self):
         return {
@@ -260,7 +431,44 @@ class FastAmp:
             "wah_freq": self.wah_freq,
             "wah_q": self.wah_q,
             "wah_mix": self.wah_mix,
+            "bass": self.bass,
+            "mid": self.mid,
+            "treble": self.treble,
+            "presence": self.presence,
+            "ir": self.ir,
+            "ir_mix": self.ir_mix,
+            "low_cut": self.low_cut,
+            "high_cut": self.high_cut,
+            "preset": self.preset,
         }
+
+    def _cab_nfft(self, frames, kernel_len):
+        need = int(frames) + int(kernel_len) - 1
+        nfft = 1
+        while nfft < need:
+            nfft *= 2
+        return nfft
+
+    def _set_ir(self, name):
+        from amp_presets import ir_samples
+
+        text = str(name or "").strip()
+        if not text:
+            self._cab_bank = ("", None, {})
+            self.ir = ""
+            return
+        kernel = np.ascontiguousarray(ir_samples(text), dtype=np.float32)
+        spectra = {}
+        for frames in (128, 256, 512, 1024):
+            nfft = self._cab_nfft(frames, kernel.size)
+            if nfft in spectra:
+                continue
+            padded = np.zeros(nfft, dtype=np.float32)
+            padded[: kernel.size] = kernel
+            spectra[nfft] = np.fft.rfft(padded)
+        # One assignment so the callback never sees a name without its spectra.
+        self._cab_bank = (text, kernel, spectra)
+        self.ir = text
 
     def _update_wah_coeffs(self, force=False):
         """RBJ constant-peak-gain bandpass for wah / sweeping EQ."""
@@ -315,6 +523,137 @@ class FastAmp:
         dry = source
         return (np.float32(1.0 - mix) * dry + np.float32(mix) * wet).astype(np.float32, copy=False)
 
+    def _biquad(self, kind, freq, db, q=0.707):
+        if abs(db) < 0.25:
+            return None
+        amp = 10.0 ** (db / 40.0)
+        w0 = 2.0 * np.pi * float(freq) / float(self.rate)
+        cos_w0 = float(np.cos(w0))
+        sin_w0 = float(np.sin(w0))
+        if kind == "peak":
+            alpha = sin_w0 / (2.0 * q)
+            b0 = 1.0 + alpha * amp
+            b1 = -2.0 * cos_w0
+            b2 = 1.0 - alpha * amp
+            a0 = 1.0 + alpha / amp
+            a1 = -2.0 * cos_w0
+            a2 = 1.0 - alpha / amp
+        else:
+            alpha = sin_w0 / 2.0 * np.sqrt(2.0)
+            root = 2.0 * np.sqrt(amp) * alpha
+            if kind == "lowshelf":
+                b0 = amp * ((amp + 1) - (amp - 1) * cos_w0 + root)
+                b1 = 2 * amp * ((amp - 1) - (amp + 1) * cos_w0)
+                b2 = amp * ((amp + 1) - (amp - 1) * cos_w0 - root)
+                a0 = (amp + 1) + (amp - 1) * cos_w0 + root
+                a1 = -2 * ((amp - 1) + (amp + 1) * cos_w0)
+                a2 = (amp + 1) + (amp - 1) * cos_w0 - root
+            else:
+                b0 = amp * ((amp + 1) + (amp - 1) * cos_w0 + root)
+                b1 = -2 * amp * ((amp - 1) + (amp + 1) * cos_w0)
+                b2 = amp * ((amp + 1) + (amp - 1) * cos_w0 - root)
+                a0 = (amp + 1) - (amp - 1) * cos_w0 + root
+                a1 = 2 * ((amp - 1) - (amp + 1) * cos_w0)
+                a2 = (amp + 1) - (amp - 1) * cos_w0 - root
+        inv = 1.0 / a0
+        return (
+            np.float32(b0 * inv),
+            np.float32(b1 * inv),
+            np.float32(b2 * inv),
+            np.float32(a1 * inv),
+            np.float32(a2 * inv),
+        )
+
+    def _update_tone_coeffs(self):
+        specs = (
+            self._biquad("lowshelf", 120.0, (self.bass - 0.5) * 18.0),
+            self._biquad("peak", 800.0, (self.mid - 0.5) * 14.0, 0.8),
+            self._biquad("highshelf", 3200.0, (self.treble - 0.5) * 14.0),
+            self._biquad("highshelf", 4800.0, (self.presence - 0.5) * 10.0),
+        )
+        self._tone_coeffs = tuple(coeff for coeff in specs if coeff is not None)
+
+    def _apply_tone(self, source):
+        coeffs = self._tone_coeffs
+        if not coeffs:
+            return source
+        states = list(self._tone_state)
+        out = source
+        for index, (b0, b1, b2, a1, a2) in enumerate(coeffs):
+            x1, x2, y1, y2 = states[index]
+            block = np.empty_like(out)
+            for i, x0 in enumerate(out):
+                y0 = b0 * x0 + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+                block[i] = y0
+                x2 = x1
+                x1 = x0
+                y2 = y1
+                y1 = y0
+            states[index] = (np.float32(x1), np.float32(x2), np.float32(y1), np.float32(y2))
+            out = block
+        self._tone_state = states
+        return out
+
+    def _apply_cuts(self, source):
+        low = float(self.low_cut)
+        high = float(self.high_cut)
+        do_hp = low > 30.0
+        do_lp = high < 18000.0
+        if not do_hp and not do_lp:
+            return source
+        hp_a = np.float32(np.exp(-2.0 * np.pi * min(low, self.rate * 0.45) / float(self.rate))) if do_hp else None
+        lp_a = np.float32(np.exp(-2.0 * np.pi * min(high, self.rate * 0.45) / float(self.rate))) if do_lp else None
+        hp_x = self._hp_x
+        hp_y = self._hp_y
+        lp_y = self._lp_y
+        out = np.empty_like(source)
+        for i, x0 in enumerate(source):
+            sample = x0
+            if do_hp:
+                hp_y = hp_a * (hp_y + sample - hp_x)
+                hp_x = sample
+                sample = hp_y
+            if do_lp:
+                lp_y = (np.float32(1.0) - lp_a) * sample + lp_a * lp_y
+                sample = lp_y
+            out[i] = sample
+        self._hp_x = np.float32(hp_x)
+        self._hp_y = np.float32(hp_y)
+        self._lp_y = np.float32(lp_y)
+        return out
+
+    def _apply_cab(self, source):
+        bank = self._cab_bank
+        if not bank or not bank[0] or self.ir_mix <= 1e-4:
+            return source
+        name, kernel, spectra = bank
+        frames = int(source.shape[0])
+        nfft = self._cab_nfft(frames, kernel.size)
+        spectrum = spectra.get(nfft)
+        if spectrum is None:
+            padded = np.zeros(nfft, dtype=np.float32)
+            padded[: kernel.size] = kernel
+            spectrum = np.fft.rfft(padded)
+        frame = np.zeros(nfft, dtype=np.float32)
+        frame[:frames] = source
+        wet = np.fft.irfft(np.fft.rfft(frame) * spectrum, nfft).astype(np.float32, copy=False)
+        tail = self._cab_tail
+        if (
+            self._cab_tail_name == name
+            and isinstance(tail, np.ndarray)
+            and tail.shape == wet.shape
+            and tail.dtype == np.float32
+        ):
+            wet = np.add(wet, tail, dtype=np.float32)
+        heard = self._apply_cuts(np.ascontiguousarray(wet[:frames], dtype=np.float32))
+        new_tail = np.zeros(nfft, dtype=np.float32)
+        if nfft > frames:
+            new_tail[: nfft - frames] = wet[frames:]
+        self._cab_tail = new_tail
+        self._cab_tail_name = name
+        mix = np.float32(np.clip(self.ir_mix, 0.0, 1.0))
+        return ((np.float32(1.0) - mix) * source + mix * heard).astype(np.float32)
+
     def source(self, indata):
         if indata.shape[1] < 2:
             source = indata[:, 0]
@@ -337,8 +676,48 @@ class FastAmp:
             print(f"Input signal peak={peak:.3f} mic={mic:.3f} inst={inst:.3f}", flush=True)
         return source
 
+    def _push_tuner(self, source):
+        """Track pitch on the clean guitar, a few times a second, off the hot path's worst case."""
+        n = int(source.shape[0])
+        if n <= 0:
+            return
+        buf = self._tune_buf
+        pos = self._tune_pos
+        end = pos + n
+        if end <= buf.size:
+            buf[pos:end] = source
+        else:
+            first = buf.size - pos
+            buf[pos:] = source[:first]
+            buf[: n - first] = source[first:]
+        self._tune_pos = (pos + n) % buf.size
+        self._tune_fill = min(buf.size, self._tune_fill + n)
+        self._tune_since += n
+        peak = float(np.max(np.abs(source)))
+        if peak < 0.012:
+            self._tune_hold -= n
+            if self._tune_hold <= 0:
+                self.tuner = _idle_tuner()
+            return
+        if self._tune_fill < buf.size or self._tune_since < 2048:
+            return
+        self._tune_since = 0
+        if self._tune_pos == 0:
+            frame = buf
+        else:
+            frame = np.concatenate((buf[self._tune_pos :], buf[: self._tune_pos]))
+        found = estimate_pitch(frame, self.rate)
+        if found is None:
+            self._tune_hold -= n
+            if self._tune_hold <= 0:
+                self.tuner = _idle_tuner()
+            return
+        self._tune_hold = int(0.35 * self.rate)
+        self.tuner = found
+
     def render(self, indata, frames):
         source = self.source(indata).astype(np.float32, copy=False)
+        self._push_tuner(source)
         # Cheap rumble scrub: subtract a 64-sample boxcar (~1.3 ms @ 48 kHz). Vectorized, no per-sample Python.
         if source.shape[0] >= 8:
             kernel = np.float32(1.0 / 64.0)
@@ -357,6 +736,8 @@ class FastAmp:
         driven = source * self.drive
         clipped = np.tanh(driven + 0.25 * driven * np.abs(driven))
         distorted = np.tanh(clipped * np.float32(3.5)).astype(np.float32)
+        distorted = self._apply_tone(distorted)
+        distorted = self._apply_cab(distorted)
         positions = (self.write + self.offsets[:frames]) % self.ring_size
         echo1 = self.ring[(positions - self.delay_frames) % self.ring_size]
         echo2 = self.ring[(positions - 2 * self.delay_frames) % self.ring_size]
@@ -379,7 +760,14 @@ class FastAmp:
     def input_callback(self, indata, frames, time_info, status):
         if status:
             print(status, file=sys.stderr)
-        result = self.render(indata, frames)
+        try:
+            result = self.render(indata, frames)
+        except Exception as error:
+            message = f"{type(error).__name__}: {error}"
+            if message != self._render_error:
+                self._render_error = message
+                print(f"Amp render error: {message}", file=sys.stderr, flush=True)
+            result = np.zeros((frames, 2), dtype=np.float32)
         try:
             self.pending.put_nowait(result)
         except queue.Full:
@@ -656,10 +1044,10 @@ def _system_default_sink():
 def pick_playback_sink(query=None):
     """Choose a live PipeWire playback sink.
 
-    Explicit query (including leftover Logitech strings): match if present.
-    If missing — especially a dead Logitech headset — fall back instead of
-    failing. Auto / default order: Scarlett/Focusrite out → system default →
-    first non-dummy sink.
+    Explicit query: match if that sink is present. A missing device, including
+    an unplugged Logitech headset, falls back instead of failing.
+    Auto order: system default sink, then a connected Logitech headset, then
+    Scarlett/Focusrite out, then the first non-dummy sink.
     """
     names = list_pipewire_sink_names()
     usable = [name for name in names if _is_usable_playback_sink(name)]
@@ -668,16 +1056,15 @@ def pick_playback_sink(query=None):
         hit = _match_sink_among(names, query)
         if hit and _is_usable_playback_sink(hit):
             return hit
-        if hit:
-            # Matched a null/dummy sink name; ignore and auto-pick.
-            pass
-        elif _looks_like_logitech_sink(query):
-            # Soften: dead Logitech preference must not block routing.
-            pass
-        else:
-            # Explicit non-Logitech query with no match: still try auto so a
-            # stale Advanced field does not hang pump_pipewire forever.
-            pass
+
+    default = _system_default_sink()
+    if default and default in names and _is_usable_playback_sink(default):
+        return default
+
+    headsets = [name for name in usable if _looks_like_logitech_sink(name)]
+    if headsets:
+        headsets.sort(key=_rank_sink_name)
+        return headsets[0]
 
     for token in ("scarlett solo", "scarlett", "focusrite"):
         preferred = [name for name in usable if token in name.lower()]
@@ -685,12 +1072,8 @@ def pick_playback_sink(query=None):
             preferred.sort(key=_rank_sink_name)
             return preferred[0]
 
-    default = _system_default_sink()
-    if default and default in names and _is_usable_playback_sink(default):
-        return default
     if usable:
-        usable_sorted = sorted(usable, key=_rank_sink_name)
-        return usable_sorted[0]
+        return sorted(usable, key=_rank_sink_name)[0]
     return None
 
 
@@ -854,7 +1237,21 @@ def _drain_stderr(proc):
             print(line, file=sys.stderr, flush=True)
 
 
-def validate_params(feedback, mix, volume, wah_mix=None, wah_q=None, wah_freq=None):
+def validate_params(
+    feedback,
+    mix,
+    volume,
+    wah_mix=None,
+    wah_q=None,
+    wah_freq=None,
+    bass=None,
+    mid=None,
+    treble=None,
+    presence=None,
+    ir_mix=None,
+    low_cut=None,
+    high_cut=None,
+):
     if not 0.0 <= feedback <= 0.9 or not 0.0 <= mix <= 1.0 or not 0.0 <= volume <= 4.0:
         raise ValueError("feedback must be 0-0.9; mix must be 0-1; volume must be 0-4")
     if wah_mix is not None and not 0.0 <= float(wah_mix) <= 1.0:
@@ -863,6 +1260,13 @@ def validate_params(feedback, mix, volume, wah_mix=None, wah_q=None, wah_freq=No
         raise ValueError("wah_q must be 0.4-16")
     if wah_freq is not None and not 120.0 <= float(wah_freq) <= 12000.0:
         raise ValueError("wah_freq must be 120-12000 Hz")
+    for name, value in (("bass", bass), ("mid", mid), ("treble", treble), ("presence", presence), ("ir_mix", ir_mix)):
+        if value is not None and not 0.0 <= float(value) <= 1.0:
+            raise ValueError(f"{name} must be 0-1")
+    if low_cut is not None and not 20.0 <= float(low_cut) <= 800.0:
+        raise ValueError("low_cut must be 20-800 Hz")
+    if high_cut is not None and not 1000.0 <= float(high_cut) <= 20000.0:
+        raise ValueError("high_cut must be 1000-20000 Hz")
 
 
 class AmpSession:
@@ -886,12 +1290,14 @@ class AmpSession:
             if not self.amp:
                 return {"running": False, "error": self._error, "config": self.config}
             meters = dict(self.amp.meters)
+            tuner = dict(self.amp.tuner)
             return {
                 "running": self.amp.running,
                 "error": self._error,
                 "config": self.config,
                 "params": self.amp.params_snapshot(),
                 "meters": meters,
+                "tuner": tuner,
             }
 
     def apply_params(self, **kwargs):
@@ -905,7 +1311,28 @@ class AmpSession:
             wah_mix = kwargs["wah_mix"] if kwargs.get("wah_mix") is not None else self.amp.wah_mix
             wah_q = kwargs["wah_q"] if kwargs.get("wah_q") is not None else self.amp.wah_q
             wah_freq = kwargs["wah_freq"] if kwargs.get("wah_freq") is not None else self.amp.wah_freq
-            validate_params(feedback, mix, volume, wah_mix=wah_mix, wah_q=wah_q, wah_freq=wah_freq)
+            bass = kwargs["bass"] if kwargs.get("bass") is not None else self.amp.bass
+            mid = kwargs["mid"] if kwargs.get("mid") is not None else self.amp.mid
+            treble = kwargs["treble"] if kwargs.get("treble") is not None else self.amp.treble
+            presence = kwargs["presence"] if kwargs.get("presence") is not None else self.amp.presence
+            ir_mix = kwargs["ir_mix"] if kwargs.get("ir_mix") is not None else self.amp.ir_mix
+            low_cut = kwargs["low_cut"] if kwargs.get("low_cut") is not None else self.amp.low_cut
+            high_cut = kwargs["high_cut"] if kwargs.get("high_cut") is not None else self.amp.high_cut
+            validate_params(
+                feedback,
+                mix,
+                volume,
+                wah_mix=wah_mix,
+                wah_q=wah_q,
+                wah_freq=wah_freq,
+                bass=bass,
+                mid=mid,
+                treble=treble,
+                presence=presence,
+                ir_mix=ir_mix,
+                low_cut=low_cut,
+                high_cut=high_cut,
+            )
             self.amp.apply_params(**kwargs)
 
     def start(self, config):
@@ -913,7 +1340,21 @@ class AmpSession:
             if self.amp and self.amp.running:
                 raise RuntimeError("Amp is already running.")
             self._error = None
-        validate_params(config["feedback"], config["mix"], config["volume"])
+        validate_params(
+            config["feedback"],
+            config["mix"],
+            config["volume"],
+            wah_mix=config.get("wah_mix", 0.0),
+            wah_q=config.get("wah_q", 5.0),
+            wah_freq=config.get("wah_freq", 900.0),
+            bass=config.get("bass", 0.5),
+            mid=config.get("mid", 0.5),
+            treble=config.get("treble", 0.5),
+            presence=config.get("presence", 0.5),
+            ir_mix=config.get("ir_mix", 0.0),
+            low_cut=config.get("low_cut", 80.0),
+            high_cut=config.get("high_cut", 8000.0),
+        )
         rate = int(config.get("rate", 48000))
         blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 256)
         input_device, output_device, dev_meta = resolve_audio_devices(config)
@@ -930,7 +1371,7 @@ class AmpSession:
             if resolved:
                 output_label = f"PipeWire: {resolved}"
             elif _is_auto_pw_sink(pw_sink):
-                output_label = "PipeWire: auto (system default / Scarlett out)"
+                output_label = "PipeWire: auto (system default / headset)"
             else:
                 output_label = f"PipeWire sink matching '{pw_sink}' (fallback if missing)"
             output_channels = 2
@@ -949,6 +1390,15 @@ class AmpSession:
             wah_freq=float(config.get("wah_freq", 900.0)),
             wah_q=float(config.get("wah_q", 5.0)),
             wah_mix=float(config.get("wah_mix", 0.0)),
+            bass=float(config.get("bass", 0.5)),
+            mid=float(config.get("mid", 0.5)),
+            treble=float(config.get("treble", 0.5)),
+            presence=float(config.get("presence", 0.5)),
+            ir=str(config.get("ir") or ""),
+            ir_mix=float(config.get("ir_mix", 0.0)),
+            low_cut=float(config.get("low_cut", 80.0)),
+            high_cut=float(config.get("high_cut", 8000.0)),
+            preset=str(config.get("preset") or ""),
         )
         stored = {
             "device": dev_meta["device"],
