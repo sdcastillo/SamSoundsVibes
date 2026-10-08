@@ -35,7 +35,7 @@ def main():
     parser.add_argument(
         '--pw-sink',
         default=None,
-        help=f'PipeWire playback sink (default: {DEFAULT_PW_SINK} = Scarlett out / system default / first real sink)',
+        help=f'PipeWire playback sink (default: {DEFAULT_PW_SINK} = system default, else headset, else Scarlett)',
     )
     parser.add_argument('--music-source', default=None, help='PipeWire source for headset channel 2 (background music)')
     parser.add_argument('--rate', type=int, default=48000)
@@ -45,6 +45,7 @@ def main():
     parser.add_argument('--feedback', type=float, default=0.35)
     parser.add_argument('--mix', type=float, default=0.30)
     parser.add_argument('--volume', type=float, default=0.35)
+    parser.add_argument('--preset', default=None, help='Factory preset name or slot number from the POD Go backup')
     args = parser.parse_args()
 
     if args.list_devices:
@@ -76,7 +77,7 @@ def main():
             if resolved:
                 output_label = f"PipeWire: {resolved}"
             elif _is_auto_pw_sink(pw_sink):
-                output_label = "PipeWire: auto (system default / Scarlett out)"
+                output_label = "PipeWire: auto (system default / headset)"
             else:
                 output_label = f"PipeWire sink matching '{pw_sink}' (fallback if missing)"
             output_channels = 2
@@ -86,10 +87,46 @@ def main():
             output_channels = 2 if output_info['max_output_channels'] >= 2 else 1
             output_label = f"{output_info['name']} ({output_channels} ch)"
         amp = FastAmp(args.rate, args.delay_ms, args.feedback, args.mix, args.drive, args.volume)
+        if args.preset:
+            from amp_presets import engine_params, get_preset
+
+            preset = None
+            try:
+                slot = int(args.preset)
+            except ValueError:
+                slot = None
+            if slot is not None and 0 <= slot <= 127:
+                try:
+                    preset = get_preset(slot=slot)
+                except KeyError:
+                    preset = None
+            if preset is None:
+                preset = get_preset(name=args.preset)
+            params = engine_params(preset)
+            validate_params(
+                params["feedback"],
+                params["mix"],
+                params["volume"],
+                wah_mix=params["wah_mix"],
+                wah_q=params["wah_q"],
+                wah_freq=params["wah_freq"],
+                bass=params["bass"],
+                mid=params["mid"],
+                treble=params["treble"],
+                presence=params["presence"],
+                ir_mix=params["ir_mix"],
+                low_cut=params["low_cut"],
+                high_cut=params["high_cut"],
+            )
+            amp.apply_params(**params)
+            print(f"Preset: {preset['name']} — {preset['amp']} / {preset['cab']}")
         print('Fast Direct ALSA Guitar Amp')
         print(f"Input:  {input_info['name']} ({input_channels} ch)")
         print(f"Output: {output_label}")
-        print(f"Drive={args.drive}, delay={args.delay_ms}ms, feedback={args.feedback}, mix={args.mix}, volume={args.volume}")
+        snap = amp.params_snapshot()
+        print(
+            f"Drive={snap['drive']}, delay={snap['delay_ms']}ms, feedback={snap['feedback']}, mix={snap['mix']}, volume={snap['volume']}"
+        )
         print('Listening on both inputs; the instrument jack is preferred.')
         print('Stereo: live note leads on the left, 20 ms double leads on the right, delay alternates.')
         print('Set Scarlett DIRECT MONITOR to OFF. Press Ctrl+C to stop.')
