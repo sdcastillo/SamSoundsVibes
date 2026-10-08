@@ -4,20 +4,86 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
-  <link rel="stylesheet" href="/static/app.css">
+  <link rel="stylesheet" href="/static/app.css?v=tuner1">
 </head>
 <body>
   <main>
     <p><a href="https://sdcastillo.github.io/SamSoundsVibes/">← SamSoundsVibes</a></p>
     <header>
       <h1>Guitar Amp</h1>
-      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start. Playback goes to the system default sink (or Scarlett out if present) — no device picking required.</p>
+      <p class="lede">Plug in your Scarlett Solo, set direct monitor OFF, then Start. Guitar goes in the Solo. Playback goes to the system default output, which is the Logitech headset when that is the default.</p>
     </header>
 
     <section class="status-bar" aria-live="polite">
       <span id="run-state" class="pill stopped">Stopped</span>
       <span id="run-detail" class="detail"></span>
       <span id="ws-state" class="detail">Connecting…</span>
+    </section>
+
+    <section class="panel tuner" aria-label="Tuner">
+      <h2>Tuner</h2>
+      <div class="tuner-readout">
+        <p id="tuner-note" class="tuner-note" aria-live="polite">–</p>
+        <p id="tuner-hz" class="tuner-hz">Play a string</p>
+      </div>
+      <div class="tuner-scale">
+        <span class="tuner-side">flat</span>
+        <div class="tuner-track">
+          <div class="tuner-center"></div>
+          <div id="tuner-needle" class="tuner-needle"></div>
+        </div>
+        <span class="tuner-side">sharp</span>
+      </div>
+      <p id="tuner-cents" class="tuner-cents">0 cents</p>
+      <div class="tuner-strings" id="tuner-strings">
+        <span data-midi="40">E</span>
+        <span data-midi="45">A</span>
+        <span data-midi="50">D</span>
+        <span data-midi="55">G</span>
+        <span data-midi="59">B</span>
+        <span data-midi="64">E</span>
+      </div>
+    </section>
+
+    <section class="panel presets" aria-label="Factory presets">
+      <h2>Factory presets</h2>
+      <p class="lede">128 tones from your POD Go backup. Loading one sets drive, tone, cabinet, delay, and wah on this amp.</p>
+      <label for="preset-search">Search</label>
+      <input id="preset-search" type="search" placeholder="Name, amp, or cab" autocomplete="off">
+      <label for="preset-list">Preset</label>
+      <select id="preset-list" size="8" aria-label="Factory preset"></select>
+      <div class="preset-nav">
+        <button type="button" id="preset-prev" class="secondary">Previous</button>
+        <button type="button" id="preset-next" class="secondary">Next</button>
+      </div>
+      <p id="preset-meta" class="preset-meta">Pick a preset.</p>
+      <p id="preset-chain" class="preset-chain"></p>
+      <div class="tone-grid">
+        <div class="control" data-param="bass">
+          <div class="control-head"><span>Bass</span><output id="out-bass">0.50</output></div>
+          <input type="range" id="bass" min="0" max="1" step="0.01" value="0.5">
+        </div>
+        <div class="control" data-param="mid">
+          <div class="control-head"><span>Mid</span><output id="out-mid">0.50</output></div>
+          <input type="range" id="mid" min="0" max="1" step="0.01" value="0.5">
+        </div>
+        <div class="control" data-param="treble">
+          <div class="control-head"><span>Treble</span><output id="out-treble">0.50</output></div>
+          <input type="range" id="treble" min="0" max="1" step="0.01" value="0.5">
+        </div>
+        <div class="control" data-param="presence">
+          <div class="control-head"><span>Presence</span><output id="out-presence">0.50</output></div>
+          <input type="range" id="presence" min="0" max="1" step="0.01" value="0.5">
+        </div>
+      </div>
+      <label for="ir">Cabinet IR</label>
+      <select id="ir" aria-label="Cabinet impulse response">
+        <option value="">Cab off</option>
+      </select>
+      <div class="control" data-param="ir_mix">
+        <div class="control-head"><span>Cab mix</span><output id="out-ir_mix">0.00</output></div>
+        <input type="range" id="ir_mix" min="0" max="1" step="0.01" value="0">
+      </div>
     </section>
 
     <section class="panel knobs">
@@ -127,10 +193,10 @@
     </details>
 
     <p class="note">
-      Input auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Playback defaults to the system default PipeWire sink (Scarlett/Focusrite out if present; never requires a Logitech headset). Sliders update live while the amp runs.
+      Input auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Playback follows the system default PipeWire sink, so a plugged-in Logitech headset that is the default gets the guitar. If that sink is missing, playback falls back to Scarlett, then any other real output. Sliders update live while the amp runs.
       OBS can capture <code>processed_guitar.monitor</code> when PipeWire is available.
     </p>
   </main>
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=tuner1"></script>
 </body>
 </html>
