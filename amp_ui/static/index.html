@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
   <link rel="stylesheet" href="/static/app.css?v=tuner1">
+  <link rel="stylesheet" href="/static/practice.css?v=practice1">
 </head>
 <body>
   <main>
@@ -18,7 +19,13 @@
       <span id="run-state" class="pill stopped">Stopped</span>
       <span id="run-detail" class="detail"></span>
       <span id="ws-state" class="detail">Connecting…</span>
+      <span id="practice-pill" class="pill practice-pill" hidden>Track playing</span>
     </section>
+
+    <div class="mode-tabs" role="tablist" aria-label="Amp sections">
+      <button type="button" id="tab-rig" role="tab" aria-selected="true">Amp</button>
+      <button type="button" id="tab-practice" role="tab" aria-selected="false">Practice</button>
+    </div>
 
     <section class="panel tuner" aria-label="Tuner">
       <h2>Tuner</h2>
@@ -45,6 +52,7 @@
       </div>
     </section>
 
+    <div id="rig-panels">
     <section class="panel presets" aria-label="Factory presets">
       <h2>Factory presets</h2>
       <p class="lede">128 tones from your POD Go backup. Loading one sets drive, tone, cabinet, delay, and wah on this amp.</p>
@@ -196,7 +204,108 @@
       Input auto-detect prefers Focusrite Scarlett Solo on ALSA (USB 1235:8211). Playback follows the system default PipeWire sink, so a plugged-in Logitech headset that is the default gets the guitar. If that sink is missing, playback falls back to Scarlett, then any other real output. Sliders update live while the amp runs.
       OBS can capture <code>processed_guitar.monitor</code> when PipeWire is available.
     </p>
+    </div>
+
+    <section id="practice-panel" class="panel practice" hidden aria-label="Practice">
+      <h2>Practice</h2>
+      <p class="lede">Solo over a backing track while the guitar still runs through the amp. The track plays in this browser, so open the page on the same machine as the amp if you want both in the same speakers or headset.</p>
+
+      <div class="source-tabs" role="tablist" aria-label="Backing source">
+        <button type="button" id="source-library" role="tab" aria-selected="true">Library</button>
+        <button type="button" id="source-local" role="tab" aria-selected="false">My file</button>
+      </div>
+
+      <div id="practice-library">
+        <label for="practice-track">Backing track</label>
+        <select id="practice-track"></select>
+      </div>
+
+      <div id="practice-local" class="practice-block" hidden>
+        <label for="practice-file">Audio file</label>
+        <input id="practice-file" type="file" accept="audio/*,.mp3,.wav,.ogg,.m4a,.flac,.aac">
+        <div class="key-row">
+          <div>
+            <label for="practice-tonic">Tonic</label>
+            <select id="practice-tonic"></select>
+          </div>
+          <div>
+            <label for="practice-mode">Mode</label>
+            <select id="practice-mode">
+              <option value="minor">Natural minor</option>
+              <option value="major">Major</option>
+              <option value="dorian">Dorian</option>
+              <option value="mixolydian">Mixolydian</option>
+            </select>
+          </div>
+        </div>
+        <p class="detect-note">Set the key yourself. Scale suggestions follow that key. A file's chords often read as the relative major or the IV, so this page does not guess.</p>
+        <label for="practice-local-bpm">Tempo (optional)</label>
+        <input id="practice-local-bpm" type="number" min="40" max="240" step="1" inputmode="numeric" placeholder="BPM">
+        <label for="practice-local-chords">Chord progression (optional, one chord per bar)</label>
+        <input id="practice-local-chords" type="text" placeholder="Am7 Dm7 Am7 Em7" autocomplete="off">
+      </div>
+
+      <div class="transport" aria-label="Transport">
+        <button type="button" id="practice-play">Play</button>
+        <button type="button" id="practice-pause" class="secondary" disabled>Pause</button>
+        <label class="loop-toggle" for="practice-loop">
+          <input id="practice-loop" type="checkbox" checked> Loop
+        </label>
+      </div>
+      <div class="seek-row">
+        <input id="practice-seek" type="range" min="0" max="1" step="0.001" value="0" aria-label="Position in the track">
+        <span id="practice-time" class="time">0:00 / 0:00</span>
+      </div>
+
+      <div class="mix-block">
+        <h3>Volume and mix</h3>
+        <div class="control">
+          <div class="control-head"><span>Guitar (amp volume)</span><output id="out-practice-guitar">0.35</output></div>
+          <input id="practice-guitar" type="range" min="0" max="4" step="0.05" value="0.35" aria-label="Guitar volume">
+        </div>
+        <div class="control">
+          <div class="control-head"><span>Backing track</span><output id="out-backing">0.80</output></div>
+          <input id="backing-level" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Backing track volume">
+        </div>
+        <p class="mix-note">Guitar level is the amp's Volume knob, so the tone stays put and only the loudness moves. Backing level is the track in this browser. Balance the two while you play.</p>
+      </div>
+
+      <div id="practice-meta" class="practice-meta"></div>
+      <div class="now-row">
+        <p id="practice-now" class="now-chord" aria-live="polite"></p>
+      </div>
+      <ol id="practice-bars" class="bars"></ol>
+      <p id="chord-legend" class="chord-legend" aria-live="polite"></p>
+
+      <div class="study-grid">
+        <div>
+          <h3>Scales</h3>
+          <div id="practice-scales" class="scale-list" role="list"></div>
+        </div>
+        <div>
+          <div class="lesson-head">
+            <h3>Lessons</h3>
+            <span id="lesson-progress" class="progress-count"></span>
+          </div>
+          <div id="practice-lessons" class="lesson-list"></div>
+          <div id="lesson-detail" class="lesson-detail" hidden></div>
+          <button type="button" id="practice-clear" class="clear-progress">Clear checkmarks for this track</button>
+        </div>
+      </div>
+
+      <div class="fret-head">
+        <h3>Fretboard</h3>
+        <button type="button" id="practice-neck" class="neck-btn">Full neck</button>
+      </div>
+      <p id="fretboard-caption" class="fret-caption"></p>
+      <div id="fretboard" class="fretboard-scroll"></div>
+      <div id="fret-legend" class="fret-legend"></div>
+
+      <p id="practice-error" class="error" hidden></p>
+    </section>
   </main>
+  <script src="/static/practice-theory.js?v=practice1"></script>
   <script src="/static/app.js?v=tuner1"></script>
+  <script src="/static/practice.js?v=practice1"></script>
 </body>
 </html>

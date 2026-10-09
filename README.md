@@ -111,6 +111,18 @@ When you visit this site, you're experiencing vibe coding in action:
 
 ---
 
+## Guitar amp
+
+The browser amp is a local control panel for the guitar engine. From the repo root:
+
+```bash
+python3 -m amp_ui
+```
+
+Open http://127.0.0.1:8790/ on the same machine. **Amp** is the tuner, presets, knobs, and touchpad. **Practice** plays an original backing loop (or a file from your computer) while the guitar still runs through the amp, and shows the key, the chords, scales that fit, and a fretboard.
+
+**Lessons** on that tab walk a scale’s five pentatonic boxes, light the chord tones of the bar that is playing, give a short phrase in tab, and a phrasing tip. Checkmarks stay in the browser. To add a loop or a lesson, edit `amp_ui/static/practice/tracks.json`. The full steps are in [docs/browser-amp-ui.md](docs/browser-amp-ui.md).
+
 ## 💡 What's Next?
 
 This is just the beginning. As I continue to explore vibe coding and my commitment to democratizing creation, I'm working on:
