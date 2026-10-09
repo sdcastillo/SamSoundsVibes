@@ -1,10 +1,11 @@
 {
-  "_readme": "Backing-track catalog for Practice mode. Drop a loop in audio/ and append an object, or omit scales and the UI will suggest them from tonic and mode. Shipped files are original synthesis dedicated to the public domain (CC0), built by amp_ui/practice/generate_backing_tracks.py. Do not commit copyrighted backing tracks.",
+  "_readme": "Backing-track catalog for Practice mode. Drop a loop in audio/ and append an object, or omit scales and the UI will suggest them from tonic and mode. Shipped files are original synthesis dedicated to the public domain (CC0), built by amp_ui/practice/generate_backing_tracks.py. Do not commit copyrighted backing tracks. genre is the style filter in the track picker.",
   "version": 1,
   "tracks": [
     {
       "id": "a-minor-blues",
       "title": "A Minor Blues",
+      "genre": "Blues",
       "file": "audio/a-minor-blues.wav",
       "key": "A minor",
       "tonic": "A",
@@ -12,30 +13,85 @@
       "bpm": 96,
       "timeSignature": "4/4",
       "feel": "shuffle",
-      "progression": ["Am7", "Am7", "Am7", "Am7", "Dm7", "Dm7", "Am7", "Am7", "Em7", "Dm7", "Am7", "Em7"],
+      "progression": [
+        "Am7",
+        "Am7",
+        "Am7",
+        "Am7",
+        "Dm7",
+        "Dm7",
+        "Am7",
+        "Am7",
+        "Em7",
+        "Dm7",
+        "Am7",
+        "Em7"
+      ],
       "scales": [
         {
           "id": "a-minor-pentatonic",
           "name": "A minor pentatonic",
           "root": "A",
-          "intervals": [0, 3, 5, 7, 10],
-          "notes": ["A", "C", "D", "E", "G"],
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "A",
+            "C",
+            "D",
+            "E",
+            "G"
+          ],
           "why": "The home box for this blues. A, C, E, and G are the Am7 chord, and the same five notes sit cleanly on Dm7 and Em7. Start here and you can play straight through all 12 bars."
         },
         {
           "id": "a-blues",
           "name": "A blues",
           "root": "A",
-          "intervals": [0, 3, 5, 6, 7, 10],
-          "notes": ["A", "C", "D", "Eb", "E", "G"],
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "A",
+            "C",
+            "D",
+            "Eb",
+            "E",
+            "G"
+          ],
           "why": "Minor pentatonic plus Eb, the flat 5. Bend it or pass through it into E. It is a spice note: holding it across Em7 puts a flat 5 on that chord, which sounds wrong if you park there."
         },
         {
           "id": "a-natural-minor",
           "name": "A natural minor (Aeolian)",
           "root": "A",
-          "intervals": [0, 2, 3, 5, 7, 8, 10],
-          "notes": ["A", "B", "C", "D", "E", "F", "G"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+          ],
           "home": true,
           "why": "The scale this progression is built from. F, the flat 6, is the color of the Dm7 bars (it is the flat 3 of D). Use F there. On the Em7 bars F is a flat 9, so ease off it until the chord moves."
         },
@@ -43,8 +99,24 @@
           "id": "a-dorian",
           "name": "A Dorian",
           "root": "A",
-          "intervals": [0, 2, 3, 5, 7, 9, 10],
-          "notes": ["A", "B", "C", "D", "E", "F#", "G"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#",
+            "G"
+          ],
           "why": "Dorian raises the 6th to F#. That note fits a major IV (D or D7), not this track: the iv is Dm7, whose F natural fights F#. Use A Dorian only on the Am7 bars if you want a brighter color, and leave it before Dm7 arrives. It is not the home scale here."
         }
       ],
@@ -56,11 +128,31 @@
           "kind": "boxes",
           "scaleId": "a-minor-pentatonic",
           "steps": [
-            {"id": "box-1", "box": 1, "text": "Home box. Start and end every pass on an orange root. Say the five notes once — A, C, D, E, G — then play the shape until you do not need to look."},
-            {"id": "box-2", "box": 2, "text": "Shift up from box 1. The frets the two boxes share are the same notes. Use those frets as the handrail so the position change is a slide, not a jump."},
-            {"id": "box-3", "box": 3, "text": "Middle of the neck. The reach is wider here than in box 1, mostly so the B string fits. If it feels like a stretch, you are in the right box."},
-            {"id": "box-4", "box": 4, "text": "High position of the same scale. Start on an orange dot. The frets are smaller; do not grip harder to make up for it."},
-            {"id": "box-5", "box": 5, "text": "This box sits just behind the home box. Learn it so you can move down the neck, not only up."}
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box. Start and end every pass on an orange root. Say the five notes once \u2014 A, C, D, E, G \u2014 then play the shape until you do not need to look."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "Shift up from box 1. The frets the two boxes share are the same notes. Use those frets as the handrail so the position change is a slide, not a jump."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Middle of the neck. The reach is wider here than in box 1, mostly so the B string fits. If it feels like a stretch, you are in the right box."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "High position of the same scale. Start on an orange dot. The frets are smaller; do not grip harder to make up for it."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "This box sits just behind the home box. Learn it so you can move down the neck, not only up."
+            }
           ]
         },
         {
@@ -70,8 +162,18 @@
           "kind": "chord-tones",
           "scaleId": "a-minor-pentatonic",
           "steps": [
-            {"id": "pentatonic", "title": "Inside the pentatonic", "scaleId": "a-minor-pentatonic", "text": "On Am7 every pentatonic note except D is a chord tone. D is the 11th, a passing note, not a place to end. On Dm7 the pentatonic gives you D, A, and C. E and G are not chord tones of Dm7, and F — the flat 3 of Dm — is not in the pentatonic. On Em7 you have E, G, and D. B, the 5th of Em, is missing until you use the full minor scale."},
-            {"id": "full-scale", "title": "Notes the pentatonic left out", "scaleId": "a-natural-minor", "text": "A natural minor adds F and B, drawn in blue when they are not chord tones. F is a chord tone of Dm7. B is a chord tone of Em7. On the Em7 bars, F is a flat 9, so do not sit on it. End phrases on the bright dots."}
+            {
+              "id": "pentatonic",
+              "title": "Inside the pentatonic",
+              "scaleId": "a-minor-pentatonic",
+              "text": "On Am7 every pentatonic note except D is a chord tone. D is the 11th, a passing note, not a place to end. On Dm7 the pentatonic gives you D, A, and C. E and G are not chord tones of Dm7, and F \u2014 the flat 3 of Dm \u2014 is not in the pentatonic. On Em7 you have E, G, and D. B, the 5th of Em, is missing until you use the full minor scale."
+            },
+            {
+              "id": "full-scale",
+              "title": "Notes the pentatonic left out",
+              "scaleId": "a-natural-minor",
+              "text": "A natural minor adds F and B, drawn in blue when they are not chord tones. F is a chord tone of Dm7. B is a chord tone of Em7. On the Em7 bars, F is a flat 9, so do not sit on it. End phrases on the bright dots."
+            }
           ]
         },
         {
@@ -87,15 +189,42 @@
               "box": 1,
               "text": "Even eighth notes. It leaves the root, climbs, and comes back to A. Loop it over the first four Am7 bars, then move the same contour into box 2.",
               "notes": [
-                {"string": "E", "fret": 5},
-                {"string": "A", "fret": 5},
-                {"string": "A", "fret": 7},
-                {"string": "D", "fret": 5},
-                {"string": "D", "fret": 7},
-                {"string": "A", "fret": 7},
-                {"string": "A", "fret": 5},
-                {"string": "E", "fret": 8},
-                {"string": "E", "fret": 5}
+                {
+                  "string": "E",
+                  "fret": 5
+                },
+                {
+                  "string": "A",
+                  "fret": 5
+                },
+                {
+                  "string": "A",
+                  "fret": 7
+                },
+                {
+                  "string": "D",
+                  "fret": 5
+                },
+                {
+                  "string": "D",
+                  "fret": 7
+                },
+                {
+                  "string": "A",
+                  "fret": 7
+                },
+                {
+                  "string": "A",
+                  "fret": 5
+                },
+                {
+                  "string": "E",
+                  "fret": 8
+                },
+                {
+                  "string": "E",
+                  "fret": 5
+                }
               ]
             }
           ]
@@ -107,8 +236,22 @@
           "kind": "tip",
           "scaleId": "a-minor-pentatonic",
           "steps": [
-            {"id": "bend", "title": "Bend the flat 7 to the root", "box": 1, "bend": {"string": "B", "fret": 8, "semitones": 2}, "text": "Hear the target first: play the low E at fret 5 so you know what A sounds like, then bend up to that pitch. Stopping a little short of A and falling back is the smaller blues version of the same bend."},
-            {"id": "call", "title": "Call and response", "text": "Over the opening Am7 bars, play a one-bar question that ends on C or G, rest for a beat, and answer by ending on A. When Dm7 arrives you can end the question on D. F, the note that really spells Dm, lives in A natural minor, not the pentatonic."}
+            {
+              "id": "bend",
+              "title": "Bend the flat 7 to the root",
+              "box": 1,
+              "bend": {
+                "string": "B",
+                "fret": 8,
+                "semitones": 2
+              },
+              "text": "Hear the target first: play the low E at fret 5 so you know what A sounds like, then bend up to that pitch. Stopping a little short of A and falling back is the smaller blues version of the same bend."
+            },
+            {
+              "id": "call",
+              "title": "Call and response",
+              "text": "Over the opening Am7 bars, play a one-bar question that ends on C or G, rest for a beat, and answer by ending on A. When Dm7 arrives you can end the question on D. F, the note that really spells Dm, lives in A natural minor, not the pentatonic."
+            }
           ]
         }
       ]
@@ -116,6 +259,7 @@
     {
       "id": "e-minor-rock",
       "title": "E Minor Rock",
+      "genre": "Rock",
       "file": "audio/e-minor-rock.wav",
       "key": "E minor",
       "tonic": "E",
@@ -123,22 +267,59 @@
       "bpm": 120,
       "timeSignature": "4/4",
       "feel": "rock",
-      "progression": ["Em", "C", "G", "D", "Em", "C", "G", "D"],
+      "progression": [
+        "Em",
+        "C",
+        "G",
+        "D",
+        "Em",
+        "C",
+        "G",
+        "D"
+      ],
       "scales": [
         {
           "id": "e-minor-pentatonic",
           "name": "E minor pentatonic",
           "root": "E",
-          "intervals": [0, 3, 5, 7, 10],
-          "notes": ["E", "G", "A", "B", "D"],
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
           "why": "The rock lead shape. Every note agrees with Em, G, and D, and over C you are playing the 3rd, 5th, and color tones (E, G, D) rather than the root. Safe for the whole loop."
         },
         {
           "id": "e-natural-minor",
           "name": "E natural minor (Aeolian)",
           "root": "E",
-          "intervals": [0, 2, 3, 5, 7, 8, 10],
-          "notes": ["E", "F#", "G", "A", "B", "C", "D"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
           "home": true,
           "why": "This is the progression's own scale. C is a chord tone of the C chord, and F# is the 3rd of D, so both extra notes have a bar where they belong. Aim C at the C bar and F# at the D bar."
         },
@@ -146,16 +327,46 @@
           "id": "e-blues",
           "name": "E blues",
           "root": "E",
-          "intervals": [0, 3, 5, 6, 7, 10],
-          "notes": ["E", "G", "A", "Bb", "B", "D"],
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "Bb",
+            "B",
+            "D"
+          ],
           "why": "Minor pentatonic plus Bb, the flat 5. Use it as a short grace into B. Over D, Bb is a flat 6, which is bluesy in passing and sour if you hold it through the bar."
         },
         {
           "id": "e-dorian",
           "name": "E Dorian",
           "root": "E",
-          "intervals": [0, 2, 3, 5, 7, 9, 10],
-          "notes": ["E", "F#", "G", "A", "B", "C#", "D"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C#",
+            "D"
+          ],
           "why": "Dorian's raised 6th is C#. This loop's bVI is a C major chord, so C# clashes there. E Dorian fits an E minor tune whose IV is A major and that never plays a C chord. On this track, keep it to the Em and G bars."
         }
       ],
@@ -167,11 +378,31 @@
           "kind": "boxes",
           "scaleId": "e-minor-pentatonic",
           "steps": [
-            {"id": "box-1", "box": 1, "text": "Box 1 uses the open strings. Open low E and open high e are roots. Do not skip the open notes — they are part of the shape, not a separate trick."},
-            {"id": "box-2", "box": 2, "text": "One position up. The frets you just played at the top of box 1 are the bottom of this one."},
-            {"id": "box-3", "box": 3, "text": "The reach widens here so the B string fits. Keep the thumb quiet and let the elbow move."},
-            {"id": "box-4", "box": 4, "text": "Upper position. Find an orange root before you run the shape, so you know where the line wants to land."},
-            {"id": "box-5", "box": 5, "text": "In E the open box already sits on the nut, so this connecting shape is written an octave higher instead of below the nut. It links back toward box 1 at the 12th fret."}
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Box 1 uses the open strings. Open low E and open high e are roots. Do not skip the open notes \u2014 they are part of the shape, not a separate trick."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "One position up. The frets you just played at the top of box 1 are the bottom of this one."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "The reach widens here so the B string fits. Keep the thumb quiet and let the elbow move."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "Upper position. Find an orange root before you run the shape, so you know where the line wants to land."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "In E the open box already sits on the nut, so this connecting shape is written an octave higher instead of below the nut. It links back toward box 1 at the 12th fret."
+            }
           ]
         },
         {
@@ -181,8 +412,18 @@
           "kind": "chord-tones",
           "scaleId": "e-minor-pentatonic",
           "steps": [
-            {"id": "pentatonic", "title": "What the pentatonic covers", "scaleId": "e-minor-pentatonic", "text": "E minor pentatonic contains every note of Em (E, G, B) and of G (G, B, D). Over C you have E and G, the 3rd and the 5th, but not the root C. Over D you have D and A, the root and the 5th, but not F#, the 3rd. End phrases on the bright dots and the chord still sounds named."},
-            {"id": "full-scale", "title": "Put the missing roots back", "scaleId": "e-natural-minor", "text": "E natural minor adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord and the 2nd of the key. Those are the blue dots. C# is not in this scale — that would be E Dorian, and it fights the C chord."}
+            {
+              "id": "pentatonic",
+              "title": "What the pentatonic covers",
+              "scaleId": "e-minor-pentatonic",
+              "text": "E minor pentatonic contains every note of Em (E, G, B) and of G (G, B, D). Over C you have E and G, the 3rd and the 5th, but not the root C. Over D you have D and A, the root and the 5th, but not F#, the 3rd. End phrases on the bright dots and the chord still sounds named."
+            },
+            {
+              "id": "full-scale",
+              "title": "Put the missing roots back",
+              "scaleId": "e-natural-minor",
+              "text": "E natural minor adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord and the 2nd of the key. Those are the blue dots. C# is not in this scale \u2014 that would be E Dorian, and it fights the C chord."
+            }
           ]
         },
         {
@@ -198,15 +439,42 @@
               "box": 1,
               "text": "Even eighth notes. Same contour as the A minor blues phrase, played where E minor pentatonic sits in the open position. A fret of 0 is an open string.",
               "notes": [
-                {"string": "E", "fret": 0},
-                {"string": "A", "fret": 0},
-                {"string": "A", "fret": 2},
-                {"string": "D", "fret": 0},
-                {"string": "D", "fret": 2},
-                {"string": "A", "fret": 2},
-                {"string": "A", "fret": 0},
-                {"string": "E", "fret": 3},
-                {"string": "E", "fret": 0}
+                {
+                  "string": "E",
+                  "fret": 0
+                },
+                {
+                  "string": "A",
+                  "fret": 0
+                },
+                {
+                  "string": "A",
+                  "fret": 2
+                },
+                {
+                  "string": "D",
+                  "fret": 0
+                },
+                {
+                  "string": "D",
+                  "fret": 2
+                },
+                {
+                  "string": "A",
+                  "fret": 2
+                },
+                {
+                  "string": "A",
+                  "fret": 0
+                },
+                {
+                  "string": "E",
+                  "fret": 3
+                },
+                {
+                  "string": "E",
+                  "fret": 0
+                }
               ]
             }
           ]
@@ -218,8 +486,22 @@
           "kind": "tip",
           "scaleId": "e-minor-pentatonic",
           "steps": [
-            {"id": "bend", "title": "Bend the flat 7 to the root", "box": 1, "bend": {"string": "B", "fret": 3, "semitones": 2}, "text": "This is the same bend as the A minor blues lesson, moved to E. Play open low E first so the target pitch is in your ear, then bend up to it. Come back down instead of releasing the string with a chirp."},
-            {"id": "call", "title": "Call and response across C", "text": "Play the question over Em and end it on E or G. Answer over the C chord, and end that answer on E or G as well — those two notes belong to both chords. If you want the answer to say the C chord's name, end on C, which means using E natural minor for that bar."}
+            {
+              "id": "bend",
+              "title": "Bend the flat 7 to the root",
+              "box": 1,
+              "bend": {
+                "string": "B",
+                "fret": 3,
+                "semitones": 2
+              },
+              "text": "This is the same bend as the A minor blues lesson, moved to E. Play open low E first so the target pitch is in your ear, then bend up to it. Come back down instead of releasing the string with a chirp."
+            },
+            {
+              "id": "call",
+              "title": "Call and response across C",
+              "text": "Play the question over Em and end it on E or G. Answer over the C chord, and end that answer on E or G as well \u2014 those two notes belong to both chords. If you want the answer to say the C chord's name, end on C, which means using E natural minor for that bar."
+            }
           ]
         }
       ]
@@ -227,6 +509,7 @@
     {
       "id": "g-major",
       "title": "G Major",
+      "genre": "Pop",
       "file": "audio/g-major.wav",
       "key": "G major",
       "tonic": "G",
@@ -234,39 +517,104 @@
       "bpm": 108,
       "timeSignature": "4/4",
       "feel": "pop",
-      "progression": ["G", "D", "Em", "C", "G", "D", "Em", "C"],
+      "progression": [
+        "G",
+        "D",
+        "Em",
+        "C",
+        "G",
+        "D",
+        "Em",
+        "C"
+      ],
       "scales": [
         {
           "id": "g-major-scale",
           "name": "G major",
           "root": "G",
-          "intervals": [0, 2, 4, 5, 7, 9, 11],
-          "notes": ["G", "A", "B", "C", "D", "E", "F#"],
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#"
+          ],
           "home": true,
-          "why": "The key of the loop. F# is the 3rd of the D chord, C is the root of the C chord, and E is the root of Em. Nothing in G–D–Em–C sits outside this scale."
+          "why": "The key of the loop. F# is the 3rd of the D chord, C is the root of the C chord, and E is the root of Em. Nothing in G\u2013D\u2013Em\u2013C sits outside this scale."
         },
         {
           "id": "g-major-pentatonic",
           "name": "G major pentatonic",
           "root": "G",
-          "intervals": [0, 2, 4, 7, 9],
-          "notes": ["G", "A", "B", "D", "E"],
+          "intervals": [
+            0,
+            2,
+            4,
+            7,
+            9
+          ],
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "D",
+            "E"
+          ],
           "why": "G major with C and F# left out. Over C, the notes you still have (E, G, B) are the 3rd, 5th, and 7th, so the IV chord stays consonant. Over D, G is a suspended 4th: pass through it, and play F# from the full major scale when you want the 3rd of D."
         },
         {
           "id": "e-minor-pentatonic-over-g",
           "name": "E minor pentatonic",
           "root": "E",
-          "intervals": [0, 3, 5, 7, 10],
-          "notes": ["E", "G", "A", "B", "D"],
-          "why": "The same five notes as G major pentatonic, with E treated as the root. Starting phrases on E is the usual rock lead sound over a major I–V–vi–IV. You are not in E minor; the chords are still G major."
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
+          "why": "The same five notes as G major pentatonic, with E treated as the root. Starting phrases on E is the usual rock lead sound over a major I\u2013V\u2013vi\u2013IV. You are not in E minor; the chords are still G major."
         },
         {
           "id": "g-mixolydian",
           "name": "G Mixolydian",
           "root": "G",
-          "intervals": [0, 2, 4, 5, 7, 9, 10],
-          "notes": ["G", "A", "B", "C", "D", "E", "F"],
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F"
+          ],
           "why": "Major with a flat 7 (F) instead of F#. F fights the D chord, whose 3rd is F#. Mixolydian fits a G7 vamp or a progression that uses F as a bVII. On this loop, use it over G and C only, or swap the idea out when D arrives."
         }
       ],
@@ -278,11 +626,31 @@
           "kind": "boxes",
           "scaleId": "g-major-pentatonic",
           "steps": [
-            {"id": "box-1", "box": 1, "text": "Home box for G major pentatonic. Put the index finger at the first lit fret; the root on the low E is one fret higher. These are the same frets as E minor pentatonic box 2, with G treated as home."},
-            {"id": "box-2", "box": 2, "text": "Shift up. Shared frets with box 1 are the same notes — do not relearn them, just move your hand."},
-            {"id": "box-3", "box": 3, "text": "Middle of the neck. Find the orange G before you run the box, so the phrase has a tonic."},
-            {"id": "box-4", "box": 4, "text": "Upper position, still in the first octave of the neck. The root on the G string is the one to resolve to."},
-            {"id": "box-5", "box": 5, "text": "Box 1 an octave higher. If the frets feel far, you are hearing the same shape you already know."}
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box for G major pentatonic. Put the index finger at the first lit fret; the root on the low E is one fret higher. These are the same frets as E minor pentatonic box 2, with G treated as home."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "Shift up. Shared frets with box 1 are the same notes \u2014 do not relearn them, just move your hand."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Middle of the neck. Find the orange G before you run the box, so the phrase has a tonic."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "Upper position, still in the first octave of the neck. The root on the G string is the one to resolve to."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "Box 1 an octave higher. If the frets feel far, you are hearing the same shape you already know."
+            }
           ]
         },
         {
@@ -292,8 +660,18 @@
           "kind": "chord-tones",
           "scaleId": "g-major-pentatonic",
           "steps": [
-            {"id": "pentatonic", "title": "Major pentatonic against the loop", "scaleId": "g-major-pentatonic", "text": "Over G you have the whole triad, G B D. Over Em you have E, G, and B. Over D you have D and A, but not F#, the 3rd — G, if you hold it, is a suspended 4th on that chord. Over C you have E and G, the 3rd and the 5th, but not the root C. Land on bright dots."},
-            {"id": "full-scale", "title": "G major puts the 3rd and the root back", "scaleId": "g-major-scale", "text": "The full G major scale adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord. Those are the blue dots. F natural is not in this scale — that is G Mixolydian, and it fights the D chord."}
+            {
+              "id": "pentatonic",
+              "title": "Major pentatonic against the loop",
+              "scaleId": "g-major-pentatonic",
+              "text": "Over G you have the whole triad, G B D. Over Em you have E, G, and B. Over D you have D and A, but not F#, the 3rd \u2014 G, if you hold it, is a suspended 4th on that chord. Over C you have E and G, the 3rd and the 5th, but not the root C. Land on bright dots."
+            },
+            {
+              "id": "full-scale",
+              "title": "G major puts the 3rd and the root back",
+              "scaleId": "g-major-scale",
+              "text": "The full G major scale adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord. Those are the blue dots. F natural is not in this scale \u2014 that is G Mixolydian, and it fights the D chord."
+            }
           ]
         },
         {
@@ -307,17 +685,44 @@
               "id": "lick-1",
               "title": "Box 1, up to G",
               "box": 1,
-              "text": "Even eighth notes. Every note is in G major pentatonic, and the last note is G. Play it over the G bar, then hold that G as D arrives — G is the 4th of D, so let it fall to F# if you switch to the full major scale.",
+              "text": "Even eighth notes. Every note is in G major pentatonic, and the last note is G. Play it over the G bar, then hold that G as D arrives \u2014 G is the 4th of D, so let it fall to F# if you switch to the full major scale.",
               "notes": [
-                {"string": "A", "fret": 2},
-                {"string": "A", "fret": 5},
-                {"string": "D", "fret": 2},
-                {"string": "D", "fret": 5},
-                {"string": "G", "fret": 2},
-                {"string": "G", "fret": 4},
-                {"string": "B", "fret": 3},
-                {"string": "B", "fret": 5},
-                {"string": "e", "fret": 3}
+                {
+                  "string": "A",
+                  "fret": 2
+                },
+                {
+                  "string": "A",
+                  "fret": 5
+                },
+                {
+                  "string": "D",
+                  "fret": 2
+                },
+                {
+                  "string": "D",
+                  "fret": 5
+                },
+                {
+                  "string": "G",
+                  "fret": 2
+                },
+                {
+                  "string": "G",
+                  "fret": 4
+                },
+                {
+                  "string": "B",
+                  "fret": 3
+                },
+                {
+                  "string": "B",
+                  "fret": 5
+                },
+                {
+                  "string": "e",
+                  "fret": 3
+                }
               ]
             }
           ]
@@ -329,8 +734,22 @@
           "kind": "tip",
           "scaleId": "g-major-pentatonic",
           "steps": [
-            {"id": "bend", "title": "Bend the 2nd up to the 3rd", "box": 1, "bend": {"string": "G", "fret": 2, "semitones": 2}, "text": "B is the major 3rd, and it is already the sweet note. Bend up to it and stop. Do not push B further — a whole step above B is C#, which is not in G major. A hammer from fret 2 to fret 4 on the same string is the picked version of this bend."},
-            {"id": "call", "title": "Question on D, answer on G", "text": "Let the question end on D, the 5th. That note is a chord tone of G and the root of the next chord, so it survives the change into the D bar. Answer by ending on G. Four beats for the question is one whole bar of the loop."}
+            {
+              "id": "bend",
+              "title": "Bend the 2nd up to the 3rd",
+              "box": 1,
+              "bend": {
+                "string": "G",
+                "fret": 2,
+                "semitones": 2
+              },
+              "text": "B is the major 3rd, and it is already the sweet note. Bend up to it and stop. Do not push B further \u2014 a whole step above B is C#, which is not in G major. A hammer from fret 2 to fret 4 on the same string is the picked version of this bend."
+            },
+            {
+              "id": "call",
+              "title": "Question on D, answer on G",
+              "text": "Let the question end on D, the 5th. That note is a chord tone of G and the root of the next chord, so it survives the change into the D bar. Answer by ending on G. Four beats for the question is one whole bar of the loop."
+            }
           ]
         }
       ]
@@ -338,6 +757,7 @@
     {
       "id": "d-dorian-funk",
       "title": "D Dorian Funk",
+      "genre": "Funk",
       "file": "audio/d-dorian-funk.wav",
       "key": "D Dorian",
       "tonic": "D",
@@ -345,14 +765,39 @@
       "bpm": 102,
       "timeSignature": "4/4",
       "feel": "funk",
-      "progression": ["Dm7", "Dm7", "G7", "G7", "Dm7", "Dm7", "G7", "G7"],
+      "progression": [
+        "Dm7",
+        "Dm7",
+        "G7",
+        "G7",
+        "Dm7",
+        "Dm7",
+        "G7",
+        "G7"
+      ],
       "scales": [
         {
           "id": "d-dorian",
           "name": "D Dorian",
           "root": "D",
-          "intervals": [0, 2, 3, 5, 7, 9, 10],
-          "notes": ["D", "E", "F", "G", "A", "B", "C"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "B",
+            "C"
+          ],
           "home": true,
           "why": "The mode this vamp is built on. B is both the natural 6 of Dm and the 3rd of G7, so it lights up the IV chord. C is the flat 7 of both Dm7 and G7. This is the scale to learn the sound from."
         },
@@ -360,24 +805,66 @@
           "id": "d-minor-pentatonic",
           "name": "D minor pentatonic",
           "root": "D",
-          "intervals": [0, 3, 5, 7, 10],
-          "notes": ["D", "F", "G", "A", "C"],
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "D",
+            "F",
+            "G",
+            "A",
+            "C"
+          ],
           "why": "A subset of D Dorian: the 2nd and the 6th are left out. It never fights Dm7 or G7. Use it when you want a funk box and do not want to think about B."
         },
         {
           "id": "d-blues",
           "name": "D blues",
           "root": "D",
-          "intervals": [0, 3, 5, 6, 7, 10],
-          "notes": ["D", "F", "G", "Ab", "A", "C"],
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "D",
+            "F",
+            "G",
+            "Ab",
+            "A",
+            "C"
+          ],
           "why": "Minor pentatonic plus Ab, the flat 5. In funk that note is a quick grace into A. Holding it over G7 makes a flat 9 against B and D, which is an outside color, not a resting tone."
         },
         {
           "id": "d-natural-minor",
           "name": "D natural minor (Aeolian)",
           "root": "D",
-          "intervals": [0, 2, 3, 5, 7, 8, 10],
-          "notes": ["D", "E", "F", "G", "A", "Bb", "C"],
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "Bb",
+            "C"
+          ],
           "why": "Dorian's darker neighbor: Bb instead of B. G7 contains B natural, so Bb rubs hard on the IV chord. Use it for a darker color on the Dm7 bars, and do not carry it into G7. The home scale of this track is Dorian."
         }
       ],
@@ -389,11 +876,31 @@
           "kind": "boxes",
           "scaleId": "d-minor-pentatonic",
           "steps": [
-            {"id": "box-1", "box": 1, "text": "Home box, root on the low E. This is the A minor box moved up the neck. Learn the pentatonic here before you add B, the Dorian 6."},
-            {"id": "box-2", "box": 2, "text": "The next position up. Shared frets with box 1 are the same notes."},
-            {"id": "box-3", "box": 3, "text": "Wider reach in the middle of the pattern, so the B string has room. Start on an orange root."},
-            {"id": "box-4", "box": 4, "text": "High position. Same five notes. If a phrase worked in box 1, play it here before you invent a new one."},
-            {"id": "box-5", "box": 5, "text": "The box just below the home position. Use it when the riff wants to sit lower than fret 10."}
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box, root on the low E. This is the A minor box moved up the neck. Learn the pentatonic here before you add B, the Dorian 6."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "The next position up. Shared frets with box 1 are the same notes."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Wider reach in the middle of the pattern, so the B string has room. Start on an orange root."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "High position. Same five notes. If a phrase worked in box 1, play it here before you invent a new one."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "The box just below the home position. Use it when the riff wants to sit lower than fret 10."
+            }
           ]
         },
         {
@@ -403,8 +910,18 @@
           "kind": "chord-tones",
           "scaleId": "d-dorian",
           "steps": [
-            {"id": "dorian", "title": "Dorian against the vamp", "scaleId": "d-dorian", "text": "Every chord tone of Dm7 (D, F, A, C) and of G7 (G, B, D, F) is in D Dorian. B is the one that changes the color: it is the 3rd of G7 and the natural 6 of D. The pentatonic leaves B out. When the bar turns to G7, the bright dot on B is the note to aim at."},
-            {"id": "pentatonic", "title": "The safe box", "scaleId": "d-minor-pentatonic", "text": "D minor pentatonic never fights either chord, because it simply omits B and E. On G7 you still have G, D, and F — the root, 5th, and flat 7 — but not the 3rd. Use this scale when you want to play through the vamp without placing the 6th. Switch back to Dorian when you want B."}
+            {
+              "id": "dorian",
+              "title": "Dorian against the vamp",
+              "scaleId": "d-dorian",
+              "text": "Every chord tone of Dm7 (D, F, A, C) and of G7 (G, B, D, F) is in D Dorian. B is the one that changes the color: it is the 3rd of G7 and the natural 6 of D. The pentatonic leaves B out. When the bar turns to G7, the bright dot on B is the note to aim at."
+            },
+            {
+              "id": "pentatonic",
+              "title": "The safe box",
+              "scaleId": "d-minor-pentatonic",
+              "text": "D minor pentatonic never fights either chord, because it simply omits B and E. On G7 you still have G, D, and F \u2014 the root, 5th, and flat 7 \u2014 but not the 3rd. Use this scale when you want to play through the vamp without placing the 6th. Switch back to Dorian when you want B."
+            }
           ]
         },
         {
@@ -420,14 +937,38 @@
               "box": 1,
               "text": "Even eighth notes, in D Dorian. The B on the B string is the natural 6. Play that note when you hear G7. The line ends on D, which belongs to both chords.",
               "notes": [
-                {"string": "D", "fret": 10},
-                {"string": "G", "fret": 10},
-                {"string": "G", "fret": 12},
-                {"string": "B", "fret": 12},
-                {"string": "B", "fret": 13},
-                {"string": "B", "fret": 12},
-                {"string": "G", "fret": 12},
-                {"string": "D", "fret": 12}
+                {
+                  "string": "D",
+                  "fret": 10
+                },
+                {
+                  "string": "G",
+                  "fret": 10
+                },
+                {
+                  "string": "G",
+                  "fret": 12
+                },
+                {
+                  "string": "B",
+                  "fret": 12
+                },
+                {
+                  "string": "B",
+                  "fret": 13
+                },
+                {
+                  "string": "B",
+                  "fret": 12
+                },
+                {
+                  "string": "G",
+                  "fret": 12
+                },
+                {
+                  "string": "D",
+                  "fret": 12
+                }
               ]
             }
           ]
@@ -439,8 +980,1234 @@
           "kind": "tip",
           "scaleId": "d-dorian",
           "steps": [
-            {"id": "bend", "title": "Bend the flat 3 up to the 4th", "box": 1, "bend": {"string": "G", "fret": 10, "semitones": 2}, "text": "F up a whole step is G, and both notes are in the scale. A smaller vocal version is to nudge F about a quarter step sharp and come back, without reaching G. Save B — B string, fret 12 in this box — for the G7 bars. Slide into it from the A at fret 10 rather than bending."},
-            {"id": "call", "title": "Leave the downbeat alone", "text": "Funk phrasing is short. Play two or three notes on the back half of the beat, then leave the next downbeat empty so the snare answers you. Filling every 16th gives the vamp nowhere to breathe. End the idea on D over Dm7, or on B over G7."}
+            {
+              "id": "bend",
+              "title": "Bend the flat 3 up to the 4th",
+              "box": 1,
+              "bend": {
+                "string": "G",
+                "fret": 10,
+                "semitones": 2
+              },
+              "text": "F up a whole step is G, and both notes are in the scale. A smaller vocal version is to nudge F about a quarter step sharp and come back, without reaching G. Save B \u2014 B string, fret 12 in this box \u2014 for the G7 bars. Slide into it from the A at fret 10 rather than bending."
+            },
+            {
+              "id": "call",
+              "title": "Leave the downbeat alone",
+              "text": "Funk phrasing is short. Play two or three notes on the back half of the beat, then leave the next downbeat empty so the snare answers you. Filling every 16th gives the vamp nowhere to breathe. End the idea on D over Dm7, or on B over G7."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a-dorian-house",
+      "title": "A Dorian House",
+      "genre": "Electronic",
+      "file": "audio/a-dorian-house.wav",
+      "key": "A Dorian",
+      "tonic": "A",
+      "mode": "dorian",
+      "bpm": 126,
+      "timeSignature": "4/4",
+      "feel": "house",
+      "progression": [
+        "Am7",
+        "Am7",
+        "G",
+        "D",
+        "Am7",
+        "Em7",
+        "G",
+        "D"
+      ],
+      "scales": [
+        {
+          "id": "a-dorian",
+          "name": "A Dorian",
+          "root": "A",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#",
+            "G"
+          ],
+          "home": true,
+          "why": "The home scale. F# is the natural 6, and it is the 3rd of the D chord. B is the 3rd of G and of Em7. Both are in this scale. A natural minor's F would fight that D chord."
+        },
+        {
+          "id": "a-minor-pentatonic",
+          "name": "A minor pentatonic",
+          "root": "A",
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "A",
+            "C",
+            "D",
+            "E",
+            "G"
+          ],
+          "why": "The five-note grid for a sequenced line. It covers Am7 except that D is only a passing 11th. Over G and D it keeps the root and the 5th and leaves the 3rd for Dorian."
+        },
+        {
+          "id": "a-blues",
+          "name": "A blues",
+          "root": "A",
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "A",
+            "C",
+            "D",
+            "Eb",
+            "E",
+            "G"
+          ],
+          "why": "Pentatonic plus Eb. Use it as a one-note ornament into E. Held across the D chord it is a flat 9, so let it go before that bar."
+        },
+        {
+          "id": "a-natural-minor",
+          "name": "A natural minor (Aeolian)",
+          "root": "A",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G"
+          ],
+          "why": "Same as Dorian except F instead of F#. F is the flat 3 of the key and it clashes with F#, the 3rd of the D chord. Save this color for the Am7 bars and leave it before D arrives."
+        }
+      ],
+      "lessons": [
+        {
+          "id": "shapes",
+          "title": "Learn the shape",
+          "summary": "The five A minor pentatonic boxes. The sequence sits on this grid. F# and B, the Dorian notes, show up in blue when you switch to A Dorian.",
+          "kind": "boxes",
+          "scaleId": "a-minor-pentatonic",
+          "steps": [
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box. The repeating cell in the phrase lesson lives here. Orange dots are A. Start and end the sequence on one."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "One position up. Frets shared with box 1 are the same notes, so the sequence can slide instead of restarting."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Middle of the neck. The reach is wider, mostly so the B string fits. Keep the same four-note order."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "High position of the same five notes. The frets are smaller. Do not grip harder to make up for it."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "This box sits just behind the home box. Use it when the line wants to drop, not only climb."
+            }
+          ]
+        },
+        {
+          "id": "chord-tones",
+          "title": "Target the chord tones",
+          "summary": "Bright dots belong to the bar that is playing. The arp in the track is already only those tones.",
+          "kind": "chord-tones",
+          "scaleId": "a-minor-pentatonic",
+          "steps": [
+            {
+              "id": "pentatonic",
+              "title": "What the pentatonic keeps",
+              "scaleId": "a-minor-pentatonic",
+              "text": "On Am7 the pentatonic gives A, C, E, and G. D is the 11th, a passing note. On G you have G and D, not B. On D you have D and A, not F#. On Em7 you have E, G, and D, not B. Land the sequence on a bright dot."
+            },
+            {
+              "id": "dorian",
+              "title": "Put F# and B back",
+              "scaleId": "a-dorian",
+              "text": "A Dorian adds B and F#, drawn in blue when they are not chord tones. B is a chord tone of G and of Em7. F# is the 3rd of D, the note that makes that chord major. F natural is not in this scale."
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "title": "A phrase",
+          "summary": "A four-note cell in A minor pentatonic. Play it as even sixteenths and let it repeat with the hats.",
+          "kind": "tab",
+          "scaleId": "a-minor-pentatonic",
+          "steps": [
+            {
+              "id": "lick-1",
+              "title": "Four notes, then again",
+              "box": 1,
+              "text": "D, G, C, E, then the same shape one step along the strings. Every note is in A minor pentatonic. Loop the first four notes as sixteenths for a whole bar of Am7, then move.",
+              "notes": [
+                {
+                  "string": "A",
+                  "fret": 5
+                },
+                {
+                  "string": "D",
+                  "fret": 5
+                },
+                {
+                  "string": "G",
+                  "fret": 5
+                },
+                {
+                  "string": "B",
+                  "fret": 5
+                },
+                {
+                  "string": "A",
+                  "fret": 5
+                },
+                {
+                  "string": "D",
+                  "fret": 5
+                },
+                {
+                  "string": "G",
+                  "fret": 7
+                },
+                {
+                  "string": "B",
+                  "fret": 5
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phrasing",
+          "title": "Phrasing",
+          "summary": "A whole-step bend up to the root, and a gap so the kick can answer.",
+          "kind": "tip",
+          "scaleId": "a-minor-pentatonic",
+          "steps": [
+            {
+              "id": "bend",
+              "title": "Bend the flat 7 to the root",
+              "box": 1,
+              "bend": {
+                "string": "B",
+                "fret": 8,
+                "semitones": 2
+              },
+              "text": "Hear A first: play the low E at fret 5, then bend the B string at fret 8 up to that pitch. Release it on the next kick so the bend does not cover the downbeat."
+            },
+            {
+              "id": "space",
+              "title": "Leave a kick empty",
+              "text": "Play the four-note cell for two beats, then stop. The four-on-the-floor kick keeps the time. Come back on the next Am7 bar, or on F# when the D chord arrives if you have switched to A Dorian."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "e-hard-rock",
+      "title": "E Hard Rock",
+      "genre": "Hard rock",
+      "file": "audio/e-hard-rock.wav",
+      "key": "E Mixolydian",
+      "tonic": "E",
+      "mode": "mixolydian",
+      "bpm": 136,
+      "timeSignature": "4/4",
+      "feel": "hard-rock",
+      "progression": [
+        "E5",
+        "E5",
+        "D5",
+        "A5",
+        "E5",
+        "D5",
+        "A5",
+        "E5"
+      ],
+      "scales": [
+        {
+          "id": "e-mixolydian",
+          "name": "E Mixolydian",
+          "root": "E",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#",
+            "D"
+          ],
+          "home": true,
+          "why": "The home scale for this I\u2013bVII\u2013IV power-chord loop. D is the flat 7, and it is the root of the D5. G# is the major 3rd of E. The track's power chords have no 3rd, so G# is yours to add when you want the chord to sound major."
+        },
+        {
+          "id": "e-minor-pentatonic",
+          "name": "E minor pentatonic",
+          "root": "E",
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
+          "why": "Every note of E5, D5, and A5 is already in here: roots and fifths only. G, the flat 3, is the rock color against the E chord. G# is not in this scale."
+        },
+        {
+          "id": "e-blues",
+          "name": "E blues",
+          "root": "E",
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "Bb",
+            "B",
+            "D"
+          ],
+          "why": "Minor pentatonic plus Bb, the flat 5. Bend into it or pass through it to B or A. It is a spice note on the E5 bars. Do not hold it through the whole D5 bar."
+        },
+        {
+          "id": "e-natural-minor",
+          "name": "E natural minor (Aeolian)",
+          "root": "E",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C",
+            "D"
+          ],
+          "why": "Adds F# and C. The power chords do not require them. C is the flat 6. G# is still missing, so this scale keeps the minor color and never states the major 3rd of E."
+        }
+      ],
+      "lessons": [
+        {
+          "id": "shapes",
+          "title": "Learn the shape",
+          "summary": "The five E minor pentatonic boxes. This is the lead shape over the power chords.",
+          "kind": "boxes",
+          "scaleId": "e-minor-pentatonic",
+          "steps": [
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Open box. Open low E and open high e are roots. Do not skip them. The chug in the track is the same E."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "One position up. The frets at the top of the open box are the bottom of this one."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "The reach widens so the B string fits. Keep the thumb quiet and let the elbow move."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "Upper position. Find an orange E before you run the shape, so the line has the I chord under it."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "The open box already uses the nut, so this shape is written an octave higher. It links back toward box 1 at the 12th fret."
+            }
+          ]
+        },
+        {
+          "id": "chord-tones",
+          "title": "Target the chord tones",
+          "summary": "E5, D5, and A5 are root and fifth only. Those notes are already inside the pentatonic.",
+          "kind": "chord-tones",
+          "scaleId": "e-minor-pentatonic",
+          "steps": [
+            {
+              "id": "pentatonic",
+              "title": "The power chords are in the box",
+              "scaleId": "e-minor-pentatonic",
+              "text": "E5 is E and B. D5 is D and A. A5 is A and E. All of those pitches are in E minor pentatonic. On an E5 bar the bright notes are E and B. G, A, and D stay dim. G is the flat 3, a color note, not a chord tone of E5."
+            },
+            {
+              "id": "mixolydian",
+              "title": "Add the major 3rd",
+              "scaleId": "e-mixolydian",
+              "text": "E Mixolydian adds F#, G#, and C#. G# is the major 3rd of the E chord. Play it on the E5 bars when you want the riff to sound major. The pentatonic's G is the flat 3, the other choice. They are a half step apart. Do not hold both."
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "title": "A phrase",
+          "summary": "A short E minor pentatonic line that starts and ends on the open E.",
+          "kind": "tab",
+          "scaleId": "e-minor-pentatonic",
+          "steps": [
+            {
+              "id": "lick-1",
+              "title": "Open E, up and home",
+              "box": 1,
+              "text": "Even eighths. E, G, B, E, G, D, then home to open E. All of it is in E minor pentatonic. Play it over the E5 bars and stop when D5 hits if you want the bVII to speak.",
+              "notes": [
+                {
+                  "string": "E",
+                  "fret": 0
+                },
+                {
+                  "string": "E",
+                  "fret": 3
+                },
+                {
+                  "string": "A",
+                  "fret": 2
+                },
+                {
+                  "string": "D",
+                  "fret": 2
+                },
+                {
+                  "string": "G",
+                  "fret": 0
+                },
+                {
+                  "string": "B",
+                  "fret": 3
+                },
+                {
+                  "string": "e",
+                  "fret": 0
+                },
+                {
+                  "string": "E",
+                  "fret": 0
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phrasing",
+          "title": "Phrasing",
+          "summary": "Bend the flat 7 up to the root against the I chord, and use the flat 5 as a passing note.",
+          "kind": "tip",
+          "scaleId": "e-blues",
+          "steps": [
+            {
+              "id": "bend",
+              "title": "Bend into the E chord",
+              "box": 1,
+              "bend": {
+                "string": "B",
+                "fret": 3,
+                "semitones": 2
+              },
+              "text": "Play open low E so the target is in your ear, then bend the B string at fret 3 up to that E. This is the flat 7 resolving to the root of the I chord. Come back down. Do not let the string chirp."
+            },
+            {
+              "id": "flat5",
+              "title": "The flat 5, then move",
+              "text": "Bb is the blue note: G string, fret 3, in this blues scale. Touch it and resolve to A at fret 2 or to B at fret 4. Holding Bb across the D5 bar puts a flat 9 on D, which is harsher than this riff wants."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d-string-score",
+      "title": "D Minor Strings",
+      "genre": "Strings",
+      "file": "audio/d-string-score.wav",
+      "key": "D harmonic minor",
+      "tonic": "D",
+      "mode": "minor",
+      "bpm": 72,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "Dm",
+        "Gm",
+        "Bb",
+        "A",
+        "Dm",
+        "Gm",
+        "Bb",
+        "A"
+      ],
+      "scales": [
+        {
+          "id": "d-harmonic-minor",
+          "name": "D harmonic minor",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "Bb",
+            "C#"
+          ],
+          "home": true,
+          "why": "The home scale. The A chord's 3rd is C#, the raised 7th. Gm and Bb use Bb, the flat 6. Every chord tone in the progression is in this scale. There is no drum part. The bow is the time."
+        },
+        {
+          "id": "d-natural-minor",
+          "name": "D natural minor (Aeolian)",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            10
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "Bb",
+            "C"
+          ],
+          "why": "Same pitches except C instead of C#. Dm, Gm, and Bb are complete. The A chord is missing its 3rd, C#. Use this scale on the minor chords, and switch when the A bar arrives if you want that chord named."
+        },
+        {
+          "id": "d-minor-pentatonic",
+          "name": "D minor pentatonic",
+          "root": "D",
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "D",
+            "F",
+            "G",
+            "A",
+            "C"
+          ],
+          "why": "Five notes for a long-tone melody. Bb, the flat 3 of Gm and the root of Bb, is not here. C# is not here either. Safe, and thinner than the two full minor scales."
+        },
+        {
+          "id": "d-blues",
+          "name": "D blues",
+          "root": "D",
+          "intervals": [
+            0,
+            3,
+            5,
+            6,
+            7,
+            10
+          ],
+          "notes": [
+            "D",
+            "F",
+            "G",
+            "Ab",
+            "A",
+            "C"
+          ],
+          "why": "Pentatonic plus Ab. A short passing note into A can sound like a film cue. Ab against the A chord is a flat 9, so do not sustain it there."
+        }
+      ],
+      "lessons": [
+        {
+          "id": "shapes",
+          "title": "Learn the shape",
+          "summary": "The five D minor pentatonic boxes, with the 2nd and the flat 6 in blue when this natural-minor scale is selected.",
+          "kind": "boxes",
+          "scaleId": "d-natural-minor",
+          "steps": [
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box, root on the low E. Blue dots are E, the 2nd, and Bb, the flat 6. C#, the harmonic-minor 7th, is not in this shape."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "The next position up. Shared frets with box 1 are the same notes. Hold one of them for a whole bow."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Wider reach in the middle so the B string has room. Pick an orange D and let it ring."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "High position. Same scale, smaller frets. A long tone does not need a harder left hand."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "The box just below the home position. Use it when the line wants to sit under fret 10."
+            }
+          ]
+        },
+        {
+          "id": "chord-tones",
+          "title": "Target the chord tones",
+          "summary": "Bright dots are the chord. On the A bar, C# is the note that separates harmonic minor from natural minor.",
+          "kind": "chord-tones",
+          "scaleId": "d-harmonic-minor",
+          "steps": [
+            {
+              "id": "harmonic",
+              "title": "Harmonic minor names every chord",
+              "scaleId": "d-harmonic-minor",
+              "text": "Dm is D, F, A. Gm is G, Bb, D. Bb is Bb, D, F. A is A, C#, E. All of those are in D harmonic minor. C# is the raised 7th. On the A bar it is the 3rd, so it is a place to arrive, not a note to avoid."
+            },
+            {
+              "id": "natural",
+              "title": "Natural minor on the A chord",
+              "scaleId": "d-natural-minor",
+              "text": "D natural minor still covers Dm, Gm, and Bb. Over A you have A and E, the root and the 5th, and you do not have C#. The scale's C is a flat 9 on that chord. Hold A or E through the A bar, or switch back to harmonic minor and play C#."
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "title": "A phrase",
+          "summary": "A slow line in D natural minor. The last note is the root. Let it ring.",
+          "kind": "tab",
+          "scaleId": "d-natural-minor",
+          "steps": [
+            {
+              "id": "lick-1",
+              "title": "One note per bow",
+              "box": 1,
+              "text": "Play these as half notes, not eighths. D, A, D, G, A, and home to D. Every note is in D natural minor. On the A chord later in the loop, this line never plays C#, so the chord's 3rd stays with the strings.",
+              "notes": [
+                {
+                  "string": "E",
+                  "fret": 10
+                },
+                {
+                  "string": "A",
+                  "fret": 12
+                },
+                {
+                  "string": "D",
+                  "fret": 12
+                },
+                {
+                  "string": "G",
+                  "fret": 12
+                },
+                {
+                  "string": "B",
+                  "fret": 10
+                },
+                {
+                  "string": "e",
+                  "fret": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phrasing",
+          "title": "Phrasing",
+          "summary": "Swell with the section, then a whole-step reach from F up to G.",
+          "kind": "tip",
+          "scaleId": "d-harmonic-minor",
+          "steps": [
+            {
+              "id": "bend",
+              "title": "A small reach, F to G",
+              "box": 1,
+              "bend": {
+                "string": "G",
+                "fret": 10,
+                "semitones": 2
+              },
+              "text": "F up a whole step is G. Both notes are in D harmonic minor and in D natural minor. Arrive slowly, the way a bow adds pressure, and stop on G. This is not a blues snap."
+            },
+            {
+              "id": "swell",
+              "title": "Match the bow",
+              "text": "Pick a chord tone and let it last the whole bar. Start quiet and get louder with the strings, then let it die as the chord changes. Vibrato stays centered on the target pitch. On the A bar the long tone to aim at is C#, B string fret 14, or A, B string fret 10."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g-bluegrass",
+      "title": "G Major Bluegrass",
+      "genre": "Bluegrass",
+      "file": "audio/g-bluegrass.wav",
+      "key": "G major",
+      "tonic": "G",
+      "mode": "major",
+      "bpm": 184,
+      "timeSignature": "4/4",
+      "feel": "bluegrass",
+      "progression": [
+        "G",
+        "C",
+        "G",
+        "G",
+        "D",
+        "C",
+        "G",
+        "D"
+      ],
+      "scales": [
+        {
+          "id": "g-major",
+          "name": "G major",
+          "root": "G",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F#"
+          ],
+          "home": true,
+          "why": "The home scale. G, C, and D are all built from it. C is the root of the IV chord. F# is the 3rd of D. The boom-chuck bass is playing those chord tones on beats 1 and 3."
+        },
+        {
+          "id": "g-major-pentatonic",
+          "name": "G major pentatonic",
+          "root": "G",
+          "intervals": [
+            0,
+            2,
+            4,
+            7,
+            9
+          ],
+          "notes": [
+            "G",
+            "A",
+            "B",
+            "D",
+            "E"
+          ],
+          "why": "The open country box: no 4th, no 7th. Over G you have the whole triad. Over C you have E and G, not the root C. Over D you have D and A, the root and the 5th, not F#, the 3rd. Fast and safe for a roll."
+        },
+        {
+          "id": "g-pent-b3",
+          "name": "G major pentatonic plus flat 3",
+          "root": "G",
+          "intervals": [
+            0,
+            2,
+            3,
+            4,
+            7,
+            9
+          ],
+          "notes": [
+            "G",
+            "A",
+            "Bb",
+            "B",
+            "D",
+            "E"
+          ],
+          "why": "The same five notes plus Bb, a passing tone into B. Bb is not a chord tone of G, C, or D. Play it as a grace on the way to B and leave it. Holding it sounds like a wrong minor chord."
+        },
+        {
+          "id": "e-minor-pentatonic-over-g",
+          "name": "E minor pentatonic",
+          "root": "E",
+          "intervals": [
+            0,
+            3,
+            5,
+            7,
+            10
+          ],
+          "notes": [
+            "E",
+            "G",
+            "A",
+            "B",
+            "D"
+          ],
+          "why": "The same pitches as G major pentatonic, with E treated as the root. Useful if a phrase wants to start on the 6th. The chords are still in G major."
+        }
+      ],
+      "lessons": [
+        {
+          "id": "shapes",
+          "title": "Learn the shape",
+          "summary": "The five G major pentatonic boxes. The roll in the phrase lesson adds Bb, the flat 3, as one passing note.",
+          "kind": "boxes",
+          "scaleId": "g-major-pentatonic",
+          "steps": [
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box. Put the index finger on the first lit fret. The G root on the low E is one fret higher. These are the same frets as E minor pentatonic box 2, with G as home."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "Shift up. Shared frets with box 1 are the same notes. A crosspick can move here without a new shape."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Middle of the neck. Find the orange G before the roll starts, so the tonic is under your hand."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "Upper position. The root on the G string is a note to land on between rolls."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "Box 1 an octave higher. If the frets feel far, it is the shape you already know."
+            }
+          ]
+        },
+        {
+          "id": "chord-tones",
+          "title": "Target the chord tones",
+          "summary": "The bass plays root and fifth on beats 1 and 3. Bright dots are the rest of the chord.",
+          "kind": "chord-tones",
+          "scaleId": "g-major-pentatonic",
+          "steps": [
+            {
+              "id": "pentatonic",
+              "title": "Major pentatonic against G, C, and D",
+              "scaleId": "g-major-pentatonic",
+              "text": "Over G you have G, B, and D, the whole triad. Over C you have E and G, the 3rd and the 5th, not the root C. Over D you have D and A, the root and the 5th, not F#, the 3rd. End a roll on a bright dot and the chord still reads."
+            },
+            {
+              "id": "major",
+              "title": "G major puts C and F# back",
+              "scaleId": "g-major",
+              "text": "The full G major scale adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord. Those are the blue dots on this scale. Bb is not in G major. That passing tone lives only in the flat-3 scale."
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "title": "A phrase",
+          "summary": "A crosspick that touches Bb once, on the way to B, then lands on G.",
+          "kind": "tab",
+          "scaleId": "g-pent-b3",
+          "steps": [
+            {
+              "id": "lick-1",
+              "title": "Forward roll, one flat 3",
+              "box": 1,
+              "text": "Alternate strings. A, then Bb, then B, so the flat 3 is a step between the 2nd and the 3rd, not a note you hold. The rest of the roll is G major pentatonic and it ends on G.",
+              "notes": [
+                {
+                  "string": "G",
+                  "fret": 2
+                },
+                {
+                  "string": "G",
+                  "fret": 3
+                },
+                {
+                  "string": "G",
+                  "fret": 4
+                },
+                {
+                  "string": "B",
+                  "fret": 3
+                },
+                {
+                  "string": "e",
+                  "fret": 3
+                },
+                {
+                  "string": "B",
+                  "fret": 5
+                },
+                {
+                  "string": "G",
+                  "fret": 4
+                },
+                {
+                  "string": "e",
+                  "fret": 3
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phrasing",
+          "title": "Phrasing",
+          "summary": "Leave beats 2 and 4 for the chuck, and bend the 2nd up to the 3rd.",
+          "kind": "tip",
+          "scaleId": "g-major-pentatonic",
+          "steps": [
+            {
+              "id": "bend",
+              "title": "Bend the 2nd up to the 3rd",
+              "box": 1,
+              "bend": {
+                "string": "G",
+                "fret": 2,
+                "semitones": 2
+              },
+              "text": "A up a whole step is B, the 3rd of G. Both notes are in G major pentatonic. Stop at B. A half step short of B is Bb, the passing tone, and that is a different idea: a grace, not this bend."
+            },
+            {
+              "id": "boom",
+              "title": "Play between the chucks",
+              "text": "The bass is on 1 and 3. The chop is on 2 and 4. Put the roll on the eighth notes around those hits, and leave at least one chuck empty so the rhythm section stays the timekeeper. End on G over the G bars, or on D when the D chord is the bar you are in."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d-lydian-ambient",
+      "title": "D Lydian Ambient",
+      "genre": "Ambient",
+      "file": "audio/d-lydian-ambient.wav",
+      "key": "D Lydian",
+      "tonic": "D",
+      "mode": "major",
+      "bpm": 64,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "D",
+        "A",
+        "E",
+        "D",
+        "F#m",
+        "A",
+        "E",
+        "D"
+      ],
+      "scales": [
+        {
+          "id": "d-lydian",
+          "name": "D Lydian",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            6,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#"
+          ],
+          "home": true,
+          "why": "The home scale. G# is the raised 4th, and it is the 3rd of the E chord. C# is the 3rd of A and the 5th of F#m. A plain D major scale has G natural instead of G#, so it cannot name the E chord."
+        },
+        {
+          "id": "d-major-pentatonic",
+          "name": "D major pentatonic",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            7,
+            9
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "A",
+            "B"
+          ],
+          "why": "Five open notes for a slow line. Over D you have the triad. Over A you are missing C#. Over E you are missing G#. Over F#m you are missing C#. Stay here when you want the drone, and add the Lydian notes when you want the chord's 3rd."
+        },
+        {
+          "id": "d-major",
+          "name": "D major",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C#"
+          ],
+          "why": "Ionian. It contains C#, so A and F#m are complete. It contains G, not G#. Over the E chord that G is a flat 9, and the real 3rd, G#, is missing. Use D Lydian on the E bars."
+        },
+        {
+          "id": "d-mixolydian",
+          "name": "D Mixolydian",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            10
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C"
+          ],
+          "why": "Major with a flat 7. C natural fights C#, which this progression uses in A and in F#m. G fights G# on the E chord. This is the scale to leave alone on this vamp."
+        }
+      ],
+      "lessons": [
+        {
+          "id": "shapes",
+          "title": "Learn the shape",
+          "summary": "D Lydian on the five major-pentatonic boxes. G# and C# are the blue notes.",
+          "kind": "boxes",
+          "scaleId": "d-lydian",
+          "steps": [
+            {
+              "id": "box-1",
+              "box": 1,
+              "text": "Home box. Orange is D. Blue is G#, the raised 4th, and C#, the major 7th. The rest is D major pentatonic."
+            },
+            {
+              "id": "box-2",
+              "box": 2,
+              "text": "Shift up. Shared frets with box 1 are the same notes. The blue G# moves with the shape."
+            },
+            {
+              "id": "box-3",
+              "box": 3,
+              "text": "Middle of the neck. Find orange D before you play. The raised 4th is a color you touch, not the note you hold for the whole swell."
+            },
+            {
+              "id": "box-4",
+              "box": 4,
+              "text": "Upper position. Same seven notes. A swell does not get louder by pressing harder."
+            },
+            {
+              "id": "box-5",
+              "box": 5,
+              "text": "Box 1 an octave higher. If the frets feel far apart, it is the shape you already learned."
+            }
+          ]
+        },
+        {
+          "id": "chord-tones",
+          "title": "Target the chord tones",
+          "summary": "The pad swells through D, A, E, and F#m. Bright dots are that chord inside the scale you picked.",
+          "kind": "chord-tones",
+          "scaleId": "d-lydian",
+          "steps": [
+            {
+              "id": "lydian",
+              "title": "Lydian covers the whole vamp",
+              "scaleId": "d-lydian",
+              "text": "D is D, F#, A. A is A, C#, E. E is E, G#, B. F#m is F#, A, C#. Every one of those is in D Lydian. G# is the note that makes the E chord major. On the E bar, that blue dot is a chord tone, so it is allowed to be the note you swell into."
+            },
+            {
+              "id": "pentatonic",
+              "title": "The pentatonic leaves the 3rds out",
+              "scaleId": "d-major-pentatonic",
+              "text": "Over D you have the whole triad. Over A you have A and E, not C#. Over E you have E and B, not G#. Over F#m you have F# and A, not C#. The line still sounds calm. It just does not say those 3rds."
+            }
+          ]
+        },
+        {
+          "id": "lick",
+          "title": "A phrase",
+          "summary": "Six notes in D major pentatonic, with space between them.",
+          "kind": "tab",
+          "scaleId": "d-major-pentatonic",
+          "steps": [
+            {
+              "id": "lick-1",
+              "title": "One note, then air",
+              "box": 1,
+              "text": "Play each note and let it decay before the next one. D, F#, E, A, E, D. All six are in D major pentatonic. Nothing here is the raised 4th. Add G# only when the E chord is the bar you are in.",
+              "notes": [
+                {
+                  "string": "E",
+                  "fret": 10
+                },
+                {
+                  "string": "A",
+                  "fret": 9
+                },
+                {
+                  "string": "G",
+                  "fret": 9
+                },
+                {
+                  "string": "B",
+                  "fret": 10
+                },
+                {
+                  "string": "e",
+                  "fret": 12
+                },
+                {
+                  "string": "e",
+                  "fret": 10
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "phrasing",
+          "title": "Phrasing",
+          "summary": "Bend the 3rd up to the raised 4th, then let a single note swell for a bar.",
+          "kind": "tip",
+          "scaleId": "d-lydian",
+          "steps": [
+            {
+              "id": "bend",
+              "title": "Bend F# up to G#",
+              "box": 1,
+              "bend": {
+                "string": "G",
+                "fret": 11,
+                "semitones": 2
+              },
+              "text": "F# up a whole step is G#, the Lydian 4th. Both notes are in D Lydian. G# is also the 3rd of the E chord, so this bend belongs on the E bar. Let it fall back to F#. Do not sit on G# for the whole vamp."
+            },
+            {
+              "id": "swell",
+              "title": "One note for the whole bar",
+              "text": "Pick a chord tone of the current bar and hold it while the pad swells and fades. The track has no drum to play against. Vibrato is slow and stays centered on the pitch. Silence after the note is part of the phrase."
+            }
           ]
         }
       ]

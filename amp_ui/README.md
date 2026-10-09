@@ -75,7 +75,7 @@ python3 amp_ui/practice/generate_backing_tracks.py
 ### Using it
 
 1. Start the amp UI and open the Practice tab. The tuner stays up. The amp keeps running if you flip back to the knobs.
-2. Pick a loop. The key, tempo, and chord bars are under the transport. The lit bar follows the playhead. Tap a bar to jump there.
+2. Pick a style, then a loop. The key, tempo, and chord bars are under the transport. The lit bar follows the playhead. Tap a bar to jump there.
 3. Hit Play. Loop is on until you turn it off.
 4. Set Guitar (amp volume) and Backing track until the mix is one you can solo over.
 5. Pick a scale. Orange dots are the root. Gold dots are the rest of the scale. Blue dots are the notes a fuller scale adds on top of its pentatonic box.
@@ -107,7 +107,7 @@ Edit `amp_ui/static/practice/tracks.json`. Drop the audio in `amp_ui/static/prac
 }
 ```
 
-`mode` is `minor`, `major`, `dorian`, or `mixolydian`. If you omit `scales`, the page suggests pentatonic, blues, and the diatonic scale that fits that mode, with a note about when each one clashes. If you omit `lessons`, it builds the four lesson types from the first scale and the progression. `feel` is only for the synthesizer (`shuffle`, `rock`, `pop`, `funk`). A file you already have can use any `feel`; the player does not read it.
+`genre` is the style name in the track picker (`Blues`, `Electronic`, `Hard rock`, `Strings`, `Bluegrass`, `Ambient`, and so on). `mode` is `minor`, `major`, `dorian`, or `mixolydian` when you want the page to suggest scales. A track can still name another home scale in `key` and in `scales`, which is how the string loop is D harmonic minor and the ambient loop is D Lydian. If you omit `scales`, the page suggests pentatonic, blues, and the diatonic scale that fits `mode`, with a note about when each one clashes. If you omit `lessons`, it builds the four lesson types from the first scale and the progression. `feel` is only for the synthesizer: `shuffle`, `rock`, `pop`, `funk`, `house`, `hard-rock`, `strings`, `bluegrass`, `ambient`. A file you already have can use any `feel`; the player does not read it. The five newer feels are written as 22.05 kHz mono wavs. The first four stay 44.1 kHz stereo.
 
 To write the scales yourself, add a `scales` array. One entry should have `"home": true`. That scale has to contain every chord tone in the progression. `intervals` are semitones from `root`. `notes` must match those intervals (A blues is A C D Eb E G, not a respelling that hides the flat 5). `why` should say when the scale fits this progression and which note clashes, if one does.
 

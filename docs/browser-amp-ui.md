@@ -64,7 +64,7 @@ Open the UI, then the **Practice** tab. The tuner stays visible. Play, pause, an
 
 **Guitar (amp volume)** is the same Volume knob as the amp. **Backing track** is only the loop. The lit chord follows the playhead; tap a chord to jump to that bar.
 
-Each library track shows its key, tempo, progression, and scales. Orange fretboard dots are the root, gold dots are the other scale notes, and blue dots are notes a scale adds beyond its pentatonic box (the flat 5 in a blues scale, the 2nd and flat 6 in natural minor, and so on). The note under each scale says when to use it on that progression and which note clashes.
+The style menu filters the library. Each track shows its key, tempo, progression, and scales. Orange fretboard dots are the root, gold dots are the other scale notes, and blue dots are notes a scale adds beyond its pentatonic box (the flat 5 in a blues scale, the 2nd and flat 6 in natural minor, and so on). The note under each scale says when to use it on that progression and which note clashes.
 
 **My file** loads a local audio file. Set the tonic and mode yourself. The page suggests scales and builds lessons from that key. Optional BPM and a space-separated progression (one chord per bar) enable the chord strip and live chord-tone highlighting. Key guessing is intentionally absent: the same pitches often fit the relative major, or the IV of a Dorian vamp, so an estimate would lie with confidence.
 
@@ -83,7 +83,7 @@ Under Scales, each track has short lessons. Check off a step when you have it; t
 
 Catalog: `amp_ui/static/practice/tracks.json`. Audio: `amp_ui/static/practice/audio/`. The shipped wavs are original loops (drums, bass, and the written chords), dedicated to the public domain under CC0. Do not commit copyrighted backing tracks.
 
-A new track needs `id`, `title`, `file`, `key`, `tonic`, `mode` (`minor`, `major`, `dorian`, or `mixolydian`), `bpm`, `timeSignature`, and `progression` (one chord symbol per bar). Omit `scales` and the UI suggests them. Omit `lessons` and the UI builds the four lessons above. `feel` (`shuffle`, `rock`, `pop`, `funk`) is used only by the synthesizer.
+A new track needs `id`, `title`, `file`, `key`, `tonic`, `mode` (`minor`, `major`, `dorian`, or `mixolydian`), `bpm`, `timeSignature`, and `progression` (one chord symbol per bar). `genre` sets which style the filter shows. Omit `scales` and the UI suggests them. Omit `lessons` and the UI builds the four lessons above. `feel` (`shuffle`, `rock`, `pop`, `funk`, `house`, `hard-rock`, `strings`, `bluegrass`, `ambient`) is used only by the synthesizer. House, hard rock, strings, bluegrass, and ambient are rendered at 22.05 kHz mono so the files stay small. The page loads `tracks.json` and the loops from the same directory as `practice.js`, so a script tag of `/static/practice.js` and a relative `static/practice.js` both resolve.
 
 To change a shipped progression and regenerate the audio:
 

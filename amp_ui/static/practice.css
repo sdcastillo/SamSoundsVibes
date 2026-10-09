@@ -356,6 +356,11 @@
   color: #f2efe8;
 }
 
+#practice-genre,
+#practice-track {
+  width: 100%;
+}
+
 .fret-head {
   display: flex;
   justify-content: space-between;

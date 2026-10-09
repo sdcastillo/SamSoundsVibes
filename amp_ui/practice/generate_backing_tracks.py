@@ -21,6 +21,7 @@ from pathlib import Path
 import numpy as np
 
 SR = 44100
+SR_LO = 22050
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "static" / "practice" / "tracks.json"
 AUDIO_DIR = ROOT / "static" / "practice" / "audio"
@@ -297,6 +298,288 @@ def _add_chords(mix, progression, bar_samples, beat_samples, feel: str) -> None:
                 place(mix, stab, _at(bar, beat, bar_samples, beat_samples), pan=0.1, gain=0.22)
 
 
+def place_mono(mix: np.ndarray, sig: np.ndarray, start: int, gain: float = 1.0) -> None:
+    start = int(start)
+    if start >= len(mix) or gain == 0.0 or len(sig) == 0:
+        return
+    if start < 0:
+        sig = sig[-start:]
+        start = 0
+    n = min(len(sig), len(mix) - start)
+    if n <= 0:
+        return
+    mix[start : start + n] += sig[:n] * gain
+
+
+def _timeline(bpm: float, bars: int, sr: int) -> tuple[int, float, int]:
+    bar_samples = int(round(4.0 * 60.0 / bpm * sr))
+    return bar_samples, bar_samples / 4.0, bar_samples * bars
+
+
+def _harmonics(freq: float, n: int, sr: int, partials: tuple[tuple[int, float], ...]) -> np.ndarray:
+    t = np.arange(n) / sr
+    sig = np.zeros(n)
+    for harmonic, gain in partials:
+        sig += gain * np.sin(2.0 * np.pi * freq * harmonic * t)
+    return sig
+
+
+def _exp_env(n: int, sr: int, attack: float, decay: float) -> np.ndarray:
+    t = np.arange(n) / sr
+    return (1.0 - np.exp(-t / max(attack, 1e-4))) * np.exp(-t * decay)
+
+
+def _kick_lo(sr: int, rng: np.random.Generator) -> np.ndarray:
+    n = int(0.2 * sr)
+    t = np.arange(n) / sr
+    freq = 48.0 + 125.0 * np.exp(-t * 26.0)
+    phase = 2.0 * np.pi * np.cumsum(freq) / sr
+    click = rng.uniform(-1.0, 1.0, n) * np.exp(-t * 85.0) * 0.16
+    return np.sin(phase) * np.exp(-t * 8.0) + click
+
+
+def _noise_hit(sr: int, rng: np.random.Generator, dur: float, decay: float) -> np.ndarray:
+    n = max(1, int(dur * sr))
+    t = np.arange(n) / sr
+    noise = rng.uniform(-1.0, 1.0, n)
+    high = np.diff(noise, prepend=noise[0])
+    return high * np.exp(-t * decay)
+
+
+def _clap_lo(sr: int, rng: np.random.Generator) -> np.ndarray:
+    n = int(0.12 * sr)
+    t = np.arange(n) / sr
+    noise = rng.uniform(-1.0, 1.0, n)
+    env = np.zeros(n)
+    for offset, gain in ((0.0, 1.0), (0.011, 0.7), (0.022, 0.45)):
+        env += gain * np.exp(-np.maximum(0.0, t - offset) * 36.0)
+    return noise * env
+
+
+def _chord_midis(symbol: str, low: int) -> list[int]:
+    root, intervals = parse_chord(symbol)
+    midis = []
+    for interval in intervals:
+        pc = (root + interval) % 12
+        midis.append(low + (pc - (low % 12)) % 12)
+    return sorted(set(midis))
+
+
+def _root_midi(symbol: str, low: int) -> int:
+    root, _intervals = parse_chord(symbol)
+    return low + (root - (low % 12)) % 12
+
+
+def _finish_mono(mix: np.ndarray, sr: int, fade_in: float, fade_out: float) -> np.ndarray:
+    peak = float(np.max(np.abs(mix))) if mix.size else 1.0
+    out = mix * (0.89 / peak) if peak > 1e-8 else mix.copy()
+    n_in = min(len(out), max(1, int(fade_in * sr)))
+    n_out = min(len(out), max(1, int(fade_out * sr)))
+    out[:n_in] *= np.linspace(0.0, 1.0, n_in)
+    out[-n_out:] *= np.linspace(1.0, 0.0, n_out)
+    return out
+
+
+def _render_house(track: dict, sr: int, rng: np.random.Generator) -> np.ndarray:
+    progression = list(track["progression"])
+    bar_samples, beat, total = _timeline(float(track["bpm"]), len(progression), sr)
+    mix = np.zeros(total)
+    kick = _kick_lo(sr, rng)
+    hat = _noise_hit(sr, rng, 0.035, 90.0)
+    open_hat = _noise_hit(sr, rng, 0.11, 18.0)
+    clap = _clap_lo(sr, rng)
+    for bar, symbol in enumerate(progression):
+        for step in range(4):
+            place_mono(mix, kick, _at(bar, step, bar_samples, beat), 0.95)
+            place_mono(mix, open_hat, _at(bar, step + 0.5, bar_samples, beat), 0.2)
+        for step in range(16):
+            place_mono(mix, hat, _at(bar, step / 4.0, bar_samples, beat), 0.06)
+        place_mono(mix, clap, _at(bar, 1, bar_samples, beat), 0.38)
+        place_mono(mix, clap, _at(bar, 3, bar_samples, beat), 0.38)
+        bass_midi = _root_midi(symbol, 36)
+        bass_n = max(1, int(beat * 0.4))
+        bass = _harmonics(midi_to_hz(bass_midi), bass_n, sr, ((1, 1.0), (2, 0.4), (3, 0.12)))
+        bass *= _exp_env(bass_n, sr, 0.004, 7.0)
+        for step in range(4):
+            place_mono(mix, bass, _at(bar, step + 0.5, bar_samples, beat), 0.72)
+        tones = _chord_midis(symbol, 57)
+        pad_n = max(1, int(bar_samples * 0.96))
+        pad = np.zeros(pad_n)
+        for midi in tones:
+            pad += _harmonics(midi_to_hz(midi), pad_n, sr, ((1, 0.55), (2, 0.28), (3, 0.12), (4, 0.05)))
+        pad /= max(1, len(tones))
+        pad *= _exp_env(pad_n, sr, 0.09, 0.45)
+        place_mono(mix, pad, _at(bar, 0, bar_samples, beat), 0.34)
+        arp_tones = _chord_midis(symbol, 72)
+        arp_n = max(1, int(beat * 0.42))
+        for step in range(8):
+            arp = _harmonics(midi_to_hz(arp_tones[step % len(arp_tones)]), arp_n, sr, ((1, 1.0), (2, 0.18)))
+            arp *= np.exp(-np.arange(arp_n) / sr * 12.0)
+            place_mono(mix, arp, _at(bar, step / 2.0, bar_samples, beat), 0.14)
+    return _finish_mono(mix, sr, 0.004, 0.018)
+
+
+def _power_chug(symbol: str, n: int, sr: int) -> np.ndarray:
+    root, _intervals = parse_chord(symbol)
+    t = np.arange(n) / sr
+    voice = np.zeros(n)
+    for interval in (0, 7):
+        midi = 40 + ((root + interval) - 4) % 12
+        for octave, level in ((0, 1.0), (12, 0.62)):
+            freq = midi_to_hz(midi + octave)
+            for harmonic, gain in ((1, 1.0), (2, 0.5), (3, 0.28), (4, 0.12)):
+                voice += level * gain * np.sin(2.0 * np.pi * freq * harmonic * t)
+    env = np.exp(-t * 12.0) * (1.0 - np.exp(-t / 0.003))
+    return np.tanh(voice * 0.22) * env
+
+
+def _render_hard_rock(track: dict, sr: int, rng: np.random.Generator) -> np.ndarray:
+    progression = list(track["progression"])
+    bar_samples, beat, total = _timeline(float(track["bpm"]), len(progression), sr)
+    mix = np.zeros(total)
+    kick = _kick_lo(sr, rng)
+    snare = _noise_hit(sr, rng, 0.16, 16.0) + 0.4 * np.sin(
+        2.0 * np.pi * 196.0 * np.arange(int(0.16 * sr)) / sr
+    ) * np.exp(-np.arange(int(0.16 * sr)) / sr * 20.0)
+    hat = _noise_hit(sr, rng, 0.04, 75.0)
+    for bar, symbol in enumerate(progression):
+        for eighth in range(8):
+            accent = 1.0 if eighth % 2 == 0 else 0.58
+            chug_n = max(1, int(beat * 0.46))
+            place_mono(mix, _power_chug(symbol, chug_n, sr), _at(bar, eighth / 2.0, bar_samples, beat), 0.62 * accent)
+            place_mono(mix, hat, _at(bar, eighth / 2.0, bar_samples, beat), 0.1 * accent)
+        root_midi = 28 + (parse_chord(symbol)[0] - 4) % 12
+        bass_n = max(1, int(beat * 0.42))
+        bass = _harmonics(midi_to_hz(root_midi), bass_n, sr, ((1, 1.0), (2, 0.22)))
+        bass *= np.exp(-np.arange(bass_n) / sr * 7.0)
+        for eighth in range(8):
+            place_mono(mix, bass, _at(bar, eighth / 2.0, bar_samples, beat), 0.42 if eighth % 2 == 0 else 0.24)
+        place_mono(mix, kick, _at(bar, 0, bar_samples, beat), 0.9)
+        place_mono(mix, kick, _at(bar, 2, bar_samples, beat), 0.72)
+        place_mono(mix, kick, _at(bar, 3.5, bar_samples, beat), 0.28)
+        place_mono(mix, snare, _at(bar, 1, bar_samples, beat), 0.48)
+        place_mono(mix, snare, _at(bar, 3, bar_samples, beat), 0.48)
+    return _finish_mono(mix, sr, 0.003, 0.016)
+
+
+def _bow(freq: float, n: int, sr: int) -> np.ndarray:
+    t = np.arange(n) / sr
+    vibrato = freq * (1.0 + 0.005 * np.sin(2.0 * np.pi * 5.1 * t))
+    phase = 2.0 * np.pi * np.cumsum(vibrato) / sr
+    sig = np.sin(phase) + 0.32 * np.sin(2.0 * phase) + 0.1 * np.sin(3.0 * phase)
+    attack = min(n, int(0.32 * sr))
+    release = min(n // 2, int(0.4 * sr))
+    env = np.ones(n)
+    if attack:
+        env[:attack] *= np.linspace(0.0, 1.0, attack)
+    if release:
+        env[-release:] *= np.linspace(1.0, 0.0, release)
+    return sig * env
+
+
+def _render_strings(track: dict, sr: int, rng: np.random.Generator) -> np.ndarray:
+    del rng
+    progression = list(track["progression"])
+    bar_samples, beat, total = _timeline(float(track["bpm"]), len(progression), sr)
+    mix = np.zeros(total)
+    for bar, symbol in enumerate(progression):
+        note_n = max(1, int(bar_samples * 0.98))
+        layer = np.zeros(note_n)
+        for midi in _chord_midis(symbol, 50):
+            for shift, level in ((-12, 0.7), (0, 1.0), (12, 0.45)):
+                layer += level * _bow(midi_to_hz(midi + shift) * 1.001, note_n, sr)
+                layer += level * 0.35 * _bow(midi_to_hz(midi + shift) * 0.997, note_n, sr)
+        layer /= max(1.0, float(np.max(np.abs(layer))))
+        place_mono(mix, layer, _at(bar, 0, bar_samples, beat), 0.8)
+    return _finish_mono(mix, sr, 0.03, 0.05)
+
+
+def _pluck(freq: float, n: int, sr: int, decay: float) -> np.ndarray:
+    t = np.arange(n) / sr
+    sig = (
+        np.sin(2.0 * np.pi * freq * t)
+        + 0.45 * np.sin(2.0 * np.pi * freq * 2.0 * t)
+        + 0.18 * np.sin(2.0 * np.pi * freq * 3.0 * t)
+    )
+    return sig * np.exp(-t * decay)
+
+
+def _render_bluegrass(track: dict, sr: int, rng: np.random.Generator) -> np.ndarray:
+    progression = list(track["progression"])
+    bar_samples, beat, total = _timeline(float(track["bpm"]), len(progression), sr)
+    mix = np.zeros(total)
+    brush = _noise_hit(sr, rng, 0.09, 22.0)
+    for bar, symbol in enumerate(progression):
+        root = _root_midi(symbol, 40)
+        fifth = root + 7
+        for beat_index, midi, gain in ((0, root, 0.7), (2, fifth, 0.55)):
+            n = max(1, int(beat * 0.9))
+            note = _pluck(midi_to_hz(midi), n, sr, 3.2)
+            place_mono(mix, note, _at(bar, beat_index, bar_samples, beat), gain)
+        chuck_tones = _chord_midis(symbol, 64)
+        chuck_n = max(1, int(beat * 0.22))
+        chuck = np.zeros(chuck_n)
+        for midi in chuck_tones:
+            chuck += _pluck(midi_to_hz(midi), chuck_n, sr, 16.0)
+        for beat_index in (1, 3):
+            place_mono(mix, chuck, _at(bar, beat_index, bar_samples, beat), 0.28)
+            place_mono(mix, brush, _at(bar, beat_index, bar_samples, beat), 0.16)
+        roll = _chord_midis(symbol, 76)
+        order = [0, 1, 2, 1] if len(roll) >= 3 else [0, 1, 0, 1]
+        pluck_n = max(1, int(beat * 0.42))
+        for eighth in range(8):
+            midi = roll[order[eighth % len(order)] % len(roll)]
+            note = _pluck(midi_to_hz(midi), pluck_n, sr, 11.0)
+            place_mono(mix, note, _at(bar, eighth / 2.0, bar_samples, beat), 0.22)
+    return _finish_mono(mix, sr, 0.004, 0.02)
+
+
+def _swell(n: int) -> np.ndarray:
+    if n <= 1:
+        return np.ones(n)
+    return np.sin(np.linspace(0.0, np.pi, n))
+
+
+def _render_ambient(track: dict, sr: int, rng: np.random.Generator) -> np.ndarray:
+    del rng
+    progression = list(track["progression"])
+    bars = len(progression)
+    bar_samples, beat, total = _timeline(float(track["bpm"]), bars, sr)
+    mix = np.zeros(total)
+    tonic = _root_midi(progression[0], 38)
+    t = np.arange(total) / sr
+    drone = np.sin(2.0 * np.pi * midi_to_hz(tonic) * t)
+    drone += 0.45 * np.sin(2.0 * np.pi * midi_to_hz(tonic + 12) * t)
+    drone += 0.28 * np.sin(2.0 * np.pi * midi_to_hz(tonic + 7) * t)
+    drone *= 0.55 + 0.08 * np.sin(2.0 * np.pi * 0.07 * t)
+    mix += drone * 0.22
+    for bar, symbol in enumerate(progression):
+        n = bar_samples
+        pad = np.zeros(n)
+        for midi in _chord_midis(symbol, 55):
+            freq = midi_to_hz(midi)
+            local = np.arange(n) / sr
+            vib = freq * (1.0 + 0.003 * np.sin(2.0 * np.pi * 0.35 * local))
+            phase = 2.0 * np.pi * np.cumsum(vib) / sr
+            pad += np.sin(phase) + 0.25 * np.sin(2.0 * phase)
+        pad *= _swell(n)
+        place_mono(mix, pad, _at(bar, 0, bar_samples, beat), 0.2)
+    echoed = mix.copy()
+    for delay, gain in ((0.09, 0.28), (0.17, 0.16), (0.29, 0.08)):
+        shift = int(delay * sr) % max(1, len(mix))
+        echoed += np.roll(mix, shift) * gain
+    return _finish_mono(echoed, sr, 0.04, 0.06)
+
+
+_STYLED = {
+    "house": _render_house,
+    "hard-rock": _render_hard_rock,
+    "strings": _render_strings,
+    "bluegrass": _render_bluegrass,
+    "ambient": _render_ambient,
+}
+
+
 def render_track(track: dict) -> np.ndarray:
     bpm = float(track["bpm"])
     progression = list(track["progression"])
@@ -321,14 +604,27 @@ def render_track(track: dict) -> np.ndarray:
     return mix
 
 
-def write_wav(path: Path, mix: np.ndarray) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    pcm = np.clip(np.round(mix * 32767.0), -32768, 32767).astype(np.int16)
-    with wave.open(str(path), "w") as handle:
-        handle.setnchannels(2)
+def encode_wav(mix: np.ndarray, sr: int) -> bytes:
+    import io
+
+    if mix.ndim == 1:
+        channels = 1
+        pcm = np.clip(np.round(mix * 32767.0), -32768, 32767).astype("<i2")
+    else:
+        channels = int(mix.shape[1])
+        pcm = np.clip(np.round(mix * 32767.0), -32768, 32767).astype("<i2")
+    buf = io.BytesIO()
+    with wave.open(buf, "w") as handle:
+        handle.setnchannels(channels)
         handle.setsampwidth(2)
-        handle.setframerate(SR)
+        handle.setframerate(sr)
         handle.writeframes(pcm.tobytes())
+    return buf.getvalue()
+
+
+def write_wav(path: Path, mix: np.ndarray, sr: int = SR) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(encode_wav(mix, sr))
 
 
 def load_catalog(path: Path = CATALOG) -> dict:
@@ -339,12 +635,27 @@ def load_catalog(path: Path = CATALOG) -> dict:
 def main() -> None:
     catalog = load_catalog()
     for track in catalog["tracks"]:
-        mix = render_track(track)
+        feel = str(track.get("feel") or "pop")
         dest = AUDIO_DIR / Path(track["file"]).name
-        write_wav(dest, mix)
-        seconds = len(mix) / SR
+        if feel in _STYLED:
+            mix = _STYLED[feel](track, SR_LO, np.random.default_rng(_seed(str(track["id"]))))
+            sr = SR_LO
+        else:
+            mix = render_track(track)
+            sr = SR
+            payload = encode_wav(mix, sr)
+            if dest.exists() and dest.read_bytes() == payload:
+                print(f"{track['id']}: unchanged")
+                continue
+            dest.write_bytes(payload)
+            seconds = len(mix) / sr
+            peak = float(np.max(np.abs(mix)))
+            print(f"{track['id']}: {dest.name}  {seconds:.2f}s  peak {peak:.2f}")
+            continue
+        write_wav(dest, mix, sr)
+        seconds = len(mix) / sr
         peak = float(np.max(np.abs(mix)))
-        print(f"{track['id']}: {dest.name}  {seconds:.2f}s  peak {peak:.2f}")
+        print(f"{track['id']}: {dest.name}  {seconds:.2f}s  peak {peak:.2f}  {sr} Hz mono")
 
 
 if __name__ == "__main__":
