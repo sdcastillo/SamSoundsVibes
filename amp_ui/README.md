@@ -61,3 +61,70 @@ The delay is a shift. The ring buffer holds the cabinet’s output and reads it 
 ## Back into the room
 
 `render` returns two channels of float samples. PipeWire takes that stream (`pw-cat`, 32-bit float, 48 kHz) and hands it to the system default sink. When that sink is the Logi USB headset, the headset’s converter builds a voltage from each sample, the drivers move, and the pressure in the earcups is the wave you hear. The tuner’s note, the cabinet’s click, and the clipped harmonic series are all inside that pressure. They got there by rewriting the samples, sometimes with an explicit Fourier transform, and then inverting it back into time.
+
+## Practice mode sits beside that chain
+
+The Practice tab does not send the backing track through the drive, the cabinet, or the delay. The browser plays the track on its own, and the guitar keeps the path above. Open the page on the same machine as the amp so both come out of the same headset. Guitar loudness is still the Volume knob. Backing loudness is the slider in the Practice tab.
+
+The shipped loops are original synthesis — drums, bass, and the chords named in the catalog — dedicated to the public domain (CC0). They are not recordings of other people’s songs. Rebuild them, after you edit a progression, with:
+
+```bash
+python3 amp_ui/practice/generate_backing_tracks.py
+```
+
+### Using it
+
+1. Start the amp UI and open the Practice tab. The tuner stays up. The amp keeps running if you flip back to the knobs.
+2. Pick a loop. The key, tempo, and chord bars are under the transport. The lit bar follows the playhead. Tap a bar to jump there.
+3. Hit Play. Loop is on until you turn it off.
+4. Set Guitar (amp volume) and Backing track until the mix is one you can solo over.
+5. Pick a scale. Orange dots are the root. Gold dots are the rest of the scale. Blue dots are the notes a fuller scale adds on top of its pentatonic box.
+6. Open a lesson. Checkmarks stay in this browser (`localStorage`). Clear checkmarks wipes only the track you are on.
+
+Each starter track has four lessons:
+
+- **Learn the shape** — the five pentatonic boxes, one position at a time. Full neck clears the highlight.
+- **Target the chord tones** — while the track plays, notes that belong to the current chord are bright. The line under the chords names which of those tones are in the scale you picked, and which chord tones the scale leaves out.
+- **A phrase** — tab, in the scale, even eighths.
+- **Phrasing** — a whole-step bend whose target is in the scale, plus a call-and-response or space tip for that progression.
+
+### Adding a track
+
+Edit `amp_ui/static/practice/tracks.json`. Drop the audio in `amp_ui/static/practice/audio/` and point `file` at it. Minimum fields:
+
+```json
+{
+  "id": "b-minor-vamp",
+  "title": "B Minor Vamp",
+  "file": "audio/b-minor-vamp.wav",
+  "key": "B minor",
+  "tonic": "B",
+  "mode": "minor",
+  "bpm": 100,
+  "timeSignature": "4/4",
+  "feel": "rock",
+  "progression": ["Bm", "G", "Bm", "A"]
+}
+```
+
+`mode` is `minor`, `major`, `dorian`, or `mixolydian`. If you omit `scales`, the page suggests pentatonic, blues, and the diatonic scale that fits that mode, with a note about when each one clashes. If you omit `lessons`, it builds the four lesson types from the first scale and the progression. `feel` is only for the synthesizer (`shuffle`, `rock`, `pop`, `funk`). A file you already have can use any `feel`; the player does not read it.
+
+To write the scales yourself, add a `scales` array. One entry should have `"home": true`. That scale has to contain every chord tone in the progression. `intervals` are semitones from `root`. `notes` must match those intervals (A blues is A C D Eb E G, not a respelling that hides the flat 5). `why` should say when the scale fits this progression and which note clashes, if one does.
+
+### Adding a lesson
+
+Put a `lessons` array on the track. If you include it, it replaces the automatic set, so include every lesson you want shown. A lesson is `id`, `title`, `summary`, `kind`, `scaleId`, and `steps`.
+
+`kind` is `boxes`, `chord-tones`, `tab`, or `tip`. `scaleId` matches a scale `id` on that track.
+
+A step can set `"box": 1` through `5`. The page fills the fret range from the scale, so you do not hardcode fret numbers. A tab step can use `notes` (`{"string": "E", "fret": 5}`, strings `e B G D A E`, high e lowercase) or a `tab` array of six strings. A bend step can include `"bend": {"string": "B", "fret": 8, "semitones": 2}`. The page names the start note and the target. Both have to be in the scale.
+
+My file, on the same tab, plays a local audio file. You set the tonic and the mode. Suggestions and lessons are computed from that. Optional tempo and a space-separated progression turn on the chord bar and the live chord-tone highlight. The page does not guess the key: a loop’s notes often belong equally to the relative major, or to the IV.
+
+Check the catalog after an edit:
+
+```bash
+node amp_ui/practice/test_theory.js
+```
+
+That checks spellings, that each home scale contains the progression, that tab notes and bend targets sit in the named scale, that every pentatonic box contains a root, and that the shipped wavs match the tempos in the JSON.
