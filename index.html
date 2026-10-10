@@ -35,6 +35,10 @@
         .song-sheet a { color: #00ffff; }
         .song-sheet .sheet-link { margin: 12px 0 0; }
         .track-note { color: #c9c9c9; font-size: 0.85em; margin: 8px 0 0; }
+        .amp-video { max-width: 900px; margin: 0 auto 36px; text-align: center; }
+        .amp-video .frame { position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; border: 1px solid #3a2158; }
+        .amp-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+        .amp-video p { color: #c9c9c9; font-size: 0.95em; margin: 8px 0 0; }
         @media (max-width: 700px) {
             .portraits, .amp-shots { grid-template-columns: 1fr; }
             .song-sheet iframe { height: 70vh; min-height: 480px; }
@@ -69,6 +73,13 @@
             <figcaption>X-Y touchpad</figcaption>
         </figure>
     </div>
+
+    <section class="amp-video" aria-label="The guitar amp, live">
+        <div class="frame">
+            <iframe src="https://www.youtube.com/embed/ezfyl9N4dp0?si=Zjr2wZN2m-ozJTk4" title="Screen recording of Sam's guitar amp running live" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen loading="lazy"></iframe>
+        </div>
+        <p>The amp, live: a screen recording of it running.</p>
+    </section>
 
     <div class="portraits">
         <figure class="portrait">
