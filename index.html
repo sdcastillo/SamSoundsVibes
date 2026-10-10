@@ -3,38 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sam Castillo | Music Publication Platform</title>
+    <title>Sam Sounds | Music</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #0b0114; color: white; margin: 0; padding: 20px; line-height: 1.6; }
-        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(rgba(11, 1, 20, 0.8), rgba(11, 1, 20, 0.8)), url('musc_background.png'); border-radius: 15px; margin-bottom: 30px; }
-        h1 { color: #ff00ff; margin: 0; font-size: 2.5em; }
-        .tagline { color: #00ffff; font-style: italic; }
+        body { font-family: 'Segoe UI', sans-serif; background: #05080f; color: white; margin: 0; padding: 20px; line-height: 1.6; }
+        .hero { text-align: center; padding: 60px 20px; background: linear-gradient(rgba(5, 12, 28, 0.82), rgba(0, 0, 0, 0.88)), url('musc_background.png'); border-radius: 15px; margin-bottom: 30px; }
+        h1 { color: #ffffff; margin: 0; font-size: 2.5em; }
+        .tagline { color: #9ec5ff; font-style: italic; }
         .track-list { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .track-card { background: #1a0229; padding: 15px; border-radius: 10px; border-left: 4px solid #8a2be2; }
+        .track-card { background: #0d1b2e; padding: 15px; border-radius: 10px; border-left: 4px solid #2f7bf5; }
         .track-name { font-weight: bold; display: block; margin-bottom: 10px; font-size: 0.9em; height: 40px; overflow: hidden; }
         audio { width: 100%; height: 35px; }
+        a { color: #6aa8ff; }
         video { width: 100%; border-radius: 6px; background: #000; }
         .stats { display: flex; justify-content: center; gap: 30px; margin-top: 20px; font-weight: bold; }
         .amp-shots { max-width: 1100px; margin: 0 auto 30px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
         .amp-shots figure { margin: 0; text-align: center; }
-        .amp-shots img { width: 100%; height: auto; border-radius: 12px; display: block; border: 1px solid #3a2158; }
-        .amp-shots figcaption { color: #c9c9c9; font-size: 0.9em; margin-top: 8px; }
+        .amp-shots img { width: 100%; height: auto; border-radius: 12px; display: block; border: 1px solid #2a3442; }
+        .amp-shots figcaption { color: #a9b3c1; font-size: 0.9em; margin-top: 8px; }
         .diagrams { max-width: 1100px; margin: 0 auto 36px; display: grid; gap: 28px; }
         .diagram { margin: 0; text-align: center; }
         .diagram img { width: 100%; height: auto; border-radius: 12px; display: block; background: #fff; }
-        .diagram figcaption { color: #c9c9c9; font-size: 0.95em; margin-top: 8px; }
-        .song-sheet { max-width: 900px; margin: 0 auto 36px; background: #1a0229; padding: 20px 22px 18px; border-radius: 12px; border-left: 4px solid #8a2be2; }
-        .song-sheet h2 { color: #ff00ff; margin: 0 0 8px; font-size: 1.7em; }
-        .song-sheet p { margin: 0 0 14px; color: #f2efe8; }
+        .diagram figcaption { color: #a9b3c1; font-size: 0.95em; margin-top: 8px; }
+        .song-sheet { max-width: 900px; margin: 0 auto 36px; background: #0d1b2e; padding: 20px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; }
+        .song-sheet h2 { color: #ffffff; margin: 0 0 8px; font-size: 1.7em; }
+        .song-sheet p { margin: 0 0 14px; color: #e6ebf2; }
         .song-sheet audio { margin-bottom: 16px; }
         .song-sheet iframe { width: 100%; height: 920px; border: 0; border-radius: 8px; background: #fff; display: block; }
-        .song-sheet a { color: #00ffff; }
+        .song-sheet a { color: #6aa8ff; }
         .song-sheet .sheet-link { margin: 12px 0 0; }
-        .track-note { color: #c9c9c9; font-size: 0.85em; margin: 8px 0 0; }
+        .track-note { color: #a9b3c1; font-size: 0.85em; margin: 8px 0 0; }
         .amp-video { max-width: 900px; margin: 0 auto 36px; text-align: center; }
-        .amp-video .frame { position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; border: 1px solid #3a2158; }
+        .amp-video .frame { position: relative; padding-top: 56.25%; border-radius: 12px; overflow: hidden; border: 1px solid #2a3442; }
         .amp-video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-        .amp-video p { color: #c9c9c9; font-size: 0.95em; margin: 8px 0 0; }
+        .amp-video p { color: #a9b3c1; font-size: 0.95em; margin: 8px 0 0; }
         @media (max-width: 700px) {
             .amp-shots { grid-template-columns: 1fr; }
             .song-sheet iframe { height: 70vh; min-height: 480px; }
@@ -44,7 +45,7 @@
 <body>
 
     <section class="hero">
-        <h1>Sam Castillo</h1>
+        <h1>Sam Sounds</h1>
         <p class="tagline">"Original Music & Stylish Covers"</p>
         <p>From Boston's "Consultones" to Austin's creative rebirth</p>
         <div class="stats">
@@ -52,7 +53,7 @@
             <span>15 Years Experience</span>
             <span>10K+ Video Views</span>
         </div>
-        <p><a href="amplifier/" style="color:#00ffff">How the guitar amp turns a signal into sound</a></p>
+        <p><a href="amplifier/" style="color:#6aa8ff">How the guitar amp turns a signal into sound</a></p>
     </section>
 
     <div class="amp-shots">
@@ -99,7 +100,7 @@
     <section class="song-sheet" id="paradise-road">
         <h2>Paradise Road</h2>
         <p>Sam and his brother wrote this song and recorded it. It is based on real events. The chart is in C major at 94 bpm.</p>
-        <audio controls preload="none" src="mp3/Sam%20Castillo%20Paradise%20Road%20with%20lead.mp3"></audio>
+        <audio controls preload="none" src="mp3/Sam%20Sounds%20Paradise%20Road%20with%20lead.mp3"></audio>
         <iframe src="Paradise%20Road.pdf#toolbar=0&navpanes=0&view=FitH" title="Paradise Road lyrics and chords"></iframe>
         <p class="sheet-link"><a href="Paradise%20Road.pdf">Open the Paradise Road chart</a></p>
     </section>
@@ -107,28 +108,28 @@
     <div class="track-list">
         <div class="track-card">
             <span class="track-name">Paradise Road (with lead)</span>
-            <audio controls preload="none" src="mp3/Sam%20Castillo%20Paradise%20Road%20with%20lead.mp3"></audio>
+            <audio controls preload="none" src="mp3/Sam%20Sounds%20Paradise%20Road%20with%20lead.mp3"></audio>
             <p class="track-note">Written and recorded by Sam and his brother. Based on real events.</p>
         </div>
 
         <div class="track-card">
             <span class="track-name">Broken Hallelujah</span>
-            <audio controls preload="none" src="mp3/Sam%20Castillo%20Broken%20Hallelujah.m4a"></audio>
+            <audio controls preload="none" src="mp3/Sam%20Sounds%20Broken%20Hallelujah.m4a"></audio>
         </div>
 
         <div class="track-card">
             <span class="track-name">In a Perfect World</span>
-            <audio controls preload="none" src="mp3/Sam%20Castillo%20Guitar%20Demo%20-%20In%20a%20Perfect%20World.m4a"></audio>
+            <audio controls preload="none" src="mp3/Sam%20Sounds%20Guitar%20Demo%20-%20In%20a%20Perfect%20World.m4a"></audio>
         </div>
 
         <div class="track-card">
             <span class="track-name">Van Halen's 5th Symphony</span>
-            <audio controls preload="none" src="mp3/Sam%20Castillo%20Guitar%20Demo%20-%20Van%20Halen%27s%205th%20Symphony.m4a"></audio>
+            <audio controls preload="none" src="mp3/Sam%20Sounds%20Guitar%20Demo%20-%20Van%20Halen%27s%205th%20Symphony.m4a"></audio>
         </div>
 
         <div class="track-card">
             <span class="track-name">Harmonic Minor Arpeggios</span>
-            <audio controls preload="none" src="mp3/Sam%20Castillo%20Harmonic%20Hm%20Arpeggios.m4a"></audio>
+            <audio controls preload="none" src="mp3/Sam%20Sounds%20Harmonic%20Hm%20Arpeggios.m4a"></audio>
         </div>
 
         <div class="track-card">
