@@ -119,7 +119,7 @@ The browser amp is a local control panel for the guitar engine. From the repo ro
 python3 -m amp_ui
 ```
 
-Open http://127.0.0.1:8790/ on the same machine. **Amp** is the tuner, presets, knobs, and touchpad. **Practice** plays an original backing loop (or a file from your computer) while the guitar still runs through the amp, and shows the key, the chords, scales that fit, and a fretboard.
+Open http://127.0.0.1:8790/ on the same machine. **Amp** is the tuner, presets, knobs, and touchpad. **Practice** plays an original backing loop (or a file from your computer) while the guitar still runs through the amp, and shows the key, the chords, scales that fit, and a fretboard. The library includes blues, rock, pop, funk, house, hard rock, strings, bluegrass, and an ambient lydian vamp, with a style filter on the track list.
 
 **Lessons** on that tab walk a scale’s five pentatonic boxes, light the chord tones of the bar that is playing, give a short phrase in tab, and a phrasing tip. Checkmarks stay in the browser. To add a loop or a lesson, edit `amp_ui/static/practice/tracks.json`. The full steps are in [docs/browser-amp-ui.md](docs/browser-amp-ui.md).
 

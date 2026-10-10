@@ -35,6 +35,15 @@ eq(theory.spellScale("D", [0, 2, 3, 5, 7, 8, 10]), ["D", "E", "F", "G", "A", "Bb
 eq(theory.spellScale("Bb", [0, 2, 4, 5, 7, 9, 11]), ["Bb", "C", "D", "Eb", "F", "G", "A"], "Bb major");
 eq(theory.spellScale("F#", [0, 2, 3, 5, 7, 8, 10]), ["F#", "G#", "A", "B", "C#", "D", "E"], "F# minor");
 eq(theory.spellScale("Eb", [0, 2, 4, 5, 7, 9, 11]), ["Eb", "F", "G", "Ab", "Bb", "C", "D"], "Eb major");
+eq(theory.spellScale("D", [0, 2, 4, 6, 7, 9, 11]), ["D", "E", "F#", "G#", "A", "B", "C#"], "D lydian");
+eq(theory.spellScale("D", [0, 2, 3, 5, 7, 8, 11]), ["D", "E", "F", "G", "A", "Bb", "C#"], "D harmonic minor");
+eq(theory.spellScale("G", [0, 2, 3, 4, 7, 9]), ["G", "A", "Bb", "B", "D", "E"], "G pentatonic plus flat 3");
+eq(theory.spellScale("E", [0, 2, 4, 5, 7, 9, 10]), ["E", "F#", "G#", "A", "B", "C#", "D"], "E mixolydian");
+eq(theory.parseChord("E5").intervals, [0, 7]);
+eq(theory.assetBaseFromScript("http://127.0.0.1:8790/static/practice.js?v=practice3"), "http://127.0.0.1:8790/static/");
+eq(theory.assetBaseFromScript("http://127.0.0.1:8790/static/practice.js?v=phone1"), "http://127.0.0.1:8790/static/");
+eq(theory.assetBaseFromScript("https://host/amp/static/practice.js"), "https://host/amp/static/");
+eq(theory.assetBaseFromScript(""), "/static/");
 
 eq(theory.parseChord("Am7").intervals, [0, 3, 7, 10]);
 eq(theory.spellScale("D", theory.parseChord("Dm7").intervals), ["D", "F", "A", "C"]);
@@ -139,7 +148,7 @@ function readWavMono(file) {
     }
     samples[i] = sum / channels;
   }
-  return { samples: samples, sr: rate, frames: frames };
+  return { samples: samples, sr: rate, frames: frames, channels: channels };
 }
 
 const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, "../static/practice/tracks.json"), "utf8"));
@@ -169,6 +178,11 @@ catalog.tracks.forEach(function (track) {
   const wav = path.join(audioDir, path.basename(track.file));
   assert.ok(fs.existsSync(wav), wav);
   const audio = readWavMono(wav);
+  if (track.feel === "house" || track.feel === "hard-rock" || track.feel === "strings" || track.feel === "bluegrass" || track.feel === "ambient") {
+    assert.strictEqual(audio.channels, 1, track.id + " channels");
+    assert.strictEqual(audio.sr, 22050, track.id + " rate");
+    assert.ok(fs.statSync(wav).size < 1500000, track.id + " wav size");
+  }
   const expected = track.progression.length * 4 * 60 / track.bpm;
   assert.ok(Math.abs(audio.frames / audio.sr - expected) < 0.02, track.id + " duration");
   let peak = 0;
@@ -232,5 +246,54 @@ const bendLesson = localLessons.filter(function (lesson) { return lesson.id === 
 const bendStep = bendLesson.steps.filter(function (step) { return step.bend; })[0];
 assert.ok(bendStep, "generated bend");
 assert.ok(allowed[theory.pitchClassAt(bendStep.bend.string, bendStep.bend.fret)]);
+
+const byId = {};
+catalog.tracks.forEach(function (track) { byId[track.id] = track; });
+["a-dorian-house", "e-hard-rock", "d-string-score", "g-bluegrass", "d-lydian-ambient"].forEach(function (id) {
+  assert.ok(byId[id], id);
+  assert.ok(byId[id].genre, id + " genre");
+  const lessons = theory.resolveLessons(byId[id], byId[id].scales);
+  const kinds = lessons.map(function (lesson) { return lesson.kind; });
+  ["boxes", "chord-tones", "tab", "tip"].forEach(function (kind) {
+    assert.ok(kinds.indexOf(kind) >= 0, id + " missing " + kind);
+  });
+});
+
+function scaleNamed(track, id) {
+  return track.scales.filter(function (scale) { return scale.id === id; })[0];
+}
+
+const house = byId["a-dorian-house"];
+eq(theory.analyzeChord("D", scaleNamed(house, "a-dorian")).missing, []);
+eq(theory.analyzeChord("D", scaleNamed(house, "a-natural-minor")).missing, ["F#"]);
+eq(theory.analyzeChord("Am7", scaleNamed(house, "a-minor-pentatonic")).missing, []);
+
+const rock = byId["e-hard-rock"];
+eq(theory.analyzeChord("E5", scaleNamed(rock, "e-mixolydian")).missing, []);
+eq(theory.analyzeChord("D5", scaleNamed(rock, "e-minor-pentatonic")).missing, []);
+eq(theory.analyzeChord("A5", scaleNamed(rock, "e-minor-pentatonic")).missing, []);
+eq(theory.analyzeChord("E5", scaleNamed(rock, "e-blues")).missing, []);
+
+const strings = byId["d-string-score"];
+eq(theory.analyzeChord("A", scaleNamed(strings, "d-harmonic-minor")).missing, []);
+eq(theory.analyzeChord("A", scaleNamed(strings, "d-natural-minor")).missing, ["C#"]);
+eq(theory.analyzeChord("Gm", scaleNamed(strings, "d-minor-pentatonic")).missing, ["Bb"]);
+eq(theory.analyzeChord("Bb", scaleNamed(strings, "d-harmonic-minor")).missing, []);
+
+const grass = byId["g-bluegrass"];
+eq(theory.analyzeChord("C", scaleNamed(grass, "g-major")).missing, []);
+eq(theory.analyzeChord("D", scaleNamed(grass, "g-major")).missing, []);
+eq(theory.analyzeChord("C", scaleNamed(grass, "g-major-pentatonic")).missing, ["C"]);
+eq(theory.analyzeChord("D", scaleNamed(grass, "g-major-pentatonic")).missing, ["F#"]);
+eq(theory.analyzeChord("D", scaleNamed(grass, "g-pent-b3")).missing, ["F#"]);
+assert.ok(scaleNamed(grass, "g-major").notes.indexOf("Bb") < 0);
+
+const ambient = byId["d-lydian-ambient"];
+eq(theory.analyzeChord("E", scaleNamed(ambient, "d-lydian")).missing, []);
+eq(theory.analyzeChord("F#m", scaleNamed(ambient, "d-lydian")).missing, []);
+eq(theory.analyzeChord("E", scaleNamed(ambient, "d-major")).missing, ["G#"]);
+eq(theory.analyzeChord("A", scaleNamed(ambient, "d-major-pentatonic")).missing, ["C#"]);
+eq(theory.pitchClassAt("G", 11), theory.parseNote("F#").pc);
+eq((theory.pitchClassAt("G", 11) + 2) % 12, theory.parseNote("G#").pc);
 
 console.log("theory tests passed");

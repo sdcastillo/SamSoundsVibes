@@ -32,6 +32,23 @@
     return document.getElementById(id);
   }
 
+  function practiceScriptSrc() {
+    var nodes = document.getElementsByTagName("script");
+    var i;
+    for (i = nodes.length - 1; i >= 0; i -= 1) {
+      var raw = nodes[i].getAttribute("src") || "";
+      if (/(^|\/)practice\.js(\?|#|$)/.test(raw)) return nodes[i].src || "";
+    }
+    return "";
+  }
+
+  function practiceAsset(path) {
+    var base = theory && theory.assetBaseFromScript
+      ? theory.assetBaseFromScript(practiceScriptSrc())
+      : "/static/";
+    return base + String(path || "").replace(/^\//, "");
+  }
+
   function store() {
     try {
       return JSON.parse(localStorage.getItem(STORAGE) || "{}") || {};
@@ -273,7 +290,7 @@
     state.box = null;
     state.chordMode = false;
     state.bar = -1;
-    audio.src = "/static/practice/" + track.file;
+    audio.src = practiceAsset("practice/" + track.file);
     audio.currentTime = 0;
     renderStudy();
     renderDetail();
@@ -303,8 +320,14 @@
     meta.appendChild(title);
     meta.appendChild(key);
     var bits = [];
+    if (track.genre) bits.push(track.genre);
     if (track.bpm) bits.push(track.bpm + " BPM");
-    if (track.feel) bits.push(track.feel.charAt(0).toUpperCase() + track.feel.slice(1));
+    if (track.feel) {
+      var feelLabel = String(track.feel).split("-").map(function (word) {
+        return word ? word.charAt(0).toUpperCase() + word.slice(1) : "";
+      }).join(" ");
+      if (!track.genre || feelLabel.toLowerCase() !== String(track.genre).toLowerCase()) bits.push(feelLabel);
+    }
     if (track.timeSignature) bits.push(track.timeSignature);
     if (progression().length) bits.push(progression().length + " bars");
     if (bits.length) {
@@ -902,34 +925,79 @@
     });
   }
 
+  function trackOptionLabel(track) {
+    return track.title + " · " + track.key + " · " + track.bpm + " BPM";
+  }
+
+  function filteredTracks() {
+    var genre = ($("practice-genre") && $("practice-genre").value) || "";
+    if (!genre) return state.catalog.slice();
+    return state.catalog.filter(function (track) {
+      return track.genre === genre;
+    });
+  }
+
+  function fillGenreSelect() {
+    var select = $("practice-genre");
+    if (!select) return;
+    var seen = {};
+    state.catalog.forEach(function (track) {
+      if (track.genre) seen[track.genre] = true;
+    });
+    Object.keys(seen).forEach(function (genre) {
+      var option = document.createElement("option");
+      option.value = genre;
+      option.textContent = genre;
+      select.appendChild(option);
+    });
+    var saved = store().genre;
+    if (saved && seen[saved]) select.value = saved;
+    select.addEventListener("change", function () {
+      var data = store();
+      data.genre = select.value;
+      save(data);
+      fillTrackSelect(true);
+    });
+  }
+
+  function fillTrackSelect(fromGenreChange) {
+    var select = $("practice-track");
+    var previous = select.value;
+    var tracks = filteredTracks();
+    select.textContent = "";
+    tracks.forEach(function (track) {
+      var option = document.createElement("option");
+      option.value = track.id;
+      option.textContent = trackOptionLabel(track);
+      select.appendChild(option);
+    });
+    var saved = store().trackId;
+    var prefer = fromGenreChange ? previous : saved;
+    var chosen = tracks.filter(function (track) { return track.id === prefer; })[0] || tracks[0];
+    if (!chosen) return;
+    select.value = chosen.id;
+    if (fromGenreChange && chosen.id === previous) return;
+    showLibraryTrack(chosen, fromGenreChange && !audio.paused);
+  }
+
   function loadCatalog() {
     if (!theory) {
       showPracticeError("Practice theory didn't load.");
       return;
     }
-    fetch("/static/practice/tracks.json")
+    fetch(practiceAsset("practice/tracks.json"))
       .then(function (response) {
         if (!response.ok) throw new Error("Couldn't load the backing-track list.");
         return response.json();
       })
       .then(function (catalog) {
         state.catalog = catalog.tracks || [];
-        var select = $("practice-track");
-        select.textContent = "";
-        state.catalog.forEach(function (track) {
-          var option = document.createElement("option");
-          option.value = track.id;
-          option.textContent = track.title + " · " + track.key + " · " + track.bpm + " BPM";
-          select.appendChild(option);
-        });
-        var saved = store().trackId;
-        var initial = state.catalog.filter(function (track) { return track.id === saved; })[0] || state.catalog[0];
-        if (initial) {
-          select.value = initial.id;
-          showLibraryTrack(initial, false);
-        }
-        select.addEventListener("change", function () {
-          var track = state.catalog.filter(function (item) { return item.id === select.value; })[0];
+        fillGenreSelect();
+        fillTrackSelect(false);
+        $("practice-track").addEventListener("change", function () {
+          var track = state.catalog.filter(function (item) {
+            return item.id === $("practice-track").value;
+          })[0];
           if (track) showLibraryTrack(track, !audio.paused);
         });
       })

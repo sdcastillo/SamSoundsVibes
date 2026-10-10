@@ -87,6 +87,12 @@
     return "";
   }
 
+  function assetBaseFromScript(resolvedSrc) {
+    var abs = String(resolvedSrc || "").split("#")[0].split("?")[0];
+    if (!/practice\.js$/.test(abs)) return "/static/";
+    return abs.replace(/practice\.js$/, "");
+  }
+
   function keyLabel(tonic, mode) {
     var normalized = normalizeMode(mode);
     if (normalized === "major") return tonic + " major";
@@ -102,6 +108,9 @@
       has[value] = true;
     });
     if (interval === 6) {
+      // Lydian has a major 3rd and a perfect 5th, so the tritone is a raised 4th.
+      // A blues scale has a perfect 4th and a perfect 5th, so the tritone is a flat 5.
+      if (has[4] && has[7] && !has[5]) return 3;
       if (has[7]) return 4;
       if (has[5]) return 3;
       return 4;
@@ -659,6 +668,7 @@
     STRING_ORDER: STRING_ORDER,
     STRING_OPEN: STRING_OPEN,
     STRING_LABEL: STRING_LABEL,
+    assetBaseFromScript: assetBaseFromScript,
     parseNote: parseNote,
     normalizeMode: normalizeMode,
     keyLabel: keyLabel,
