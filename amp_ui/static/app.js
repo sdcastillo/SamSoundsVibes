@@ -140,8 +140,15 @@
     if (typeof syncXyFromParams === "function") syncXyFromParams();
   }
 
+  function pageBase() {
+    var path = location.pathname || "/";
+    if (!path.endsWith("/")) path = path.replace(/[^/]+$/, "");
+    return path;
+  }
+
   async function api(path, options) {
-    const response = await fetch(path, options);
+    var rel = path.charAt(0) === "/" ? path.slice(1) : path;
+    const response = await fetch(pageBase() + rel, options);
     const data = await response.json().catch(function () {
       return {};
     });
@@ -601,7 +608,7 @@
 
   function connectWs() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
-    ws = new WebSocket(proto + "//" + location.host + "/ws");
+    ws = new WebSocket(proto + "//" + location.host + pageBase() + "ws");
     ws.onopen = function () {
       wsState.textContent = "Live link on";
       if (!presetCatalog.length) loadFactoryPresets();
