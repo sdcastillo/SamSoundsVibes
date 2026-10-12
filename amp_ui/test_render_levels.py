@@ -13,12 +13,15 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 os.environ["AMP_GATE_OFF"] = "1"
 
+from amp_presets import CAB_ENERGY_GAIN, CAB_L1_CAP, get_preset, ir_names, ir_samples, list_presets  # noqa: E402
 from guitar_amp_engine import (  # noqa: E402
     INPUT_CLIP_LEVEL,
     OUTPUT_CEILING,
+    POST_CAB_GAIN,
     FastAmp,
     JitterBuffer,
     _conceal_underrun,
+    _output_limit,
 )
 
 
@@ -195,6 +198,143 @@ def test_render_stays_inside_a_block():
     print(f"mean render {elapsed:.2f} ms for {block} samples")
 
 
+def test_cabinet_irs_are_energy_normalized():
+    loudest = None
+    for name in ir_names():
+        kernel = ir_samples(name)
+        energy = float(np.sqrt(np.sum(kernel.astype(np.float64) ** 2)))
+        worst = float(np.sum(np.abs(kernel.astype(np.float64))))
+        assert energy <= CAB_ENERGY_GAIN * 1.02
+        assert worst <= CAB_L1_CAP * 1.01
+        if loudest is None or worst > loudest[0]:
+            loudest = (worst, energy, name)
+    print(f"hottest IR after norm: {loudest[2]} L1={loudest[0]:.3f} energy={loudest[1]:.3f}")
+
+
+def _render_note(amp, freq, amp_level, blocks, blocksize=256):
+    rate = 48000
+    peak = 0.0
+    ears_peak = 0.0
+    chunks = []
+    for index in range(blocks):
+        t = (np.arange(blocksize) + index * blocksize) / rate
+        mono = (amp_level * np.sin(2.0 * np.pi * freq * t)).astype(np.float32)
+        ears = amp.render(_stereo(mono), blocksize)
+        peak = max(peak, float(amp.pre_peak))
+        ears_peak = max(ears_peak, float(np.max(np.abs(ears))))
+        chunks.append(ears[:, 0].copy())
+    return peak, ears_peak, np.concatenate(chunks)
+
+
+def test_worst_cabinets_with_high_drive_and_feedback():
+    # These are the files Sam measured: Dtar L1 near 70, Mesa/LX near 18–32.
+    # Delay is short so the feedback tap returns inside the render and can stack.
+    names = [
+        "106_Dtar_btq_finger-_ir.wav",
+        "102_Dtar_small_fingerstyle-_ir.wav",
+        "088 LX TDR Marshall 2.wav",
+        "087 LX TDR Marshall 1.wav",
+        "107 Mesa MKIIC+ TM 2.wav",
+        "106 Mesa MKIIC+ TM1.wav",
+    ]
+    worst = (0.0, "", 0.0)
+    for name in names:
+        for freq in (82.4, 110.0, 196.0, 329.6, 440.0):
+            amp = FastAmp(
+                48000,
+                25.0,
+                0.9,
+                0.75,
+                36.0,
+                0.5,
+                bass=1.0,
+                mid=1.0,
+                treble=1.0,
+                presence=1.0,
+                ir=name,
+                ir_mix=1.0,
+                low_cut=60.0,
+                high_cut=12000.0,
+            )
+            amp.signaled = True
+            pre, out, audio = _render_note(amp, freq, 0.4, blocks=16)
+            assert np.all(np.isfinite(audio))
+            assert out <= float(OUTPUT_CEILING) + 1e-3
+            assert pre <= 1.0
+            assert amp.cab_peak <= 2.5
+            # A hard tanh on a cabinet overshoot fills the ceiling. The gentle
+            # limiter should leave the body of the note below it.
+            near_ceiling = float(np.mean(np.abs(audio) > float(OUTPUT_CEILING) * 0.98))
+            assert near_ceiling < 0.02
+            if pre > worst[0]:
+                worst = (pre, name, freq)
+    print(f"worst cab/note pre-limiter peak {worst[0]:.3f} ({worst[1]} @ {worst[2]} Hz)")
+
+
+def test_every_ir_with_every_preset_stays_bounded():
+    block = 256
+    rate = 48000
+    t = np.arange(block) / rate
+    mono = (
+        0.22 * np.sin(2.0 * np.pi * 110.0 * t) + 0.16 * np.sin(2.0 * np.pi * 165.0 * t) + 0.1 * np.sin(2.0 * np.pi * 220.0 * t)
+    ).astype(np.float32)
+    indata = _stereo(mono)
+    names = ir_names()
+    presets = list_presets()["presets"]
+    # One amp, long enough delay line for every preset, so the sweep stays a check
+    # rather than thousands of buffer allocations.
+    amp = FastAmp(48000, 800.0, 0.2, 0.0, 8.0, 0.35)
+    amp.signaled = True
+    worst = (0.0, "", "")
+    for preset in presets:
+        play = dict(get_preset(slot=preset["slot"])["play"])
+        play.pop("preset", None)
+        volume = float(play["volume"])
+        for name in names:
+            play["ir"] = name
+            play["ir_mix"] = 1.0
+            amp.apply_params(**play)
+            amp.ring.fill(0)
+            amp.write = 0
+            amp._cab_tail = None
+            amp._cab_tail_name = ""
+            pre = 0.0
+            cab = 0.0
+            for _ in range(6):
+                ears = amp.render(indata, block)
+                assert ears.shape == (block, 2)
+                assert np.all(np.isfinite(ears))
+                assert np.max(np.abs(ears)) <= float(OUTPUT_CEILING) + 1e-3
+                pre = max(pre, float(amp.pre_peak))
+                cab = max(cab, float(amp.cab_peak))
+            # Feedback is a convex mix of this post-cab signal, so the final
+            # stage cannot exceed cab peak times the preset volume.
+            assert cab * volume <= 1.0
+            assert pre <= 1.0
+            if cab * volume > worst[0]:
+                worst = (cab * volume, preset["name"], name)
+    print(
+        f"preset x IR sweep: {len(presets)} x {len(names)} "
+        f"worst cab×volume {worst[0]:.3f} ({worst[1]} / {worst[2]})"
+    )
+    assert POST_CAB_GAIN < 1.0
+
+
+def test_gentle_limiter_does_not_square_a_moderate_over():
+    rate = 48000
+    t = np.arange(4096) / rate
+    # A wave that peaks at twice the ceiling. tanh flattens it; the knee should not.
+    hot = (np.sin(2.0 * np.pi * 220.0 * t) * float(OUTPUT_CEILING) * 2.0).astype(np.float32)
+    gentle = _output_limit(hot)
+    hard = (OUTPUT_CEILING * np.tanh(hot / OUTPUT_CEILING)).astype(np.float32)
+    assert np.max(np.abs(gentle)) <= float(OUTPUT_CEILING) + 1e-4
+    # Most of a sine sits under the knee, so the gentle curve stays near the input
+    # there. tanh pulls those samples down.
+    quiet = np.abs(hot) < float(OUTPUT_CEILING) * 0.85
+    assert np.max(np.abs(gentle[quiet] - hot[quiet])) < 1e-5
+    assert np.mean(np.abs(hard[quiet] - hot[quiet])) > 1e-3
+
+
 def test_conceal_matches_direct_call():
     got = np.full((4, 2), 0.3, dtype=np.float32)
     faded = _conceal_underrun(got, 32, np.zeros(2, dtype=np.float32))
@@ -215,6 +355,10 @@ def main():
         test_callback_status_counts_as_xrun,
         test_oversampled_drive_aliases_less_than_double_tanh,
         test_render_stays_inside_a_block,
+        test_cabinet_irs_are_energy_normalized,
+        test_worst_cabinets_with_high_drive_and_feedback,
+        test_gentle_limiter_does_not_square_a_moderate_over,
+        test_every_ir_with_every_preset_stays_bounded,
         test_conceal_matches_direct_call,
     ]
     for test in tests:

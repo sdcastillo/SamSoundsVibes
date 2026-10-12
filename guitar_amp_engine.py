@@ -342,20 +342,35 @@ def _stream_fir(samples, kernel, state):
     return filtered, new_state
 
 
-def _output_limit(samples):
-    """Unity gain for small signals, smooth ceiling near -6 dBFS."""
-    ceiling = OUTPUT_CEILING
-    return (ceiling * np.tanh(samples / ceiling)).astype(np.float32)
+# Linear trim after the cabinet, before the delay taps see the signal.
+# The impulse is already energy-normalized; this leaves room for the tone
+# stack, the Haas pair, and delay feedback to sum without crossing full scale.
+POST_CAB_GAIN = np.float32(0.5)
 
 
-def _tame_peak(samples, ceiling):
-    if samples.size == 0:
-        return samples
-    peak = float(np.max(np.abs(samples)))
-    limit = float(ceiling)
-    if peak <= limit or peak <= 1e-12:
-        return samples
-    return (samples * np.float32(limit / peak)).astype(np.float32)
+def _output_limit(samples, ceiling=None):
+    """Linear below the knee, then a soft approach to the ceiling.
+
+    ceiling * tanh(x / ceiling) bends every peak and, once the cabinet has
+    overshot, flattens the wave into a buzz. This curve leaves quieter samples
+    alone and only rounds the tips that are already near the ceiling.
+    """
+    if ceiling is None:
+        ceiling = OUTPUT_CEILING
+    ceiling = np.float32(ceiling)
+    knee = ceiling * np.float32(0.85)
+    span = ceiling - knee
+    out = np.asarray(samples, dtype=np.float32)
+    if out.size == 0 or span <= 0:
+        return out
+    hot = np.abs(out) > knee
+    if not np.any(hot):
+        return out
+    shaped = np.array(out, copy=True)
+    excess = np.abs(out[hot]) - knee
+    limited = ceiling - span * np.exp(-excess / span)
+    shaped[hot] = np.sign(out[hot]) * limited.astype(np.float32)
+    return shaped
 
 
 def _resample_rows(block, count):
@@ -667,7 +682,10 @@ class FastAmp:
             "drift_drops": 0,
             "jitter_ms": 0.0,
             "jitter": 0.0,
+            "pre": 0.0,
         }
+        self.pre_peak = 0.0
+        self.cab_peak = 0.0
         self._tune_len = 16384
         self._tune_buf = np.zeros(self._tune_len, dtype=np.float32)
         self._tune_pos = 0
@@ -954,7 +972,10 @@ class FastAmp:
         self._cab_tail = new_tail
         self._cab_tail_name = name
         mix = np.float32(np.clip(self.ir_mix, 0.0, 1.0))
-        return ((np.float32(1.0) - mix) * source + mix * heard).astype(np.float32)
+        mixed = (np.float32(1.0) - mix) * source + mix * heard
+        # Fixed headroom, not a per-block peak duck. Ducking the block to fit
+        # a hot impulse changes gain every 5 ms and clicks.
+        return (mixed * POST_CAB_GAIN).astype(np.float32)
 
     def source(self, indata):
         if indata.shape[1] < 2:
@@ -1099,17 +1120,21 @@ class FastAmp:
         distorted = self._distort(source)
         distorted = self._apply_tone(distorted)
         distorted = self._apply_cab(distorted)
-        distorted = _tame_peak(distorted, 1.0)
+        self.cab_peak = float(np.max(np.abs(distorted))) if distorted.size else 0.0
+        self.meters["cab"] = self.cab_peak
         frames = int(distorted.shape[0])
         positions = (self.write + self.offsets[:frames]) % self.ring_size
         echo1 = self.ring[(positions - self.delay_frames) % self.ring_size]
         echo2 = self.ring[(positions - 2 * self.delay_frames) % self.ring_size]
         echo3 = self.ring[(positions - 3 * self.delay_frames) % self.ring_size]
         doubled = self.ring[(positions - self.haas_frames) % self.ring_size]
-        # 0.80 + 0.45 = 1.25; scale so the Haas pair stays near unity.
+        # 0.80 + 0.45 = 1.25; scale so the Haas pair cannot exceed the dry sample.
         wide_l = (np.float32(0.80) * distorted + np.float32(0.45) * doubled) * np.float32(0.8)
         wide_r = (np.float32(0.45) * distorted + np.float32(0.80) * doubled) * np.float32(0.8)
-        feedback = np.float32(self.feedback)
+        # echo1 + fb²·echo3 would exceed the stored sample. Divide by 1+fb² so
+        # the feedback sum stays at or below the post-cab level. fb itself is
+        # at most 0.9, so the repeats decay.
+        feedback = np.float32(min(0.9, max(0.0, float(self.feedback))))
         feedback_sq = feedback * feedback
         wet_scale = np.float32(1.0) / (np.float32(1.0) + feedback_sq)
         wet_l = wet_scale * (echo1 + feedback_sq * echo3)
@@ -1120,6 +1145,8 @@ class FastAmp:
         pre_peak = 0.0
         if left.size:
             pre_peak = float(max(np.max(np.abs(left)), np.max(np.abs(right))))
+        self.pre_peak = pre_peak
+        self.meters["pre"] = pre_peak
         self._latch_flag(
             "_out_clip_hold",
             "out_clip",

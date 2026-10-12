@@ -115,15 +115,37 @@ def read_wav_mono(path: Path) -> np.ndarray:
         raise ValueError(f"Unsupported wav {path.name}: format={audio_format} bits={bits}")
     if channels > 1:
         samples = samples.reshape(-1, channels)[:, 0].copy()
-    peak = float(np.max(np.abs(samples))) if samples.size else 0.0
-    if peak > 1e-8:
-        samples *= np.float32(0.35 / peak)
     if rate and rate != 48000 and samples.size:
         # POD Go IRs are 48 kHz. Resample with linear interpolation if one is not.
         length = int(round(samples.size * 48000 / float(rate)))
         grid = np.linspace(0.0, samples.size - 1, length, dtype=np.float64)
         samples = np.interp(grid, np.arange(samples.size), samples).astype(np.float32)
-    return np.ascontiguousarray(samples, dtype=np.float32)
+    return normalize_cabinet_ir(samples)
+
+
+# Raw cabinet files peak near full scale. Their white-noise energy gain is about
+# 2–2.7, and the worst-case sum of |samples| runs from ~18 (Mesa / LX electric)
+# to ~70 (Dtar acoustic). The drive stage is already near ±1, so those impulses
+# throw the cabinet well past full scale. Peak-only scaling does not fix that.
+# Energy gain is ||h||₂ (RMS of a full-scale noise through the cab). The L1 cap
+# is the safety factor: no full-scale input can come out hotter than this, even
+# when every IR sample lines up with the note.
+CAB_ENERGY_GAIN = 0.45
+CAB_L1_CAP = 2.5
+
+
+def normalize_cabinet_ir(samples: np.ndarray) -> np.ndarray:
+    """Give every cabinet the same energy, then cap the worst-case gain."""
+    out = np.ascontiguousarray(samples, dtype=np.float32)
+    if out.size == 0:
+        return out
+    energy = float(np.sqrt(np.sum(out.astype(np.float64) ** 2)))
+    if energy > 1e-8:
+        out *= np.float32(CAB_ENERGY_GAIN / energy)
+    worst = float(np.sum(np.abs(out.astype(np.float64))))
+    if worst > CAB_L1_CAP:
+        out *= np.float32(CAB_L1_CAP / worst)
+    return np.ascontiguousarray(out, dtype=np.float32)
 
 
 def ir_names():
