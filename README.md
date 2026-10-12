@@ -1,10 +1,10 @@
-# SamSoundsVibes
+# Sam Sounds
 
 ## 🎵 Welcome to My Musical Universe
 
-**[🎸 Experience SamSoundsVibes NOW →](https://scene-music-messenger.lovable.app/)**
+**[🎸 Experience Sam Sounds NOW →](https://scene-music-messenger.lovable.app/)**
 
-Hey there! I'm **Sam Castillo**, a musician and creative technologist passionate about blending art, technology, and innovation. Welcome to **SamSoundsVibes**—a space where music, code, and vibration converge into something magical.
+Hey there! I'm Sam, the musician behind **Sam Sounds** and a creative technologist passionate about blending art, technology, and innovation. Welcome to **Sam Sounds**—a space where music, code, and vibration converge into something magical.
 
 This project represents my journey of discovering how technology can amplify creative expression, and how the principles of music can reshape the way we code.
 
@@ -36,7 +36,7 @@ I don't take these tools for granted. **Lovable, AI, and modern development fram
 
 2. **Community First** - These powerful tools should be used by the community to help artists showcase their talents. A musician with a vision but no coding experience deserves the same platform as a seasoned developer.
 
-3. **Accessibility is Revolutionary** - When tools like Lovable exist, we have a responsibility to use them ethically and share their power. I built SamSoundsVibes not just as a portfolio piece, but as proof that non-technical artists can create stunning digital experiences.
+3. **Accessibility is Revolutionary** - When tools like Lovable exist, we have a responsibility to use them ethically and share their power. I built Sam Sounds not just as a portfolio piece, but as proof that non-technical artists can create stunning digital experiences.
 
 4. **Amplify Talent, Not Gatekeep Skills** - The music world doesn't require you to be a mixing engineer to share your gift. Technology should work the same way. If you're talented, you deserve a stage.
 
@@ -76,7 +76,7 @@ When you code with vibes in mind, you're thinking about:
 
 ---
 
-## 🚀 Building SamSoundsVibes with Lovable
+## 🚀 Building Sam Sounds with Lovable
 
 ### The Creation Story
 
