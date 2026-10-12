@@ -146,6 +146,14 @@ Interested in vibe coding? Are you an artist or musician looking to build your d
 - 💻 **Tech & Data** - [LinkedIn](https://linkedin.com/in/samdcastillo)
 - 🎸 **Creative Projects** - [GitHub](https://github.com/sdcastillo)
 
+### More from Sam
+
+- 🎶 **[Sam Sounds](https://sdcastillo.github.io/SamSoundsVibes/)** - music, the guitar amp, and the practice tool
+- 📊 **[Predictive Insights AI](https://www.predictiveinsightsai.com)** - Sam's AI and analytics company
+- 👕 **[Merch](https://sammy-merch-store.printful.me/)** - Sam's merch store
+- 🔗 **[Linktree](https://linktr.ee/samuel.castillo)** - all of Sam's links in one place
+- 𝕏 **[X](https://x.com/SamCast65215624)** - updates and new posts
+
 ---
 
 *Built with Lovable. Inspired by vibration. Created with vibes. Recorded with passion.* 🌊🎸🎵✨
