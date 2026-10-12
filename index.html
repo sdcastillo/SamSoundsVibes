@@ -31,6 +31,22 @@
         .diagram a:focus-visible { outline: 2px solid #2f7bf5; }
         .diagram figcaption span { display: block; color: #a9b3c1; font-size: 0.9em; }
         .diagram figcaption strong { color: #ffffff; }
+        .mos-cards { max-width: 900px; margin: 0 auto 36px; display: grid; gap: 24px; }
+        .mos-card { background: #0d1b2e; padding: 22px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; color: #e6ebf2; min-width: 0; }
+        .mos-card h3 { color: #ffffff; margin: 0 0 6px; font-size: 1.4em; }
+        .mos-card h4 { color: #ffffff; margin: 18px 0 6px; font-size: 1.05em; border-bottom: 1px solid #2a3442; padding-bottom: 4px; }
+        .mos-card p, .mos-card li { color: #e6ebf2; }
+        .mos-card .mos-lede { color: #a9b3c1; font-style: italic; }
+        .mos-card .mos-note { color: #a9b3c1; font-size: 0.9em; }
+        .mos-card .mos-chain { background: #05080f; border: 1px solid #2a3442; border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+        .mos-card .mos-illegible { color: #a9b3c1; font-style: italic; }
+        .mos-card ul, .mos-card ol { padding-left: 1.3em; }
+        .mos-card .katex-display { overflow-x: auto; overflow-y: hidden; padding: 6px 0; margin: 10px 0; }
+        .mos-card .katex { color: #ffffff; }
+        .mos-original { margin-top: 16px; }
+        .mos-original summary { cursor: pointer; color: #6aa8ff; font-weight: bold; }
+        .mos-original summary:focus-visible { outline: 2px solid #2f7bf5; outline-offset: 3px; }
+        .mos-original .diagram { margin-top: 12px; }
         .song-sheet { max-width: 900px; margin: 0 auto 36px; background: #0d1b2e; padding: 20px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; }
         .song-sheet h2 { color: #ffffff; margin: 0 0 8px; font-size: 1.7em; }
         .song-sheet p { margin: 0 0 14px; color: #e6ebf2; }
@@ -68,6 +84,9 @@
             .listen-watch ul { grid-template-columns: 1fr; }
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous" onload="renderMathInElement(document.getElementById('math-cards'), {delimiters: [{left: '$$', right: '$$', display: true}, {left: '\\(', right: '\\)', display: false}], throwOnError: false});"></script>
 </head>
 <body>
 
@@ -108,25 +127,155 @@
 
     <section class="math-of-sound" id="math-of-sound" aria-labelledby="math-of-sound-title">
         <h2 id="math-of-sound-title">The Math of Sound: waves &amp; transforms</h2>
-        <p>How the amp turns a guitar string into numbers and back into sound. Tap any diagram to open it full size.</p>
+        <p>How the amp turns a guitar string into numbers and back into sound. Each card spells out one infographic; open "View original infographic" to see it, and tap the image for full size.</p>
     </section>
-    <div class="diagrams">
-        <figure class="diagram">
-            <a href="electrical_engineering3.jpeg" target="_blank" rel="noopener" aria-label="Open full size: A held note is a Fourier series"><img src="electrical_engineering3.jpeg" alt="Diagram: a held guitar note is a Fourier series, and drive rewrites that series before the tuner reads the clean string" loading="lazy" decoding="async"></a>
-            <figcaption><strong>A held note is a Fourier series</strong><span>A ringing string is a fundamental plus harmonics. The drive knob bends and flattens the wave, adding new harmonics, while the tuner reads the clean string.</span></figcaption>
-        </figure>
-        <figure class="diagram">
-            <a href="electrical_engineering1.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Convolution: the cabinet as an impulse response"><img src="electrical_engineering1.jpeg" alt="Diagram: cabinet sound as convolution of the distorted guitar with an impulse response, computed with an FFT and overlap-add" loading="lazy" decoding="async"></a>
-            <figcaption><strong>Convolution: the cabinet as an impulse response</strong><span>A cabinet and mic are captured as a short "click." Playing through them is convolution, done fast with the FFT and overlap-add.</span></figcaption>
-        </figure>
-        <figure class="diagram">
-            <a href="electrical_engineering4.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Guitar effects as DSP building blocks"><img src="electrical_engineering4.jpeg" alt="Diagram: wah, tone stack, delay, feedback, and Haas stereo width as short digital filters" loading="lazy" decoding="async"></a>
-            <figcaption><strong>Guitar effects as DSP building blocks</strong><span>Wah, tone stack, delay, feedback, and stereo width are small filters: weighted sums of recent samples, no FFT needed.</span></figcaption>
-        </figure>
-        <figure class="diagram">
-            <a href="electrical_engineering2.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Back into the room"><img src="electrical_engineering2.jpeg" alt="Diagram: float samples travel through PipeWire to the headset, which turns them back into air pressure" loading="lazy" decoding="async"></a>
-            <figcaption><strong>Back into the room</strong><span>The processed samples stream through PipeWire to the headset, where the converter and driver turn them back into air pressure.</span></figcaption>
-        </figure>
+    <div class="mos-cards" id="math-cards">
+
+        <article class="mos-card" id="fourier-series">
+            <h3>A held note is a Fourier series</h3>
+            <p class="mos-lede">A string that rings on one pitch is close to periodic. A periodic wave can be written as a sum of sines: the fundamental, then twice that frequency, three times, and so on. That sum is a Fourier series.</p>
+            <h4>1. The string plays a near-periodic wave</h4>
+            <p>This wave repeats every period \(T\). Its frequency is</p>
+            $$f_1 = \frac{1}{T} \quad \text{(the fundamental).}$$
+            <p>Its Fourier series is</p>
+            $$y(t) = \frac{a_0}{2} + \sum_{n=1}^{\infty} a_n \cos(2\pi n f_1 t) + b_n \sin(2\pi n f_1 t)$$
+            <p>\(f_1\) is the pitch the tuner names. The sizes \(|c_n| = \sqrt{a_n^2 + b_n^2}\) shape the tone.</p>
+            <ul>
+                <li><strong>Guitar (richer):</strong> strong harmonics at \(f_1, 2f_1, 3f_1, 4f_1, \dots\)</li>
+                <li><strong>Flute (purer):</strong> mostly the fundamental, with small harmonics.</li>
+            </ul>
+            <p>Different instruments have different harmonic sizes → different tone.</p>
+            <h4>2. Drive rewrites that series</h4>
+            <p>The engine multiplies the string by the drive knob, bends it with a soft absolute-value term, then passes it through tanh twice.</p>
+            <p class="mos-chain">string \(y(t)\) → × drive \(k \in [0, 1]\) → soft abs \(+\,\alpha\,|y(t)|\) (asymmetric bend) → tanh (flattens peaks) → tanh (flattens peaks) → processed wave \(z(t)\)</p>
+            <ul>
+                <li>tanh flattens the peaks. A flattened wave needs extra odd harmonics in its Fourier series, so the tone gets brighter and harsher as \(k\) goes up.</li>
+                <li>The small absolute-value bend is asymmetric, so even harmonics show up too.</li>
+                <li>Nothing in this stage looks at a spectrum. The new harmonics are just what that new shape is made of.</li>
+            </ul>
+            <p><strong>As drive \(k\) increases</strong> (low → medium → high), the wave goes from a sine toward a square: brighter, harsher, more odd harmonics (and some even harmonics).</p>
+            <h4>3. The tuner reads the string before this bend</h4>
+            <p>It hears the series the string actually played, not the driven, bent version. Tuner input \(= y(t)\) (before drive processing). It names \(f_1\) and sees the harmonic sizes of the string's own motion.</p>
+            <h4>Summary</h4>
+            <ul>
+                <li>A held note is a Fourier series: fundamental + harmonics.</li>
+                <li>Drive multiplies, bends, and flattens the wave → adds new harmonics (especially odd, plus even from asymmetry).</li>
+                <li>The tuner reads the string before this bend → it hears what was actually played.</li>
+            </ul>
+            <p class="mos-note">Legend: linear / string path (what the tuner sees); nonlinear drive path (rewrites the series). Note: all plots are illustrative. Real string motion includes decay, slight inharmonicity, and noise.</p>
+            <details class="mos-original"><summary>View original infographic</summary>
+                <figure class="diagram">
+                    <a href="electrical_engineering3.jpeg" target="_blank" rel="noopener" aria-label="Open full size: A held note is a Fourier series"><img src="electrical_engineering3.jpeg" alt="Diagram: a held guitar note is a Fourier series, and drive rewrites that series before the tuner reads the clean string" loading="lazy" decoding="async"></a>
+                    <figcaption><strong>A held note is a Fourier series</strong><span>A ringing string is a fundamental plus harmonics. The drive knob bends and flattens the wave, adding new harmonics, while the tuner reads the clean string.</span></figcaption>
+                </figure>
+            </details>
+        </article>
+
+        <article class="mos-card" id="convolution">
+            <h3>Convolution: cabinet as impulse response</h3>
+            <p class="mos-lede">How a guitar note becomes the sound of a cabinet and microphone.</p>
+            <h4>1. Impulse response = the cabinet's "click"</h4>
+            <p>A single click \(\delta[n]\) into the cabinet, recorded by the mic, gives the impulse response \(h[n]\): 2048 samples at 48 kHz ≈ 43 ms.</p>
+            <p class="mos-note">irs/ contents (from POD Go backup, 8 November 2023): 48 kHz, 32-bit float, 2048 samples, ≈ 43 ms.</p>
+            <h4>2. Playing guitar through the cabinet = convolution</h4>
+            <p class="mos-chain">Guitar → Amp (distorted) \(x[n]\) → Convolution (cabinet + mic) → \(y[n]\) (what the mic hears)</p>
+            <p>Every sample of the distorted string is replaced by a copy of the click (\(h\)), scaled by that sample, and the copies are added where they overlap.</p>
+            <h4>3. The convolution sum (time domain)</h4>
+            $$y[n] = x[n]\,h[0] + x[n-1]\,h[1] + x[n-2]\,h[2] + \dots + x[n-k]\,h[k] + \dots$$
+            <ul>
+                <li>\(x\) = amp (input)</li>
+                <li>\(h\) = cabinet impulse response (IR)</li>
+                <li>\(y\) = microphone output (what you hear)</li>
+            </ul>
+            <p><strong>Different \(h\) → different sound.</strong> Marshall IR \((h_{\text{Marshall}})\) vs. Mesa IR \((h_{\text{Mesa}})\): same \(x[n]\), different \(h\) → different body and top end.</p>
+            <h4>4. Cab mix &amp; post-convolution filters</h4>
+            <p class="mos-chain">\(y[n]\) (convolution output) + dry amp \(x[n]\) via Blend (0–100%) → Low Cut (one-pole HPF) → High Cut (one-pole LPF) → Output (to next stage)</p>
+            <p>Cab mix blends convolution output back with the dry amp. Low cut and high cut are one-pole filters (6 dB/oct), like turning down rumble and hiss on the mic.</p>
+            <h4>5. How the engine actually does it (FFT convolution)</h4>
+            <p>Direct 2048-tap convolution on every block is too expensive for the audio callback. The engine uses the Fourier transform:</p>
+            <p class="mos-chain">Input blocks \((x)\) → FFT → \(X[k]\) → Multiply \((X[k] \cdot H[k])\) → IFFT → Overlap / Add → Output blocks \((y)\)</p>
+            <ul>
+                <li>\(H[k]\) is the FFT of \(h\), precomputed.</li>
+                <li>Overlap-add (or overlap-save) reassembles the blocks into continuous audio.</li>
+                <li>Far fewer operations per block → fits in the audio callback.</li>
+            </ul>
+            <details class="mos-original"><summary>View original infographic</summary>
+                <figure class="diagram">
+                    <a href="electrical_engineering1.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Convolution: the cabinet as an impulse response"><img src="electrical_engineering1.jpeg" alt="Diagram: cabinet sound as convolution of the distorted guitar with an impulse response, computed with an FFT and overlap-add" loading="lazy" decoding="async"></a>
+                    <figcaption><strong>Convolution: the cabinet as an impulse response</strong><span>A cabinet and mic are captured as a short "click." Playing through them is convolution, done fast with the FFT and overlap-add.</span></figcaption>
+                </figure>
+            </details>
+        </article>
+
+        <article class="mos-card" id="dsp-blocks">
+            <h3>Guitar effects &amp; processing as DSP building blocks</h3>
+            <p class="mos-lede">No FFT. Each output sample is a weighted sum of a few recent input samples and a few recent output samples.</p>
+            <h4>1. Wah, tone stack, cab low &amp; high cuts</h4>
+            <p>Shapes: moving peak (wah), low shelf (lift lows), high shelf (cut highs).</p>
+            <p><strong>Biquad (wah / tone stack)</strong>, Direct Form I / Transposed Direct Form II:</p>
+            $$y[n] = b_0 x[n] + b_1 x[n-1] + b_2 x[n-2] - a_1 y[n-1] - a_2 y[n-2]$$
+            <p><strong>One-pole cuts (low / high):</strong></p>
+            $$\text{Low cut (high pass): } y[n] = (1-\alpha)\,y[n-1] + \alpha\,x[n]$$
+            $$\text{High cut (low pass): } y[n] = \alpha\,y[n-1] + (1-\alpha)\,x[n]$$
+            <p>The Fourier transform of the filter's own impulse response is its frequency response. Same family of idea as the cabinet: impulse response so short that the direct sum is cheaper than an FFT.</p>
+            <h4>Cabinet as short impulse response (example)</h4>
+            $$y[n] = \sum_{i=0}^{M} b_i\, x[n-i]$$
+            <p>A weighted sum, no recursion. A typical cab IR is very short (about 5 ms); its frequency response (FFT of the IR) is plotted from 20 Hz to 10 kHz, between about 0 dB and −20 dB.</p>
+            <h4>2. Delay, feedback &amp; comb filter</h4>
+            <p class="mos-chain">Input \(x[n]\) → (+) → Cabinet / Filter \(H(z)\) → Output \(y[n]\), with Feedback \(g\) (\(0 \le g &lt; 1\)) through Delay (shift) back into the sum</p>
+            <p>Delay ring buffer: write \(y[n]\), read \(y[n-D]\). The delay is a shift. The ring buffer holds the cabinet's output and reads it back tens or hundreds of milliseconds later. Feedback adds that echo into later echoes.</p>
+            <p>A delayed copy of a wave, mixed with the original, is a comb:</p>
+            $$y[n] = x[n] + g\,x[n-D]$$
+            <p>Its magnitude response has notches at \(k / D\) Hz \((k = 0, 1, 2, \dots)\).</p>
+            <h4>3. Stereo width (Haas delay)</h4>
+            <p>A much shorter copy of the same trick, the Haas delay, with the louder copy swapped between left and right. Input \(y[n]\) → Delay (\(\tau\) samples, \(\tau \approx\) 5–30 ms) → Gain (L) <span class="mos-illegible">[illegible: "hiquer left"]</span> → Left Out; Gain (R) <span class="mos-illegible">[illegible: "hoder right"]</span> → Right Out.</p>
+            <p>A short delay (\(\tau\)) creates spatial width without a full echo. Same comb idea, but \(\tau\) is small and used for perception, not repetition.</p>
+            <h4>All effects here are rational transfer functions</h4>
+            $$H(z) = \frac{Y(z)}{X(z)} = \frac{b_0 + b_1 z^{-1} + b_2 z^{-2} + \dots}{1 + a_1 z^{-1} + a_2 z^{-2} + \dots}$$
+            <p>For the cabinet cuts, many \(a_i = 0\) after the first few terms. Build complex sound with simple recurrence, delay, and feedback. No FFT required.</p>
+            <details class="mos-original"><summary>View original infographic</summary>
+                <figure class="diagram">
+                    <a href="electrical_engineering4.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Guitar effects as DSP building blocks"><img src="electrical_engineering4.jpeg" alt="Diagram: wah, tone stack, delay, feedback, and Haas stereo width as short digital filters" loading="lazy" decoding="async"></a>
+                    <figcaption><strong>Guitar effects as DSP building blocks</strong><span>Wah, tone stack, delay, feedback, and stereo width are small filters: weighted sums of recent samples, no FFT needed.</span></figcaption>
+                </figure>
+            </details>
+        </article>
+
+        <article class="mos-card" id="back-into-the-room">
+            <h3>Back into the room</h3>
+            <p class="mos-lede">From rewritten float samples to sound pressure in the earcups.</p>
+            <ol>
+                <li><strong>render() returns</strong> 2 channels of float samples (example: 48 kHz, 32-bit float; left and right front).</li>
+                <li><strong>PipeWire (pw-cat):</strong> 32-bit float, 48 kHz audio stream (2 ch, F32LE, 48 kHz).</li>
+                <li><strong>System default sink</strong> (e.g., Logi USB headset): SINK: Logi USB Headset (Playback).</li>
+                <li><strong>Inside the headset: converter → drivers → pressure.</strong>
+                    <ul>
+                        <li>DAC (converter): builds a voltage from each sample.</li>
+                        <li>Amplifier / driver: moves the voice coil and diaphragm.</li>
+                        <li>Acoustic pressure in the earcup: the pressure wave you hear.</li>
+                    </ul>
+                </li>
+                <li><strong>What the pressure can contain</strong> (all encoded in the rewritten samples):
+                    <ul>
+                        <li>Tuner's note: a stable sinusoid at the target frequency (e.g., A4 ≈ 440 Hz).</li>
+                        <li>Cabinet's click: a short transient impulse (e.g., mechanical click).</li>
+                        <li>Clipped harmonic series: harmonics + hard clipping = bright, buzzy tone (e.g., saw-like + clip).</li>
+                    </ul>
+                </li>
+                <li><strong>How it got there: rewrite in frequency, invert back to time.</strong> Rewrite the spectrum (optional but explicit):
+                    $$X[k] = \mathrm{FFT}\{x[n]\} \;\xrightarrow{\text{modify } X[k]}\; X'[k] \;\longrightarrow\; x'[n] = \mathrm{IFFT}\{X'[k]\}$$
+                    Send the <span class="mos-illegible">[unclear: "newdomain"]</span> samples to PipeWire (back to step 2).
+                </li>
+            </ol>
+            <p>Every sound you hear in the headset started as numbers: rewritten, transformed, inverted, and turned back into pressure.</p>
+            <details class="mos-original"><summary>View original infographic</summary>
+                <figure class="diagram">
+                    <a href="electrical_engineering2.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Back into the room"><img src="electrical_engineering2.jpeg" alt="Diagram: float samples travel through PipeWire to the headset, which turns them back into air pressure" loading="lazy" decoding="async"></a>
+                    <figcaption><strong>Back into the room</strong><span>The processed samples stream through PipeWire to the headset, where the converter and driver turn them back into air pressure.</span></figcaption>
+                </figure>
+            </details>
+        </article>
+
     </div>
 
     <section class="song-sheet" id="paradise-road">
