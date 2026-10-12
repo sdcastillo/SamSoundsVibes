@@ -24,6 +24,13 @@
         .diagram { margin: 0; text-align: center; }
         .diagram img { width: 100%; height: auto; border-radius: 12px; display: block; background: #fff; }
         .diagram figcaption { color: #a9b3c1; font-size: 0.95em; margin-top: 8px; }
+        .math-of-sound { max-width: 1100px; margin: 0 auto 14px; text-align: center; }
+        .math-of-sound h2 { color: #ffffff; margin: 0 0 6px; font-size: 1.6em; }
+        .math-of-sound p { color: #a9b3c1; margin: 0 auto; max-width: 760px; }
+        .diagram a { display: block; border-radius: 12px; outline-offset: 3px; }
+        .diagram a:focus-visible { outline: 2px solid #2f7bf5; }
+        .diagram figcaption span { display: block; color: #a9b3c1; font-size: 0.9em; }
+        .diagram figcaption strong { color: #ffffff; }
         .song-sheet { max-width: 900px; margin: 0 auto 36px; background: #0d1b2e; padding: 20px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; }
         .song-sheet h2 { color: #ffffff; margin: 0 0 8px; font-size: 1.7em; }
         .song-sheet p { margin: 0 0 14px; color: #e6ebf2; }
@@ -99,22 +106,26 @@
         <p>The amp, live: a screen recording of it running.</p>
     </section>
 
+    <section class="math-of-sound" id="math-of-sound" aria-labelledby="math-of-sound-title">
+        <h2 id="math-of-sound-title">The Math of Sound: waves &amp; transforms</h2>
+        <p>How the amp turns a guitar string into numbers and back into sound. Tap any diagram to open it full size.</p>
+    </section>
     <div class="diagrams">
         <figure class="diagram">
-            <img src="electrical_engineering3.jpeg" alt="Diagram: a held guitar note is a Fourier series, and drive rewrites that series before the tuner reads the clean string">
-            <figcaption>A held note is a Fourier series</figcaption>
+            <a href="electrical_engineering3.jpeg" target="_blank" rel="noopener" aria-label="Open full size: A held note is a Fourier series"><img src="electrical_engineering3.jpeg" alt="Diagram: a held guitar note is a Fourier series, and drive rewrites that series before the tuner reads the clean string" loading="lazy" decoding="async"></a>
+            <figcaption><strong>A held note is a Fourier series</strong><span>A ringing string is a fundamental plus harmonics. The drive knob bends and flattens the wave, adding new harmonics, while the tuner reads the clean string.</span></figcaption>
         </figure>
         <figure class="diagram">
-            <img src="electrical_engineering1.jpeg" alt="Diagram: cabinet sound as convolution of the distorted guitar with an impulse response, computed with an FFT and overlap-add">
-            <figcaption>Convolution: the cabinet as an impulse response</figcaption>
+            <a href="electrical_engineering1.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Convolution: the cabinet as an impulse response"><img src="electrical_engineering1.jpeg" alt="Diagram: cabinet sound as convolution of the distorted guitar with an impulse response, computed with an FFT and overlap-add" loading="lazy" decoding="async"></a>
+            <figcaption><strong>Convolution: the cabinet as an impulse response</strong><span>A cabinet and mic are captured as a short "click." Playing through them is convolution, done fast with the FFT and overlap-add.</span></figcaption>
         </figure>
         <figure class="diagram">
-            <img src="electrical_engineering4.jpeg" alt="Diagram: wah, tone stack, delay, feedback, and Haas stereo width as short digital filters">
-            <figcaption>Guitar effects as DSP building blocks</figcaption>
+            <a href="electrical_engineering4.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Guitar effects as DSP building blocks"><img src="electrical_engineering4.jpeg" alt="Diagram: wah, tone stack, delay, feedback, and Haas stereo width as short digital filters" loading="lazy" decoding="async"></a>
+            <figcaption><strong>Guitar effects as DSP building blocks</strong><span>Wah, tone stack, delay, feedback, and stereo width are small filters: weighted sums of recent samples, no FFT needed.</span></figcaption>
         </figure>
         <figure class="diagram">
-            <img src="electrical_engineering2.jpeg" alt="Diagram: float samples travel through PipeWire to the headset, which turns them back into air pressure">
-            <figcaption>Back into the room</figcaption>
+            <a href="electrical_engineering2.jpeg" target="_blank" rel="noopener" aria-label="Open full size: Back into the room"><img src="electrical_engineering2.jpeg" alt="Diagram: float samples travel through PipeWire to the headset, which turns them back into air pressure" loading="lazy" decoding="async"></a>
+            <figcaption><strong>Back into the room</strong><span>The processed samples stream through PipeWire to the headset, where the converter and driver turn them back into air pressure.</span></figcaption>
         </figure>
     </div>
 
