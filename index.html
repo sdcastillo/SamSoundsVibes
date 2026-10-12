@@ -38,6 +38,14 @@
         .amp-video p { color: #a9b3c1; font-size: 0.95em; margin: 8px 0 0; }
         .hero-links { margin: 6px 0 0; font-size: 0.95em; color: #a9b3c1; }
         .hero-links a { color: #6aa8ff; }
+        .listen-watch { max-width: 900px; margin: 0 auto 36px; background: #0d1b2e; padding: 22px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; }
+        .listen-watch h2 { color: #ffffff; margin: 0 0 6px; font-size: 1.5em; }
+        .listen-watch > p { color: #a9b3c1; margin: 0 0 14px; }
+        .listen-watch h3 { color: #ffffff; margin: 16px 0 8px; font-size: 1.05em; }
+        .listen-watch ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+        .listen-watch li a { color: #6aa8ff; font-weight: bold; text-decoration: none; }
+        .listen-watch li a:hover, .listen-watch li a:focus { text-decoration: underline; }
+        .listen-watch li span { display: block; color: #a9b3c1; font-size: 0.88em; }
         .more-from-sam { max-width: 900px; margin: 40px auto 10px; background: #0d1b2e; padding: 22px 22px 18px; border-radius: 12px; border-left: 4px solid #2f7bf5; }
         .more-from-sam h2 { color: #ffffff; margin: 0 0 6px; font-size: 1.5em; }
         .more-from-sam > p { color: #a9b3c1; margin: 0 0 14px; }
@@ -50,6 +58,7 @@
             .amp-shots { grid-template-columns: 1fr; }
             .song-sheet iframe { height: 70vh; min-height: 480px; }
             .more-from-sam ul { grid-template-columns: 1fr; }
+            .listen-watch ul { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -149,6 +158,27 @@
             <audio controls preload="none" src="mp3/White%20Christmas%20-%20Electric%20Guitar%20-%20Sam.m4a"></audio>
         </div>
     </div>
+
+    <section class="listen-watch" id="listen-watch" aria-labelledby="listen-watch-title">
+        <h2 id="listen-watch-title">Listen &amp; Watch</h2>
+        <p>More music from Sam: covers, originals, and jams. Pull up a chair and enjoy.</p>
+        <h3>Channels &amp; music</h3>
+        <ul>
+            <li><a href="https://www.youtube.com/@GUILDSOUNDVIBES" target="_blank" rel="noopener">YouTube</a><span>Guitar videos on the GUILD SOUND VIBES channel</span></li>
+            <li><a href="https://music.youtube.com/@GUILDSOUNDVIBES" target="_blank" rel="noopener">YouTube Music</a><span>The same channel, made for listening</span></li>
+            <li><a href="https://samshreds.bandcamp.com/" target="_blank" rel="noopener">Bandcamp</a><span>Buy the music, pay what you want</span></li>
+        </ul>
+        <h3>Videos</h3>
+        <ul>
+            <li><a href="https://www.youtube.com/watch?v=XV818nVcaqQ" target="_blank" rel="noopener">Sam and Jacob: Rock in A Minor</a><span>A jam with Jacob</span></li>
+            <li><a href="https://youtu.be/X18q9cAfCdY" target="_blank" rel="noopener">Beethoven Metal (5th Symphony)</a><span>Original guitar solo, classical meets metal</span></li>
+            <li><a href="https://youtu.be/s7yfQKVZQWQ" target="_blank" rel="noopener">Crazy Train</a><span>Ozzy Osbourne guitar cover</span></li>
+            <li><a href="https://youtu.be/U-wi7-UzxBk" target="_blank" rel="noopener">Can't Help Falling in Love</a><span>Elvis, electric guitar cover</span></li>
+            <li><a href="https://youtu.be/wRxdoR28oes" target="_blank" rel="noopener">Silent Night</a><span>Surf rock guitar cover in melodic minor</span></li>
+            <li><a href="https://youtu.be/eT0Cun5xlX4" target="_blank" rel="noopener">Home</a><span>Andrew York cover</span></li>
+            <li><a href="https://youtu.be/sKZ8t0SEF-Q" target="_blank" rel="noopener">Featured performance</a><span>A recent guitar cover</span></li>
+        </ul>
+    </section>
 
     <footer class="more-from-sam" aria-labelledby="more-from-sam-title">
         <h2 id="more-from-sam-title">More from Sam</h2>
