@@ -190,6 +190,28 @@ def resolve_audio_devices(config):
 
 
 _NOTE_NAMES = ("C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B")
+_LETTER_STEPS = {"C": 0, "D": 1, "E": 2, "F": 3, "G": 4, "A": 5, "B": 6}
+
+
+def staff_from_tuner(note, octave):
+    """Map a tuner note name to a grand-staff step (C4 = 0) and accidental."""
+    raw = str(note or "")
+    letter = raw[:1].upper() if raw else ""
+    accidental = "#" if "#" in raw else ("b" if "b" in raw[1:].lower() else "")
+    if letter not in _LETTER_STEPS:
+        return {"step": 0, "accidental": "", "clef": "treble"}
+    try:
+        octv = int(octave)
+    except (TypeError, ValueError):
+        octv = 4
+    step = (octv - 4) * 7 + _LETTER_STEPS[letter]
+    return {
+        "step": int(step),
+        "accidental": accidental,
+        "clef": "treble" if step >= 0 else "bass",
+    }
+
+
 # Standard guitar, low E to high E. MIDI note numbers.
 _GUITAR_STRINGS = (
     {"name": "E2", "midi": 40},
@@ -211,6 +233,7 @@ def _idle_tuner():
         "midi": 0,
         "clarity": 0.0,
         "string": -1,
+        "staff": staff_from_tuner("", 4),
     }
 
 
@@ -281,15 +304,17 @@ def estimate_pitch(samples, rate):
     nearest = min(_GUITAR_STRINGS, key=lambda item: abs(item["midi"] - midi_float))
     if abs(nearest["midi"] - midi_float) <= 0.55:
         string_index = _GUITAR_STRINGS.index(nearest)
+    note_name = _NOTE_NAMES[midi % 12]
     return {
         "active": True,
         "hz": round(hz, 2),
         "cents": round(cents, 1),
-        "note": _NOTE_NAMES[midi % 12],
+        "note": note_name,
         "octave": octave,
         "midi": midi,
         "clarity": round(best, 3),
         "string": string_index,
+        "staff": staff_from_tuner(note_name, octave),
     }
 
 

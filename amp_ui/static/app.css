@@ -491,6 +491,65 @@ meter {
   border-color: var(--accent2);
 }
 
+.staff-wrap {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.staff-caption {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.note-staff {
+  display: block;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  background: #16131c;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.note-staff .clef {
+  fill: #f2efe8;
+  font-size: 44px;
+  font-family: "Segoe UI Symbol", "Noto Music", serif;
+}
+
+.note-staff .bass-clef {
+  font-size: 36px;
+}
+
+.staff-note.is-ghost .staff-head,
+.staff-note.is-ghost .staff-stem,
+.staff-note.is-ghost .staff-accidental,
+.staff-note.is-ghost .staff-ledger {
+  opacity: 0.28;
+}
+
+.staff-head {
+  fill: var(--accent2);
+}
+
+.staff-note.is-live .staff-head {
+  fill: #ffe08a;
+}
+
+.staff-stem,
+.staff-ledger {
+  stroke: #f2efe8;
+  stroke-width: 1.6;
+}
+
+.staff-accidental {
+  fill: #f2efe8;
+  font-size: 16px;
+  font-family: "Georgia", serif;
+}
+
 .presets {
   margin-bottom: 18px;
 }

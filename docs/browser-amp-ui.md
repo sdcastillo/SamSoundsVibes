@@ -35,6 +35,7 @@ Open **http://127.0.0.1:8790/** in a browser **on the same machine** while the t
 Optional bind/port: `python3 -m amp_ui --host 127.0.0.1 --port 8790` or env `AMP_UI_HOST` / `AMP_UI_PORT`.
 
 - **Start amp** — auto-detects a Focusrite Scarlett on ALSA for **input** (prefers **Scarlett Solo**, e.g. USB `1235:8211`) and plays back through an auto-picked PipeWire sink: Scarlett/Focusrite out if present, otherwise the system default sink, otherwise the first non-dummy sink. A missing Logitech headset is ignored. No device fields needed. Also starts the OBS `processed_guitar` tap when PipeWire is available.
+- **Tuner + staff** — the existing McLeod pitch tuner names the note. That same reading (`note`, octave, MIDI) is drawn on a grand staff under the needle: live notehead, sharp/flat, ledger lines, and a short trail of the last few pitches. The staff stays visible on the Practice tab.
 - **Sliders** — drive, delay (ms), feedback, wet mix, volume, plus wah freq / Q / mix update live over WebSocket (REST fallback).
 - **X–Y touchpad** — finger/mouse pad (ZONA / Kaoss-style) maps two axes to amp params. Default: **X = Drive**, **Y = Wet mix**. Alternate mappings: Delay/Feedback, Drive/Delay, or **Wah freq / Wah mix** (resonant bandpass EQ into the drive). **Hold** freezes the last position. Readout shows Kaoss-style CC12/CC13 for reference; values ride the same WebSocket param path (no separate MIDI stack). Touch-friendly for phone Safari over Tailscale (`0.0.0.0:8790`).
 - **Advanced** (collapsed) — device list, manual filters, PipeWire sink, and background music source.
@@ -60,7 +61,7 @@ python3 direct_alsa_guitar_amp_fast.py --output-device Scarlett     # direct ALS
 
 ## Practice mode
 
-Open the UI, then the **Practice** tab. The tuner stays visible. Play, pause, and loop a backing track while the guitar still goes through the amp. The track is played by the browser, not by the drive/cabinet chain, so open this page on the same computer as the amp if you want both in one headset or set of speakers. On a phone over Tailscale the track plays on the phone.
+Open the UI, then the **Practice** tab. The tuner and notation staff stay visible. Play, pause, and loop a backing track while the guitar still goes through the amp. The track is played by the browser, not by the drive/cabinet chain, so open this page on the same computer as the amp if you want both in one headset or set of speakers. On a phone over Tailscale the track plays on the phone.
 
 **Guitar (amp volume)** is the same Volume knob as the amp. **Backing track** is only the loop. The lit chord follows the playhead; tap a chord to jump to that bar.
 

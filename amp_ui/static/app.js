@@ -71,6 +71,120 @@
   }
 
   let tunerCents = 0;
+  var staffPreviewOn = /[?&]staffPreview=1/.test(location.search || "");
+  const LETTER_STEPS = { C: 0, D: 1, E: 2, F: 3, G: 4, A: 5, B: 6 };
+  const STAFF_STEP_PX = 7;
+  const STAFF_Y_C4 = 92;
+  const STAFF_NOTE_X = [92, 124, 156, 188, 220];
+  let staffHistory = [];
+
+  function staffFromTuner(tuner) {
+    if (tuner && tuner.staff && typeof tuner.staff.step === "number") {
+      return tuner.staff;
+    }
+    const raw = String((tuner && tuner.note) || "");
+    const letter = raw.charAt(0).toUpperCase();
+    const accidental = raw.indexOf("#") >= 0 ? "#" : raw.toLowerCase().indexOf("b") >= 1 ? "b" : "";
+    const octv = Number(tuner && tuner.octave);
+    if (!LETTER_STEPS.hasOwnProperty(letter) || !isFinite(octv)) {
+      return { step: 0, accidental: "", clef: "treble" };
+    }
+    const step = (octv - 4) * 7 + LETTER_STEPS[letter];
+    return { step: step, accidental: accidental, clef: step >= 0 ? "treble" : "bass" };
+  }
+
+  function staffY(step) {
+    return STAFF_Y_C4 - step * STAFF_STEP_PX;
+  }
+
+  function staffLedgers(step, clef) {
+    const lines = [];
+    if (clef === "treble") {
+      if (step >= 12) {
+        for (let s = 12; s <= step; s += 2) lines.push(s);
+      }
+      if (step <= 0) {
+        for (let s = 0; s >= step; s -= 2) lines.push(s);
+      }
+    } else {
+      if (step <= -12) {
+        for (let s = -12; s >= step; s -= 2) lines.push(s);
+      }
+      if (step >= 0) {
+        for (let s = 0; s <= step; s += 2) lines.push(s);
+      }
+    }
+    return lines;
+  }
+
+  function applyStaff(tuner) {
+    const layer = document.querySelector("#staff-notes");
+    const caption = document.querySelector("#staff-caption");
+    if (!layer) return;
+    const active = tuner && tuner.active && tuner.note;
+    if (!active) {
+      staffHistory = [];
+      layer.innerHTML = "";
+      if (caption) caption.textContent = "— play a note";
+      return;
+    }
+    const staff = staffFromTuner(tuner);
+    const midi = Number(tuner.midi);
+    const last = staffHistory[staffHistory.length - 1];
+    if (!last || last.midi !== midi) {
+      staffHistory.push({ midi: midi, staff: staff, label: tuner.note + String(tuner.octave) });
+      if (staffHistory.length > STAFF_NOTE_X.length) staffHistory.shift();
+    } else {
+      last.staff = staff;
+      last.label = tuner.note + String(tuner.octave);
+    }
+    const ns = "http://www.w3.org/2000/svg";
+    layer.innerHTML = "";
+    staffHistory.forEach(function (item, index) {
+      const current = index === staffHistory.length - 1;
+      const x = STAFF_NOTE_X[STAFF_NOTE_X.length - staffHistory.length + index];
+      const y = staffY(item.staff.step);
+      const group = document.createElementNS(ns, "g");
+      group.setAttribute("class", current ? "staff-note is-live" : "staff-note is-ghost");
+      staffLedgers(item.staff.step, item.staff.clef).forEach(function (step) {
+        const ledger = document.createElementNS(ns, "line");
+        ledger.setAttribute("x1", String(x - 12));
+        ledger.setAttribute("x2", String(x + 12));
+        ledger.setAttribute("y1", String(staffY(step)));
+        ledger.setAttribute("y2", String(staffY(step)));
+        ledger.setAttribute("class", "staff-ledger");
+        group.appendChild(ledger);
+      });
+      if (item.staff.accidental) {
+        const acc = document.createElementNS(ns, "text");
+        acc.setAttribute("x", String(x - 18));
+        acc.setAttribute("y", String(y + 4));
+        acc.setAttribute("class", "staff-accidental");
+        acc.textContent = item.staff.accidental === "b" ? "♭" : "♯";
+        group.appendChild(acc);
+      }
+      const head = document.createElementNS(ns, "ellipse");
+      head.setAttribute("cx", String(x));
+      head.setAttribute("cy", String(y));
+      head.setAttribute("rx", "7.5");
+      head.setAttribute("ry", "5.2");
+      head.setAttribute("transform", "rotate(-18 " + x + " " + y + ")");
+      head.setAttribute("class", "staff-head");
+      group.appendChild(head);
+      const stemUp = item.staff.step < (item.staff.clef === "treble" ? 6 : -6);
+      const stem = document.createElementNS(ns, "line");
+      stem.setAttribute("x1", String(stemUp ? x + 7 : x - 7));
+      stem.setAttribute("x2", String(stemUp ? x + 7 : x - 7));
+      stem.setAttribute("y1", String(y));
+      stem.setAttribute("y2", String(stemUp ? y - 28 : y + 28));
+      stem.setAttribute("class", "staff-stem");
+      group.appendChild(stem);
+      layer.appendChild(group);
+    });
+    if (caption) {
+      caption.textContent = tuner.note + String(tuner.octave) + " · " + Number(tuner.hz).toFixed(1) + " Hz";
+    }
+  }
 
   function applyTuner(tuner) {
     const noteEl = document.querySelector("#tuner-note");
@@ -89,6 +203,7 @@
       document.querySelectorAll("#tuner-strings span").forEach(function (el) {
         el.classList.remove("is-target");
       });
+      applyStaff(null);
       return;
     }
     const raw = Math.max(-50, Math.min(50, Number(tuner.cents) || 0));
@@ -106,6 +221,7 @@
     document.querySelectorAll("#tuner-strings span").forEach(function (el) {
       el.classList.toggle("is-target", Number(el.dataset.midi) === tuner.midi);
     });
+    applyStaff(tuner);
   }
 
   function clearLevels() {
@@ -180,7 +296,7 @@
     }
     applyParamsToUi(status && status.params);
     applyMeters(status && status.meters);
-    applyTuner(status && status.tuner);
+    if (!staffPreviewOn) applyTuner(status && status.tuner);
     if (typeof syncXyFromParams === "function") syncXyFromParams();
   }
 
@@ -718,4 +834,19 @@
   loadFactoryPresets();
   api("/api/status").then(applyStatus).catch(function () {});
   connectWs();
+  if (staffPreviewOn) {
+    const demo = [
+      { active: true, note: "E", octave: 2, midi: 40, hz: 82.4, cents: 0 },
+      { active: true, note: "A", octave: 2, midi: 45, hz: 110.0, cents: -4 },
+      { active: true, note: "C", octave: 4, midi: 60, hz: 261.6, cents: 2 },
+      { active: true, note: "F#", octave: 4, midi: 66, hz: 370.0, cents: 8 },
+      { active: true, note: "A", octave: 4, midi: 69, hz: 440.0, cents: 0 },
+    ];
+    let demoIndex = 0;
+    applyTuner(demo[0]);
+    setInterval(function () {
+      demoIndex = (demoIndex + 1) % demo.length;
+      applyTuner(demo[demoIndex]);
+    }, 800);
+  }
 })();
