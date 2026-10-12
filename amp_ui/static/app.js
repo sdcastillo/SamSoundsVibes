@@ -108,14 +108,58 @@
     });
   }
 
+  function clearLevels() {
+    const peak = document.querySelector("#level-readout");
+    if (peak) peak.textContent = "In — · Out — · Buf —";
+    ["clip-in", "clip-out"].forEach(function (id) {
+      const el = document.querySelector("#" + id);
+      if (el) el.hidden = true;
+    });
+    const handoff = document.querySelector("#handoff-readout");
+    if (handoff) {
+      handoff.textContent = "Underruns 0 · Overruns 0 · Xruns 0 · Drift 0";
+      handoff.classList.remove("is-hot");
+    }
+  }
+
   function applyMeters(meters) {
-    if (!meters) return;
+    if (!meters) {
+      clearLevels();
+      return;
+    }
     ["mic", "inst", "gate", "out"].forEach(function (key) {
       const el = document.querySelector("#meter-" + key);
       if (el && meters[key] !== undefined) {
         el.value = Math.min(1, meters[key]);
       }
     });
+    const inn = Number(meters.in || 0);
+    const out = Number(meters.out || 0);
+    const buf = meters.jitter_ms === undefined ? null : Number(meters.jitter_ms);
+    const peak = document.querySelector("#level-readout");
+    if (peak) {
+      peak.textContent =
+        "In " + inn.toFixed(2) + " · Out " + out.toFixed(2) + " · Buf " + (buf === null ? "—" : buf.toFixed(0) + " ms");
+    }
+    const inClip = document.querySelector("#clip-in");
+    if (inClip) inClip.hidden = !(Number(meters.in_clip) > 0);
+    const outClip = document.querySelector("#clip-out");
+    if (outClip) outClip.hidden = !(Number(meters.out_clip) > 0);
+    const underruns = Number(meters.underruns || 0);
+    const overruns = Number(meters.overruns || 0);
+    const xruns = Number(meters.xruns || 0);
+    const adds = Number(meters.drift_adds || 0);
+    const drops = Number(meters.drift_drops || 0);
+    const obsUnderruns = Number(meters.obs_underruns || 0);
+    const handoff = document.querySelector("#handoff-readout");
+    if (handoff) {
+      let drift = "0";
+      if (adds || drops) drift = "+" + adds + "/−" + drops;
+      let text = "Underruns " + underruns + " · Overruns " + overruns + " · Xruns " + xruns + " · Drift " + drift;
+      if (obsUnderruns) text += " · OBS underruns " + obsUnderruns;
+      handoff.textContent = text;
+      handoff.classList.toggle("is-hot", underruns + overruns + xruns + obsUnderruns > 0);
+    }
   }
 
   function applyStatus(status) {
@@ -209,6 +253,8 @@
   startBtn.addEventListener("click", function () {
     showError("");
     const body = readAdvancedStartBody(readParams());
+    const blockSize = document.querySelector("#blocksize");
+    if (blockSize) body.blocksize = Number(blockSize.value) === 512 ? 512 : 256;
     api("/api/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
-  <link rel="stylesheet" href="static/app.css?v=phone2">
+  <link rel="stylesheet" href="static/app.css?v=levels1">
   <link rel="stylesheet" href="static/practice.css?v=practice3">
 </head>
 <body>
@@ -20,6 +20,10 @@
       <span id="run-detail" class="detail"></span>
       <span id="ws-state" class="detail">Connecting…</span>
       <span id="practice-pill" class="pill practice-pill" hidden>Track playing</span>
+      <span id="level-readout" class="detail">In — · Out — · Buf —</span>
+      <span id="clip-in" class="pill clip-pill" hidden>Input clip</span>
+      <span id="clip-out" class="pill clip-pill" hidden>Output limit</span>
+      <span id="handoff-readout" class="detail">Underruns 0 · Overruns 0 · Xruns 0 · Drift 0</span>
     </section>
 
     <div class="mode-tabs" role="tablist" aria-label="Amp sections">
@@ -135,10 +139,17 @@
         <div class="meter"><span>Gate</span><meter id="meter-gate" min="0" max="1" value="0"></meter></div>
         <div class="meter"><span>Out</span><meter id="meter-out" min="0" max="1" value="0"></meter></div>
       </div>
+      <p class="level-note">Out is after a −6 dB ceiling so the browser backing track has room on the same headset. Input clip means the Scarlett is already at full scale. Underruns, overruns, and xruns on the status line are the guitar handoff between the Solo and the headset.</p>
 
       <div class="actions">
         <button type="button" id="start">Start amp</button>
         <button type="button" id="stop" class="secondary" disabled>Stop</button>
+        <label class="block-size" for="blocksize">Block size
+          <select id="blocksize" aria-label="Audio block size">
+            <option value="256" selected>256 · lower latency</option>
+            <option value="512">512 · fewer xruns</option>
+          </select>
+        </label>
       </div>
       <p id="error" class="error" hidden></p>
     </section>
@@ -309,7 +320,7 @@
     </section>
   </main>
   <script src="static/practice-theory.js?v=practice3"></script>
-  <script src="static/app.js?v=phone2"></script>
+  <script src="static/app.js?v=levels1"></script>
   <script src="static/practice.js?v=practice3"></script>
 </body>
 </html>
