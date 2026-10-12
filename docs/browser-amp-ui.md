@@ -35,7 +35,8 @@ Open **http://127.0.0.1:8790/** in a browser **on the same machine** while the t
 Optional bind/port: `python3 -m amp_ui --host 127.0.0.1 --port 8790` or env `AMP_UI_HOST` / `AMP_UI_PORT`.
 
 - **Start amp** — auto-detects a Focusrite Scarlett on ALSA for **input** (prefers **Scarlett Solo**, e.g. USB `1235:8211`) and plays back through an auto-picked PipeWire sink: Scarlett/Focusrite out if present, otherwise the system default sink, otherwise the first non-dummy sink. A missing Logitech headset is ignored. No device fields needed. Also starts the OBS `processed_guitar` tap when PipeWire is available.
-- **Tuner + staff** — the existing McLeod pitch tuner names the note. That same reading (`note`, octave, MIDI) is drawn on a grand staff under the needle: live notehead, sharp/flat, ledger lines, and a short trail of the last few pitches. The staff stays visible on the Practice tab.
+- **Tuner** — McLeod pitch detection names the note from E2 up to C6 (the whole neck to the 20th fret).
+- **Staff Lab** — the tuner reading drawn on a staff, plus note-reading games, scales, and songs. See [Staff Lab](#staff-lab) below. It stays visible on the Practice tab.
 - **Sliders** — drive, delay (ms), feedback, wet mix, volume, plus wah freq / Q / mix update live over WebSocket (REST fallback).
 - **X–Y touchpad** — finger/mouse pad (ZONA / Kaoss-style) maps two axes to amp params. Default: **X = Drive**, **Y = Wet mix**. Alternate mappings: Delay/Feedback, Drive/Delay, or **Wah freq / Wah mix** (resonant bandpass EQ into the drive). **Hold** freezes the last position. Readout shows Kaoss-style CC12/CC13 for reference; values ride the same WebSocket param path (no separate MIDI stack). Touch-friendly for phone Safari over Tailscale (`0.0.0.0:8790`).
 - **Advanced** (collapsed) — device list, manual filters, PipeWire sink, and background music source.
@@ -59,9 +60,35 @@ python3 direct_alsa_guitar_amp_fast.py --pw-sink SomeOtherSink      # override t
 python3 direct_alsa_guitar_amp_fast.py --output-device Scarlett     # direct ALSA out; skips PipeWire playback
 ```
 
+## Staff Lab
+
+Under the tuner. Each note you play is placed on the staff, with where to find it on a 12-fret neck.
+
+| Mode | What you do |
+|------|-------------|
+| Free play | Play anything. The last eight notes stay on the staff with their names, the written pitch, and every fret that plays them. |
+| Note Quest | One note appears; play it. Six levels: open strings, low strings, high strings, all of first position, sharps and flats, and frets 5–12. **Practice** has no clock; the **60-second challenge** keeps a high score per level. 10 points a note, +5 within 10 cents, ×2 at a streak of 5, ×3 at 10. Two misses on a note shows it on the fretboard; **Hint** does the same (in the challenge it resets your streak). Notes you miss come up more often. |
+| Scale Climb | Up and back down: C, G, and D major, E minor pentatonic (open), A minor pentatonic box 1, and a chromatic spider walk. Fretboard dots show where the next note is. Stars: three for no misses. |
+| Songs | Public-domain melodies in written guitar pitch (Mary Had a Little Lamb, Twinkle Twinkle, Ode to Joy, Frère Jacques, Au clair de la lune, Jingle Bells, Happy Birthday) with real rhythms, bar lines, and time signatures. It waits for each note. **Hear the melody** plays it first. |
+
+**Hear it** plays the target note so you can match it by ear. Trophies, best scores, stars, and per-note accuracy are saved in the browser (`localStorage`). **Drill my weak notes** starts a round from the notes you miss most.
+
+Under **Notation and input**:
+
+- **Guitar staff** (default) — treble clef with the small 8: guitar music is written an octave above how it sounds, as in every method book. Low E sits under three ledger lines. **Grand staff** shows sounding pitch on treble and bass, like piano music.
+- Note names under the staff, fretboard hints for scales and songs, and **Any octave counts** for beginners.
+- **Hear my guitar through** — the amp tuner (Scarlett, the default; the page polls faster while a lesson runs), **this device's microphone** (an acoustic guitar near a laptop; the browser only allows it on `http://127.0.0.1` or https, so not over plain Tailscale http), or **tap the fretboard** (no guitar, tapping plays the note).
+
+One pluck is one note: a held note counts once, and the same note counts again after a gap or a fresh pick attack, so repeated notes in a melody work.
+
+```bash
+node amp_ui/practice/test_staff_core.js
+python3 scripts/verify_amp_staff.py
+```
+
 ## Practice mode
 
-Open the UI, then the **Practice** tab. The tuner and notation staff stay visible. Play, pause, and loop a backing track while the guitar still goes through the amp. The track is played by the browser, not by the drive/cabinet chain, so open this page on the same computer as the amp if you want both in one headset or set of speakers. On a phone over Tailscale the track plays on the phone.
+Open the UI, then the **Practice** tab. The tuner and Staff Lab stay visible. Play, pause, and loop a backing track while the guitar still goes through the amp. The track is played by the browser, not by the drive/cabinet chain, so open this page on the same computer as the amp if you want both in one headset or set of speakers. On a phone over Tailscale the track plays on the phone.
 
 **Guitar (amp volume)** is the same Volume knob as the amp. **Backing track** is only the loop. The lit chord follows the playhead; tap a chord to jump to that bar.
 

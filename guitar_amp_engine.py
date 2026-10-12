@@ -266,7 +266,7 @@ def estimate_pitch(samples, rate):
         left[1:] = cumulative[-2::-1]
     right = cumulative[-1] - np.concatenate((np.zeros(1), cumulative[:-1]))
     nsdf = (2.0 * acf) / (left + right + 1e-12)
-    min_lag = max(2, int(rate / 520.0))
+    min_lag = max(2, int(rate / 1100.0))
     max_lag = min(size - 2, int(rate / 70.0))
     if max_lag <= min_lag + 2:
         return None

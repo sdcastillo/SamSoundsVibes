@@ -45,9 +45,28 @@ def test_estimate_pitch_puts_a4_on_staff():
     print("estimate_pitch A4 → staff: OK")
 
 
+def _plucked(hz, rate, seconds=0.35):
+    t = np.arange(int(rate * seconds), dtype=np.float64) / rate
+    partials = ((1, 1.0), (2, 0.8), (3, 0.55), (4, 0.35), (5, 0.2))
+    tone = sum(amp * np.sin(2.0 * np.pi * hz * k * t) for k, amp in partials)
+    return (0.1 * tone * np.exp(-t * 3.0)).astype(np.float32)
+
+
+def test_estimate_pitch_whole_neck_with_harmonics():
+    rate = 48000
+    for midi in (40, 45, 50, 55, 59, 64, 69, 72, 76, 81, 84):
+        hz = 440.0 * 2.0 ** ((midi - 69) / 12.0)
+        found = estimate_pitch(_plucked(hz, rate), rate)
+        if not found or found["midi"] != midi:
+            got = found and found["midi"]
+            raise AssertionError(f"midi {midi} ({hz:.1f} Hz) read as {got}")
+    print("estimate_pitch E2..C6 with harmonics: OK")
+
+
 def main():
     test_staff_from_tuner_guitar_range()
     test_estimate_pitch_puts_a4_on_staff()
+    test_estimate_pitch_whole_neck_with_harmonics()
     print("All verify_amp_staff checks passed.")
 
 

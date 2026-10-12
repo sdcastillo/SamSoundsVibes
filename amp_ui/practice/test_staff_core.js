@@ -1,0 +1,149 @@
+#!/usr/bin/env node
+"use strict";
+
+const assert = require("assert");
+const core = require("../static/staff-core.js");
+
+function eq(actual, expected, label) {
+  assert.deepStrictEqual(actual, expected, label || "");
+}
+
+eq(core.parseNote("E2").midi, 40, "low E");
+eq(core.parseNote("C4").midi, 60, "middle C");
+eq(core.parseNote("Bb3").midi, 58, "B flat");
+eq(core.parseNote("F#4").midi, 66, "F sharp");
+eq(core.noteName(core.noteFromMidi(61, true)), "D\u266D4", "flat spelling");
+eq(core.noteName(core.noteFromMidi(61, false)), "C\u266F4", "sharp spelling");
+
+eq(core.staffStep(core.parseNote("C4")), 0, "middle C step");
+eq(core.staffStep(core.parseNote("E4")), 2, "bottom treble line");
+eq(core.staffStep(core.parseNote("G2")), -10, "bottom bass line");
+
+const lowE = core.writtenNote(core.parseNote("E2"), "guitar");
+eq(core.noteName(lowE), "E3", "guitar writes low E as E3");
+const lowStep = core.staffStep(lowE);
+eq(lowStep, -5, "written E3 step");
+eq(core.ledgerSteps(lowStep, "guitar"), [0, -2, -4], "low E hangs under three ledger lines");
+eq(core.ledgerSteps(core.staffStep(core.writtenNote(core.parseNote("E4"), "guitar")), "guitar"), [], "open high e sits in the staff");
+eq(core.ledgerSteps(core.staffStep(core.writtenNote(core.parseNote("E5"), "guitar")), "guitar"), [12, 14, 16], "12th fret high e");
+eq(core.ledgerSteps(core.staffStep(core.parseNote("E2")), "concert"), [-12], "grand staff low E");
+eq(core.ledgerSteps(0, "concert"), [0], "grand staff middle C");
+eq(core.ledgerSteps(1, "concert"), [], "D4 needs no ledger on the grand staff");
+eq(core.stemUp(4, "guitar"), true, "below middle line stems up");
+eq(core.stemUp(8, "guitar"), false, "above middle line stems down");
+
+eq(core.fretPositions(40), [{ string: 6, label: "low E", fret: 0 }], "low E has one spot");
+eq(
+  core.fretPositions(64).map((p) => p.string + ":" + p.fret),
+  ["1:0", "2:5", "3:9"],
+  "open high e also lives on B5 and G9"
+);
+eq(core.describePosition({ string: 5, fret: 3 }), "A string (5th), fret 3", "describe");
+eq(core.describePosition({ string: 3, fret: 0 }), "open G string", "describe open");
+
+core.LEVELS.forEach(function (level) {
+  assert(level.notes.length >= 6, level.id + " has a pool");
+  level.notes.forEach(function (name) {
+    const n = core.parseNote(name);
+    assert(n.midi >= 40 && n.midi <= 76, level.id + " " + name + " is on a 12-fret neck");
+  });
+});
+eq(core.LEVELS[0].notes, ["E2", "A2", "D3", "G3", "B3", "E4"], "open strings");
+assert(core.LEVELS[4].notes.indexOf("Gb2") >= 0 && core.LEVELS[4].notes.indexOf("F#2") >= 0, "both spellings");
+
+core.SCALES.forEach(function (scale) {
+  const notes = core.scaleNotes(scale);
+  eq(notes[0].note.midi, notes[notes.length - 1].note.midi, scale.id + " returns home");
+  notes.forEach(function (item) {
+    assert(core.fretPositions(item.note.midi).length > 0, scale.id + " playable");
+  });
+});
+
+core.SONGS.forEach(function (song) {
+  const parsed = core.parseSong(song);
+  assert(parsed.notes.length >= 20, song.id + " has a melody");
+  const perBar = {};
+  parsed.notes.forEach(function (item) {
+    assert(core.fretPositions(item.note.midi, 5).length > 0, song.id + " stays in first position");
+    perBar[item.bar] = (perBar[item.bar] || 0) + item.beats;
+  });
+  const bars = Object.keys(perBar).map(Number);
+  bars.forEach(function (bar) {
+    const expected = bar === 0 && song.pickup ? song.pickup : parsed.perBar;
+    eq(perBar[bar], expected, song.id + " bar " + bar + " adds up");
+  });
+});
+eq(core.parseSong(core.findById(core.SONGS, "mary")).notes[0].note.midi, 52, "written E4 sounds E3");
+
+assert(core.matches(40, 40, false));
+assert(!core.matches(40, 52, false));
+assert(core.matches(40, 52, true), "any octave");
+eq(core.missHint(45, 43), "Go higher by two frets (a whole step).", "hint up");
+eq(core.missHint(45, 46), "Go lower by one fret (a half step).", "hint down");
+eq(core.missHint(52, 40), "Right letter, wrong octave \u2014 go up an octave.", "octave hint");
+
+eq(core.hitPoints(1, 30).total, 10, "plain hit");
+eq(core.hitPoints(1, 4).total, 15, "in-tune bonus");
+eq(core.hitPoints(5, 30).total, 20, "x2 at streak 5");
+eq(core.hitPoints(10, 0).total, 35, "x3 at streak 10 plus bonus");
+eq(core.stars(0, 15), 3);
+eq(core.stars(2, 15), 2);
+eq(core.stars(6, 15), 1);
+
+let seq = 0;
+const fakeRand = () => ((seq = (seq * 9301 + 49297) % 233280) / 233280);
+let prev = null;
+for (let i = 0; i < 200; i++) {
+  const n = core.pickTarget(core.LEVELS[0].notes, {}, prev, fakeRand);
+  assert(core.noteKey(n) !== prev, "no immediate repeat");
+  prev = core.noteKey(n);
+}
+const weighted = { 40: { hits: 0, misses: 9 }, 45: { hits: 9, misses: 0 } };
+let lowCount = 0;
+for (let i = 0; i < 400; i++) {
+  if (core.pickTarget(["E2", "A2"], weighted, null, fakeRand).midi === 40) lowCount++;
+}
+assert(lowCount > 250, "missed notes come up more often (" + lowCount + "/400)");
+eq(core.weakestNotes(weighted).map((r) => r.midi), [40], "weakest notes");
+
+(function onsetDetector() {
+  const det = core.createOnsetDetector({ stableMs: 100 });
+  const frame = (midi, level) => ({ active: true, midi: midi, cents: 0, level: level || 0.2 });
+  eq(det.push(frame(40), 0), null, "needs to be stable first");
+  eq(det.push(frame(40), 120).midi, 40, "fires once stable");
+  eq(det.push(frame(40), 240), null, "held note does not repeat");
+  eq(det.push(frame(45), 360), null, "new note waits for stability");
+  eq(det.push(frame(45), 480).midi, 45, "new note fires");
+  eq(det.push({ active: false }, 600), null, "silence");
+  det.push(frame(45), 700);
+  eq(det.push(frame(45), 820).midi, 45, "same note again after silence");
+  det.push(frame(45, 0.1), 900);
+  det.push(frame(45, 0.5), 1000);
+  eq(det.push(frame(45, 0.45), 1120).midi, 45, "same note again after a pick attack");
+  const tap = core.createOnsetDetector({ stableMs: 0 });
+  eq(tap.push(frame(50), 0).midi, 50, "zero stability fires immediately");
+})();
+
+(function pitchDetector() {
+  const rate = 48000;
+  [40, 45, 50, 55, 59, 64, 69, 72, 76, 81].forEach(function (midi) {
+    const hz = core.midiToHz(midi);
+    const buf = new Float32Array(4096);
+    for (let i = 0; i < buf.length; i++) {
+      const t = i / rate;
+      buf[i] =
+        0.1 *
+        (Math.sin(2 * Math.PI * hz * t) +
+          0.8 * Math.sin(4 * Math.PI * hz * t) +
+          0.5 * Math.sin(6 * Math.PI * hz * t) +
+          0.3 * Math.sin(8 * Math.PI * hz * t));
+    }
+    const found = core.detectPitch(buf, rate);
+    assert(found, "pitch for midi " + midi);
+    eq(found.midi, midi, "midi " + midi + " detected (" + found.hz.toFixed(1) + " Hz)");
+    assert(Math.abs(found.cents) < 10, "cents near zero for " + midi);
+  });
+  eq(core.detectPitch(new Float32Array(2048), rate), null, "silence");
+})();
+
+console.log("staff-core: all checks passed");
