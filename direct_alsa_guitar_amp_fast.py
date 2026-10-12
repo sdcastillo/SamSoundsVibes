@@ -158,7 +158,7 @@ def main():
         output_thread.start()
         try:
             with sd.InputStream(device=input_device, samplerate=args.rate, blocksize=args.blocksize,
-                                channels=input_channels, dtype='float32', latency='high',
+                                channels=input_channels, dtype='float32', latency=0.021,
                                 callback=amp.input_callback):
                 while True:
                     time.sleep(0.5)

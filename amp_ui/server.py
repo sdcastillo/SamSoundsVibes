@@ -104,6 +104,7 @@ async def api_start(payload: dict):
         text = str(value).strip()
         return text or None
 
+    requested_block = int(payload.get("blocksize") or 256)
     config = {
         "device": _optional_str("device"),
         "input_device": _optional_str("input_device"),
@@ -111,7 +112,7 @@ async def api_start(payload: dict):
         "pw_sink": _optional_str("pw_sink"),
         "music_source": _optional_str("music_source"),
         "rate": int(payload.get("rate") or 48000),
-        "blocksize": int(payload.get("blocksize") or 256),
+        "blocksize": requested_block if requested_block in (256, 512) else 256,
         "drive": float(payload.get("drive") if payload.get("drive") is not None else 18.0),
         "delay_ms": float(payload.get("delay_ms") if payload.get("delay_ms") is not None else 380.0),
         "feedback": float(payload.get("feedback") if payload.get("feedback") is not None else 0.35),

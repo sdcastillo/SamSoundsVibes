@@ -115,8 +115,39 @@ button:disabled {
 
 .pill.running { background: #1b4332; color: #95d5b2; }
 .pill.stopped { background: #3d1f2a; color: #ffb3c1; }
+.pill.clip-pill { background: #6b2d16; color: #ffd0a8; }
 
 .detail { color: var(--muted); font-size: 0.9rem; }
+.detail.is-hot { color: #ffb4a2; font-weight: 700; }
+
+.level-note {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.block-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.block-size select {
+  background: #16141c;
+  color: var(--text);
+  border: 1px solid #3a3548;
+  border-radius: 8px;
+  padding: 6px 8px;
+}
 
 .control { margin: 16px 0; }
 
