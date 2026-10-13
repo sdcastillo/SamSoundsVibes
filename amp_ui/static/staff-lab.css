@@ -17,11 +17,11 @@
 .lab-input-status {
   margin: 0;
   font-size: 0.82rem;
-  color: #7be0a5;
+  color: #A3D9D9;
 }
 
 .lab-input-status.is-warn {
-  color: var(--accent2);
+  color: #D89F58;
 }
 
 .lab-modes {
@@ -32,7 +32,7 @@
 }
 
 .lab-modes button {
-  background: #1d1a26;
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -43,7 +43,8 @@
 .lab-modes button[aria-selected="true"] {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   border-color: transparent;
-  color: #1a0a00;
+  color: #1A3567;
+  font-weight: 800;
 }
 
 .lab-setup {
@@ -89,7 +90,7 @@
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 10px;
-  background: #1a1722;
+  background: var(--surface);
 }
 
 .lab-stat span {
@@ -107,11 +108,11 @@
 
 .lab-stat.is-hot {
   border-color: var(--accent);
-  box-shadow: 0 0 14px rgba(255, 107, 44, 0.35);
+  box-shadow: 0 0 14px rgba(216, 159, 88, 0.4);
 }
 
 .lab-stat.is-hot strong {
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .lab-stage {
@@ -119,7 +120,7 @@
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: linear-gradient(#fbf7ee, #f1eadb);
+  background: linear-gradient(#f3f9f9, #e1efef);
 }
 
 .lab-stage.is-shake {
@@ -136,14 +137,14 @@
   display: block;
   width: 100%;
   height: auto;
-  color: #1d1a16;
+  color: #1A3567;
 }
 
 .lab-lines line,
 .lab-ledger,
 .lab-bar,
 .lab-brace {
-  stroke: #2b2721;
+  stroke: #1A3567;
   stroke-width: 1.3;
 }
 
@@ -158,7 +159,7 @@
 .lab-clef {
   font-family: "Noto Music", "Bravura Text", "Segoe UI Symbol", "DejaVu Sans", serif;
   font-size: 46px;
-  fill: #1d1a16;
+  fill: #1A3567;
 }
 
 .lab-clef.lab-bass {
@@ -167,46 +168,46 @@
 
 .lab-clef-8 {
   font: italic 700 12px Georgia, serif;
-  fill: #1d1a16;
+  fill: #1A3567;
 }
 
 .lab-meter {
   font: 700 22px Georgia, serif;
-  fill: #1d1a16;
+  fill: #1A3567;
   text-anchor: middle;
 }
 
 .lab-head-note,
 .lab-head {
-  fill: #1d1a16;
-  stroke: #1d1a16;
+  fill: #1A3567;
+  stroke: #1A3567;
   stroke-width: 1;
 }
 
 .lab-head.is-hollow {
-  fill: #fbf7ee;
+  fill: #f3f9f9;
   stroke-width: 2.2;
 }
 
 .lab-stem {
-  stroke: #1d1a16;
+  stroke: #1A3567;
   stroke-width: 1.6;
 }
 
 .lab-flag,
 .lab-dot {
-  fill: #1d1a16;
+  fill: #1A3567;
 }
 
 .lab-acc {
   font: 22px "Noto Music", "DejaVu Sans", Georgia, serif;
-  fill: #1d1a16;
+  fill: #1A3567;
   text-anchor: middle;
 }
 
 .lab-name {
   font: 700 14px "Segoe UI", system-ui, sans-serif;
-  fill: #6b6153;
+  fill: #176571;
   text-anchor: middle;
 }
 
@@ -214,13 +215,13 @@
   font: 600 11px "Segoe UI", system-ui, sans-serif;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  fill: #8a7d6a;
+  fill: #176571;
   text-anchor: middle;
 }
 
 .lab-page {
   font: 600 11px "Segoe UI", system-ui, sans-serif;
-  fill: #8a7d6a;
+  fill: #176571;
   text-anchor: end;
 }
 
@@ -231,12 +232,12 @@
 .lab-note.is-live .lab-head,
 .lab-note.is-live .lab-stem,
 .lab-note.is-live .lab-acc {
-  fill: #d94f12;
-  stroke: #d94f12;
+  fill: #D89F58;
+  stroke: #D89F58;
 }
 
 .lab-note.is-live .lab-head.is-hollow {
-  fill: #fbf7ee;
+  fill: #f3f9f9;
 }
 
 .lab-note.is-target .lab-head,
@@ -244,12 +245,12 @@
 .lab-note.is-target .lab-flag,
 .lab-note.is-target .lab-acc,
 .lab-note.is-target .lab-dot {
-  fill: #d94f12;
-  stroke: #d94f12;
+  fill: #D89F58;
+  stroke: #D89F58;
 }
 
 .lab-note.is-target .lab-head.is-hollow {
-  fill: #fde4d3;
+  fill: #faecd8;
 }
 
 .lab-note.is-target {
@@ -257,7 +258,7 @@
 }
 
 @keyframes lab-glow {
-  50% { filter: drop-shadow(0 0 6px rgba(255, 107, 44, 0.85)); }
+  50% { filter: drop-shadow(0 0 6px rgba(216, 159, 88, 0.85)); }
 }
 
 .lab-note.is-done .lab-head,
@@ -268,12 +269,12 @@
 .lab-note.is-ok .lab-head,
 .lab-note.is-ok .lab-stem,
 .lab-note.is-ok .lab-acc {
-  fill: #1f9d55;
-  stroke: #1f9d55;
+  fill: #176571;
+  stroke: #176571;
 }
 
 .lab-note.is-done .lab-head.is-hollow {
-  fill: #dff5e7;
+  fill: #A3D9D9;
 }
 
 .lab-note.is-todo {
@@ -284,12 +285,12 @@
 .lab-note.is-bad .lab-stem,
 .lab-note.is-bad .lab-acc,
 .lab-note.is-bad .lab-ledger {
-  fill: #d7263d;
-  stroke: #d7263d;
+  fill: #C33F45;
+  stroke: #C33F45;
 }
 
 .lab-note.is-bad .lab-name {
-  fill: #d7263d;
+  fill: #C33F45;
 }
 
 .lab-note.is-small {
@@ -314,14 +315,15 @@
 }
 
 .lab-pop.is-ok {
-  background: #1f9d55;
-  color: #fff;
+  background: #176571;
+  color: #A3D9D9;
+  border: 1px solid #A3D9D9;
 }
 
 .lab-pop.is-big,
 .lab-pop.is-trophy {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: #1a0a00;
+  color: #1A3567;
   font-size: 1.15rem;
 }
 
@@ -361,11 +363,11 @@
 }
 
 .lab-message.is-ok {
-  color: #7be0a5;
+  color: #A3D9D9;
 }
 
 .lab-message.is-bad {
-  color: #ff8a9b;
+  color: #C33F45;
 }
 
 .lab-result {
@@ -373,12 +375,12 @@
   padding: 12px 16px;
   border: 1px solid var(--accent);
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(255, 107, 44, 0.16), rgba(255, 179, 71, 0.08));
+  background: linear-gradient(135deg, rgba(216, 159, 88, 0.2), rgba(23, 101, 113, 0.3));
 }
 
 .lab-result h3 {
   margin: 0 0 4px;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .lab-result p {
@@ -388,7 +390,7 @@
 .lab-stars {
   font-size: 1.8rem;
   letter-spacing: 0.12em;
-  color: #ffd166;
+  color: #D89F58;
 }
 
 .lab-fret-wrap {
@@ -402,26 +404,26 @@
 }
 
 .lab-neck {
-  fill: #3a2616;
+  fill: #12264a;
 }
 
 .lab-inlay {
-  fill: #d9cbb0;
-  opacity: 0.55;
+  fill: #A3D9D9;
+  opacity: 0.45;
 }
 
 .lab-fretwire {
-  stroke: #b9b2a5;
+  stroke: #176571;
   stroke-width: 2;
 }
 
 .lab-nut {
-  stroke: #efe6d2;
+  stroke: #D89F58;
   stroke-width: 5;
 }
 
 .lab-string {
-  stroke: #e6dccb;
+  stroke: #A3D9D9;
 }
 
 .lab-stringname,
@@ -432,32 +434,33 @@
 }
 
 .lab-spot circle {
-  stroke: #1a0a00;
+  stroke: #1A3567;
   stroke-width: 1.5;
 }
 
 .lab-spot.is-target circle {
-  fill: #ffb347;
-  opacity: 0.8;
+  fill: #A3D9D9;
+  opacity: 0.85;
 }
 
 .lab-spot.is-target.is-first circle {
-  fill: #ff6b2c;
+  fill: #D89F58;
   opacity: 1;
 }
 
 .lab-spot text {
   font: 800 10px "Segoe UI", system-ui, sans-serif;
-  fill: #1a0a00;
+  fill: #1A3567;
   text-anchor: middle;
 }
 
 .lab-spot.is-ok circle {
-  fill: #7be0a5;
+  fill: #176571;
+  stroke: #A3D9D9;
 }
 
 .lab-spot.is-bad circle {
-  fill: #ff4d6d;
+  fill: #C33F45;
 }
 
 .lab-tap {
@@ -469,7 +472,7 @@
 }
 
 .lab-fret.is-tap .lab-tap:hover {
-  fill: rgba(255, 179, 71, 0.35);
+  fill: rgba(216, 159, 88, 0.35);
 }
 
 .lab-fret-caption {
@@ -481,8 +484,8 @@
 .lab-tip {
   margin: 8px 0 12px;
   padding: 8px 12px;
-  border-left: 3px solid var(--accent2);
-  background: #1a1722;
+  border-left: 3px solid var(--accent);
+  background: var(--surface);
   border-radius: 0 8px 8px 0;
   font-size: 0.9rem;
 }
@@ -536,8 +539,8 @@
 
 .lab-trophies li.is-earned {
   opacity: 1;
-  border-color: var(--accent2);
-  background: rgba(255, 179, 71, 0.08);
+  border-color: var(--accent);
+  background: rgba(216, 159, 88, 0.14);
 }
 
 .lab-trophies strong {
@@ -571,7 +574,7 @@
   flex-basis: 100%;
   margin: 0;
   font-size: 0.85rem;
-  color: #7be0a5;
+  color: #A3D9D9;
 }
 
 .lab-tone-status:empty,
@@ -580,9 +583,10 @@
 }
 
 .tone-btn {
-  background: linear-gradient(135deg, #3a7bd5, #7ab8ff);
-  color: #04101f;
-  border: none;
+  background: linear-gradient(135deg, #176571, #A3D9D9);
+  color: #1A3567;
+  border: 1px solid #A3D9D9;
+  font-weight: 800;
 }
 
 .lab-buttons .tone-btn[hidden] {
@@ -598,14 +602,14 @@
   padding: 8px 12px;
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #17141f;
+  background: var(--surface);
   font-size: 0.88rem;
 }
 
 .lab-metro-title {
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .lab-metro .lab-step {
@@ -640,8 +644,8 @@
 }
 
 #lab-metro-go[aria-pressed="true"] {
-  background: linear-gradient(135deg, #1f9d55, #7be0a5);
-  color: #03140a;
+  background: linear-gradient(135deg, #176571, #A3D9D9);
+  color: #1A3567;
 }
 
 .lab-beats {
@@ -654,8 +658,8 @@
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: #2e2a38;
-  border: 1px solid #4a4458;
+  background: #12264a;
+  border: 1px solid #176571;
   transition: background 0.04s, transform 0.04s;
 }
 
@@ -669,68 +673,71 @@
   background: var(--accent2);
   border-color: var(--accent2);
   transform: scale(1.2);
-  box-shadow: 0 0 10px rgba(255, 179, 71, 0.8);
+  box-shadow: 0 0 10px rgba(163, 217, 217, 0.8);
 }
 
 .lab-beats i.is-down.is-on {
   background: var(--accent);
   border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(216, 159, 88, 0.85);
 }
 
 .lab-tab-lines line {
-  stroke: #8d8577;
+  stroke: #176571;
   stroke-width: 1;
+  opacity: 0.65;
 }
 
 .lab-tab-clef {
   font: 700 14px Georgia, serif;
-  fill: #1d1a16;
+  fill: #1A3567;
   text-anchor: middle;
 }
 
 .lab-tabnum rect {
-  fill: #fbf7ee;
+  fill: #f3f9f9;
 }
 
 .lab-tabnum text {
   font: 700 13px "Segoe UI", system-ui, sans-serif;
-  fill: #1d1a16;
+  fill: #1A3567;
   text-anchor: middle;
 }
 
 .lab-tabnum.is-ghost text {
-  fill: #9a8f7c;
+  fill: #176571;
+  opacity: 0.65;
 }
 
 .lab-tabnum.is-target rect,
 .lab-tabnum.is-live rect {
-  fill: #d94f12;
+  fill: #D89F58;
 }
 
 .lab-tabnum.is-target text,
 .lab-tabnum.is-live text {
-  fill: #fff6e8;
+  fill: #1A3567;
 }
 
 .lab-tabnum.is-done text,
 .lab-tabnum.is-hit text,
 .lab-tabnum.is-ok text {
-  fill: #1f9d55;
+  fill: #176571;
 }
 
 .lab-tabnum.is-missed text,
 .lab-tabnum.is-bad text {
-  fill: #d7263d;
+  fill: #C33F45;
 }
 
 .lab-rest path,
 .lab-rest rect,
 .lab-rest circle {
-  fill: #1d1a16;
+  fill: #1A3567;
 }
 
 .lab-rest-stem {
-  stroke: #1d1a16;
+  stroke: #1A3567;
   stroke-width: 1.6;
 }
 
@@ -740,14 +747,14 @@
 
 .lab-chord {
   font: 700 13px "Segoe UI", system-ui, sans-serif;
-  fill: #6b3d14;
+  fill: #176571;
 }
 
 .lab-playhead {
-  stroke: #ff6b2c;
+  stroke: #D89F58;
   stroke-width: 2.5;
   stroke-linecap: round;
-  opacity: 0.85;
+  opacity: 0.9;
 }
 
 .lab-note.is-hit .lab-head,
@@ -755,12 +762,12 @@
 .lab-note.is-hit .lab-flag,
 .lab-note.is-hit .lab-acc,
 .lab-note.is-hit .lab-dot {
-  fill: #1f9d55;
-  stroke: #1f9d55;
+  fill: #176571;
+  stroke: #176571;
 }
 
 .lab-note.is-hit .lab-head.is-hollow {
-  fill: #dff5e7;
+  fill: #A3D9D9;
 }
 
 .lab-note.is-missed .lab-head,
@@ -768,11 +775,11 @@
 .lab-note.is-missed .lab-flag,
 .lab-note.is-missed .lab-acc,
 .lab-note.is-missed .lab-dot {
-  fill: #d7263d;
-  stroke: #d7263d;
-  opacity: 0.75;
+  fill: #C33F45;
+  stroke: #C33F45;
+  opacity: 0.8;
 }
 
 .lab-note.is-missed .lab-head.is-hollow {
-  fill: #f9dade;
+  fill: #f5d0d2;
 }
