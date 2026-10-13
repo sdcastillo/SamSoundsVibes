@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
-  <link rel="stylesheet" href="static/app.css?v=levels1">
+  <link rel="stylesheet" href="static/app.css?v=lab1">
   <link rel="stylesheet" href="static/practice.css?v=practice3">
+  <link rel="stylesheet" href="static/staff-lab.css?v=lab1">
 </head>
 <body>
   <main>
@@ -54,6 +55,93 @@
         <span data-midi="59">B</span>
         <span data-midi="64">E</span>
       </div>
+    </section>
+
+    <section class="panel staff-lab" id="staff-lab" aria-label="Staff Lab">
+      <div class="lab-head">
+        <h2>Staff Lab</h2>
+        <p id="lab-input-status" class="lab-input-status">Listening through the amp tuner</p>
+      </div>
+      <p class="lede">Read music by playing it. Your guitar's note lands on the staff, and the lessons check every note you play.</p>
+
+      <div class="lab-modes" role="tablist" aria-label="Staff Lab mode">
+        <button type="button" role="tab" data-mode="free" aria-selected="true">Free play</button>
+        <button type="button" role="tab" data-mode="quest" aria-selected="false">Note Quest</button>
+        <button type="button" role="tab" data-mode="scale" aria-selected="false">Scale Climb</button>
+        <button type="button" role="tab" data-mode="song" aria-selected="false">Songs</button>
+      </div>
+
+      <div class="lab-setup">
+        <label class="lab-field" data-for="quest">Level
+          <select id="lab-level"></select>
+        </label>
+        <label class="lab-field" data-for="quest">Round
+          <select id="lab-round">
+            <option value="practice">Practice (no clock)</option>
+            <option value="challenge">60-second challenge</option>
+          </select>
+        </label>
+        <label class="lab-field" data-for="scale">Scale
+          <select id="lab-scale"></select>
+        </label>
+        <label class="lab-field" data-for="song">Song
+          <select id="lab-song"></select>
+        </label>
+        <div class="lab-buttons">
+          <button type="button" id="lab-go" data-for="quest scale song">Start</button>
+          <button type="button" id="lab-hear" class="secondary" data-for="quest scale song">Hear it</button>
+          <button type="button" id="lab-hint" class="secondary" data-for="quest">Hint</button>
+          <button type="button" id="lab-skip" class="secondary" data-for="quest">Skip</button>
+          <button type="button" id="lab-stop" class="secondary" data-for="quest scale song">Stop</button>
+        </div>
+      </div>
+
+      <div id="lab-hud" class="lab-hud" aria-live="polite"></div>
+
+      <div class="lab-stage" id="lab-stage">
+        <svg id="lab-staff" class="lab-staff" role="img" aria-label="Musical staff"></svg>
+        <div id="lab-pop" class="lab-pop" aria-hidden="true"></div>
+        <div id="lab-confetti" class="lab-confetti" aria-hidden="true"></div>
+      </div>
+      <p id="lab-message" class="lab-message" aria-live="polite">Play any note. It shows up on the staff.</p>
+      <div id="lab-result" class="lab-result" hidden></div>
+
+      <div class="lab-fret-wrap">
+        <svg id="lab-fret" class="lab-fret" viewBox="0 0 640 156" role="img" aria-label="Where to play it on the fretboard"></svg>
+        <p id="lab-fret-caption" class="lab-fret-caption"></p>
+      </div>
+      <p id="lab-tip" class="lab-tip"></p>
+
+      <details class="lab-more">
+        <summary>Notation and input</summary>
+        <div class="lab-settings">
+          <label>Staff
+            <select id="lab-notation">
+              <option value="guitar">Guitar staff (treble, sounds an octave lower)</option>
+              <option value="concert">Grand staff (sounding pitch)</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" id="lab-names"> Show note names under the staff</label>
+          <label class="check"><input type="checkbox" id="lab-frets"> Show where to play on scales and songs</label>
+          <label class="check"><input type="checkbox" id="lab-octave"> Any octave counts (easier)</label>
+          <fieldset class="lab-inputs">
+            <legend>Hear my guitar through</legend>
+            <label class="check"><input type="radio" name="lab-input" value="amp"> Amp tuner (Scarlett)</label>
+            <label class="check"><input type="radio" name="lab-input" value="mic"> This device's microphone</label>
+            <label class="check"><input type="radio" name="lab-input" value="tap"> Tap the fretboard (no guitar)</label>
+          </fieldset>
+        </div>
+      </details>
+
+      <details class="lab-more">
+        <summary>Trophies and progress <span id="lab-trophy-count"></span></summary>
+        <ul id="lab-trophies" class="lab-trophies"></ul>
+        <p id="lab-weak" class="lab-weak"></p>
+        <div class="lab-buttons">
+          <button type="button" id="lab-drill" class="secondary">Drill my weak notes</button>
+          <button type="button" id="lab-reset" class="secondary">Reset progress</button>
+        </div>
+      </details>
     </section>
 
     <div id="rig-panels">
@@ -320,7 +408,9 @@
     </section>
   </main>
   <script src="static/practice-theory.js?v=practice3"></script>
-  <script src="static/app.js?v=levels1"></script>
+  <script src="static/staff-core.js?v=lab1"></script>
+  <script src="static/app.js?v=lab1"></script>
+  <script src="static/staff-lab.js?v=lab1"></script>
   <script src="static/practice.js?v=practice3"></script>
 </body>
 </html>

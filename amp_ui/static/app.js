@@ -71,7 +71,6 @@
   }
 
   let tunerCents = 0;
-
   function applyTuner(tuner) {
     const noteEl = document.querySelector("#tuner-note");
     const hzEl = document.querySelector("#tuner-hz");
@@ -107,6 +106,7 @@
       el.classList.toggle("is-target", Number(el.dataset.midi) === tuner.midi);
     });
   }
+  window.AmpUI = { applyTuner: applyTuner };
 
   function clearLevels() {
     const peak = document.querySelector("#level-readout");
@@ -180,7 +180,9 @@
     }
     applyParamsToUi(status && status.params);
     applyMeters(status && status.meters);
-    applyTuner(status && status.tuner);
+    const lab = window.StaffLab;
+    if (!(lab && lab.ownsTuner())) applyTuner(status && status.tuner);
+    if (lab) lab.onAmpStatus(status);
     if (typeof syncXyFromParams === "function") syncXyFromParams();
   }
 
@@ -652,6 +654,8 @@
     }).catch(function () {});
   }
 
+  let pingLoopStarted = false;
+
   function connectWs() {
     const proto = location.protocol === "https:" ? "wss:" : "ws:";
     ws = new WebSocket(proto + "//" + location.host + pageBase() + "ws");
@@ -677,11 +681,15 @@
         showError(data.error);
       }
     };
-    setInterval(function () {
+    if (pingLoopStarted) return;
+    pingLoopStarted = true;
+    (function pingLoop() {
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "ping" }));
       }
-    }, 200);
+      const lab = window.StaffLab;
+      setTimeout(pingLoop, lab && lab.wantsFastStatus() ? 100 : 200);
+    })();
   }
 
   let presetLoadTimer = null;

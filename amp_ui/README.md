@@ -129,6 +129,7 @@ Check the catalog after an edit:
 
 ```bash
 node amp_ui/practice/test_theory.js
+node amp_ui/practice/test_staff_core.js
 ```
 
-That checks spellings, that each home scale contains the progression, that tab notes and bend targets sit in the named scale, that every pentatonic box contains a root, and that the shipped wavs match the tempos in the JSON.
+That checks spellings, that each home scale contains the progression, that tab notes and bend targets sit in the named scale, that every pentatonic box contains a root, and that the shipped wavs match the tempos in the JSON. The second covers the Staff Lab: staff positions and ledger lines, fret positions, that every song bar adds up and stays in first position, scoring, the pluck detector, and the browser pitch detector.
