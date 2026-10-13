@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
-  <link rel="stylesheet" href="static/app.css?v=theme1">
-  <link rel="stylesheet" href="static/practice.css?v=theme1">
-  <link rel="stylesheet" href="static/staff-lab.css?v=theme1">
+  <link rel="stylesheet" href="static/app.css?v=theme2">
+  <link rel="stylesheet" href="static/practice.css?v=theme2">
+  <link rel="stylesheet" href="static/staff-lab.css?v=theme2">
+  <link rel="stylesheet" href="static/song-studio.css?v=theme2">
 </head>
 <body>
   <main>
@@ -30,6 +31,7 @@
     <div class="mode-tabs" role="tablist" aria-label="Amp sections">
       <button type="button" id="tab-rig" role="tab" aria-selected="true">Amp</button>
       <button type="button" id="tab-practice" role="tab" aria-selected="false">Practice</button>
+      <button type="button" id="tab-song" role="tab" aria-selected="false">Song Studio · Sunset Redline</button>
     </div>
 
     <section class="panel tuner" aria-label="Tuner">
@@ -255,6 +257,16 @@
         <div class="control-head"><span>Wah mix</span><output id="out-wah_mix">0.00</output></div>
         <input type="range" id="wah_mix" min="0" max="1" step="0.01" value="0">
       </div>
+      <div class="control" data-param="octave_down">
+        <div class="control-head"><span>Down-Octave (Bass Mode)</span><output id="out-octave_down">0.00</output></div>
+        <input type="range" id="octave_down" min="0" max="1" step="0.01" value="0">
+      </div>
+      <div class="actions" style="margin-top: 8px; margin-bottom: 4px;">
+        <button type="button" id="octave-down-btn" class="octave-down-btn" aria-pressed="false">
+          <span class="octave-down-dot" aria-hidden="true"></span>
+          <span class="octave-btn-text">Down-Octave: OFF (Guitar Pitch)</span>
+        </button>
+      </div>
 
       <div class="meters">
         <div class="meter"><span>Mic in</span><meter id="meter-mic" min="0" max="1" value="0"></meter></div>
@@ -460,11 +472,114 @@
 
       <p id="practice-error" class="error" hidden></p>
     </section>
+
+    <section id="song-panel" class="panel song-studio" hidden aria-label="Song Studio: Sunset Redline">
+      <div class="song-header">
+        <div>
+          <h2>Sunset Redline — Melodic Metal Song &amp; Multi-Track Guitar Recorder</h2>
+          <p class="lede">Fast cars racing down the shoreline at sunset. Select any part below to view its notation, guitar tab, and lyrics, load its amp tone, toggle the Down-Octave button so your guitar sounds like a bass, and record your takes over the metal drum machine.</p>
+        </div>
+        <div class="song-badges">
+          <span class="song-badge is-crimson">Key: E Minor</span>
+          <span class="song-badge is-gold" id="song-bpm-out">132 BPM</span>
+          <span class="song-badge">4/4 · 16 Bars</span>
+        </div>
+      </div>
+
+      <div id="song-part-tabs" class="song-part-tabs" role="tablist" aria-label="Song parts">
+        <button type="button" role="tab" data-part="rhythm" aria-selected="true">
+          <span>1) Rhythm Guitar</span>
+          <span class="part-sub">E5 beach gallop &amp; chorus chords</span>
+        </button>
+        <button type="button" role="tab" data-part="lead" aria-selected="false">
+          <span>2) Lead + Guitar Solo</span>
+          <span class="part-sub">Twin hooks &amp; 4-bar shred solo</span>
+        </button>
+        <button type="button" role="tab" data-part="bass" aria-selected="false">
+          <span>3) Bass Part (-1 Oct)</span>
+          <span class="part-sub">Auto-engages Down-Octave</span>
+        </button>
+        <button type="button" role="tab" data-part="drums" aria-selected="false">
+          <span>4) Drum Machine</span>
+          <span class="part-sub">16-step double-kick metal kit</span>
+        </button>
+        <button type="button" role="tab" data-part="vocals" aria-selected="false">
+          <span>5) Lyrics (Notes + Words)</span>
+          <span class="part-sub">Sunset beach race melody &amp; words</span>
+        </button>
+      </div>
+
+      <div class="song-control-bar" aria-label="Recording and playback controls">
+        <button type="button" id="song-play-btn">▶ Play Backing &amp; Guide</button>
+        <button type="button" id="song-record-btn" class="song-rec-btn">● Record My Rhythm Guitar Take</button>
+        <button type="button" id="song-load-tone-btn" class="secondary">Load Part Amp Tone + IR</button>
+        <button type="button" id="song-octave-btn" class="octave-down-btn" aria-pressed="false" title="Shift guitar down 1 octave so it sounds like a bass">
+          <span class="octave-down-dot" aria-hidden="true"></span>
+          <span class="octave-btn-text">Down-Octave: OFF (Guitar Pitch)</span>
+        </button>
+        <button type="button" id="song-export-mix" class="secondary">Export Full Mix WAV</button>
+      </div>
+
+      <div class="song-section-bar">
+        <div id="song-sections" class="song-sections" role="group" aria-label="Song section loop">
+          <button type="button" data-section="all" aria-pressed="true">Full Song (1–16)</button>
+          <button type="button" data-section="verse" aria-pressed="false">Verse Riff (1–4)</button>
+          <button type="button" data-section="prechorus" aria-pressed="false">Pre-Chorus (5–8)</button>
+          <button type="button" data-section="chorus" aria-pressed="false">Chorus (9–12)</button>
+          <button type="button" data-section="solo" aria-pressed="false">Guitar Solo (13–16)</button>
+        </div>
+        <label class="song-tempo-wrap" for="song-bpm">
+          <span>Tempo</span>
+          <input type="range" id="song-bpm" min="80" max="180" step="2" value="132">
+        </label>
+      </div>
+
+      <div class="song-part-banner">
+        <p id="song-part-tip" class="song-part-banner-text"></p>
+        <span id="song-part-meta" class="song-part-banner-meta"></span>
+      </div>
+      <p id="song-tone-status" class="detail" aria-live="polite"></p>
+      <p id="song-score-readout" class="detail" aria-live="polite">Ready — pick a part and press Play Backing or Record My Take.</p>
+
+      <div class="song-stage">
+        <svg id="song-staff-svg" class="song-staff-svg" role="img" aria-label="Song notation, guitar tab, and synchronized lyrics"></svg>
+      </div>
+
+      <div class="song-mixer-grid">
+        <div class="song-box">
+          <h3>Multi-Track Guitar &amp; Stem Recorder Control System</h3>
+          <p class="lede" style="margin-bottom: 8px;">Record each guitar part one by one (Rhythm, Lead/Solo, and Bass with Down-Octave ON). Recorded takes play back together with the Drum Machine.</p>
+          <div id="song-mixer-rows" class="song-track-rows"></div>
+        </div>
+
+        <div class="song-box">
+          <div class="drum-pattern-head">
+            <h3>4) Open-Source Metal Drum Machine</h3>
+            <select id="song-drum-preset" aria-label="Drum machine pattern" style="width: auto; margin-top: 0; padding: 5px 8px;">
+              <option value="verse">Verse: Beach Gallop</option>
+              <option value="prechorus">Pre-Chorus: Turbo Build</option>
+              <option value="chorus">Chorus: Half-Time Crash</option>
+              <option value="solo">Guitar Solo: Double-Kick Overdrive</option>
+            </select>
+          </div>
+          <p id="song-drum-pattern-name" class="detail" style="margin: 0 0 6px;"></p>
+          <div class="drum-grid-wrap">
+            <div id="song-drum-grid" class="drum-grid" role="group" aria-label="16-step drum sequencer"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="song-box" style="margin-top: 14px;">
+        <h3>5) Complete Lyrics: Notes + Words ("Sunset Redline" — Fast Cars Racing on the Beach at Sunset)</h3>
+        <div id="song-lyrics-sheet" class="song-lyrics-sheet"></div>
+      </div>
+    </section>
   </main>
-  <script src="static/practice-theory.js?v=theme1"></script>
-  <script src="static/staff-core.js?v=theme1"></script>
-  <script src="static/app.js?v=theme1"></script>
-  <script src="static/staff-lab.js?v=theme1"></script>
-  <script src="static/practice.js?v=theme1"></script>
+  <script src="static/practice-theory.js?v=theme2"></script>
+  <script src="static/staff-core.js?v=theme2"></script>
+  <script src="static/app.js?v=theme2"></script>
+  <script src="static/staff-lab.js?v=theme2"></script>
+  <script src="static/practice.js?v=theme2"></script>
+  <script src="static/song-studio.js?v=theme2"></script>
 </body>
 </html>

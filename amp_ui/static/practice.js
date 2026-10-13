@@ -171,18 +171,29 @@
   function initTabs() {
     var rig = $("tab-rig");
     var practice = $("tab-practice");
+    var song = $("tab-song");
     var rigPanels = $("rig-panels");
+    var songPanel = $("song-panel");
+    var staffLab = $("staff-lab");
     if (!rig || !practice || !rigPanels) return;
     function show(which) {
       var practiceOn = which === "practice";
-      rig.setAttribute("aria-selected", practiceOn ? "false" : "true");
+      var songOn = which === "song";
+      rig.setAttribute("aria-selected", !practiceOn && !songOn ? "true" : "false");
       practice.setAttribute("aria-selected", practiceOn ? "true" : "false");
-      rigPanels.hidden = practiceOn;
+      if (song) song.setAttribute("aria-selected", songOn ? "true" : "false");
+      rigPanels.hidden = practiceOn || songOn;
       panel.hidden = !practiceOn;
+      if (songPanel) songPanel.hidden = !songOn;
+      if (staffLab) staffLab.hidden = songOn;
       if (practiceOn) syncGuitarFromAmp();
+      if (songOn && window.SongStudio && window.SongStudio.controller()) {
+        window.SongStudio.controller().renderSongScore();
+      }
     }
     rig.addEventListener("click", function () { show("rig"); });
     practice.addEventListener("click", function () { show("practice"); });
+    if (song) song.addEventListener("click", function () { show("song"); });
   }
 
   function initSources() {

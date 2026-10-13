@@ -1,5 +1,5 @@
 (function () {
-  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix"];
+  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix", "octave_down"];
   let toneExtra = { low_cut: 80, high_cut: 8000, preset: "" };
   let presetCatalog = [];
   const runState = document.querySelector("#run-state");
@@ -68,6 +68,34 @@
     if (params.low_cut !== undefined) toneExtra.low_cut = params.low_cut;
     if (params.high_cut !== undefined) toneExtra.high_cut = params.high_cut;
     if (params.preset !== undefined) toneExtra.preset = params.preset;
+    if (params.octave_down !== undefined) {
+      syncOctaveButtons(Number(params.octave_down) >= 0.5);
+    }
+  }
+
+  function syncOctaveButtons(on) {
+    ["octave-down-btn", "song-octave-btn"].forEach(function (id) {
+      const btn = document.getElementById(id);
+      if (!btn) return;
+      btn.setAttribute("aria-pressed", on ? "true" : "false");
+      const txt = btn.querySelector(".octave-btn-text");
+      if (txt) {
+        txt.textContent = on ? "Down-Octave: ON (-1 Oct Bass)" : "Down-Octave: OFF (Guitar Pitch)";
+      }
+    });
+  }
+
+  function setOctaveDown(enabled, shouldPush) {
+    const val = enabled ? 1.0 : 0.0;
+    const el = document.querySelector("#octave_down");
+    if (el) el.value = String(val);
+    const label = document.querySelector("#out-octave_down");
+    if (label) label.textContent = formatParam("octave_down", val);
+    syncOctaveButtons(!!enabled);
+    if (shouldPush !== false) {
+      clearTimeout(paramTimer);
+      paramTimer = setTimeout(pushParams, 30);
+    }
   }
 
   let tunerCents = 0;
@@ -106,7 +134,7 @@
       el.classList.toggle("is-target", Number(el.dataset.midi) === tuner.midi);
     });
   }
-  window.AmpUI = { applyTuner: applyTuner };
+  window.AmpUI = { applyTuner: applyTuner, setOctaveDown: setOctaveDown };
 
   function clearLevels() {
     const peak = document.querySelector("#level-readout");
@@ -281,6 +309,9 @@
     if (!el) return;
     el.addEventListener("input", function () {
       readParams();
+      if (name === "octave_down") {
+        syncOctaveButtons(parseFloat(el.value) >= 0.5);
+      }
       clearTimeout(paramTimer);
       paramTimer = setTimeout(pushParams, 80);
     });

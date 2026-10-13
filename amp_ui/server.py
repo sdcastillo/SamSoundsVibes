@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """Local browser UI for the guitar amp. Default bind 0.0.0.0 (override with AMP_UI_HOST)."""
 
+import base64
 import json
 import os
+import re
 import sys
+import time
+import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 REPO_ROOT = ROOT.parent
 STATIC = ROOT / "static"
+RECORDINGS = ROOT / "recordings"
+RECORDINGS.mkdir(parents=True, exist_ok=True)
+VALID_TAKE_PARTS = ("rhythm", "lead", "solo", "bass", "vocals")
 
 
 def _env_host():
@@ -60,6 +67,7 @@ PARAM_DEFAULTS = {
     "ir_mix": 0.0,
     "low_cut": 80.0,
     "high_cut": 8000.0,
+    "octave_down": 0.0,
 }
 
 
@@ -135,6 +143,7 @@ async def api_start(payload: dict):
             ir_mix=config["ir_mix"],
             low_cut=config["low_cut"],
             high_cut=config["high_cut"],
+            octave_down=config["octave_down"],
         )
         session.start(config)
     except (ValueError, RuntimeError) as error:
@@ -222,6 +231,127 @@ async def api_preset(payload: dict):
         "ir": params.get("ir") or "",
     }
     return {"preset": view, "params": params, **session.status()}
+
+
+def _clean_part_id(part_id):
+    cleaned = re.sub(r"[^a-z0-9_-]", "", str(part_id or "").strip().lower())
+    return cleaned if cleaned in VALID_TAKE_PARTS else "rhythm"
+
+
+def _wav_duration(path: Path) -> float:
+    try:
+        with wave.open(str(path), "rb") as wf:
+            frames = wf.getnframes()
+            rate = wf.getframerate()
+            return round(float(frames) / float(rate), 2) if rate else 0.0
+    except Exception:
+        return 0.0
+
+
+def _list_takes():
+    takes = {}
+    for part in VALID_TAKE_PARTS:
+        for ext in (".wav", ".webm", ".ogg"):
+            candidate = RECORDINGS / f"{part}{ext}"
+            if candidate.is_file() and candidate.stat().st_size > 44:
+                mtime = int(candidate.stat().st_mtime * 1000)
+                takes[part] = {
+                    "part": part,
+                    "url": f"api/takes/{part}{ext}?t={mtime}",
+                    "duration": _wav_duration(candidate) if ext == ".wav" else 0.0,
+                    "size": candidate.stat().st_size,
+                    "updated_ms": mtime,
+                }
+                break
+    return takes
+
+
+@app.get("/api/takes")
+def api_takes():
+    return {"takes": _list_takes(), "recording": session.status().get("recording")}
+
+
+@app.post("/api/takes/start")
+async def api_takes_start(payload: dict):
+    part = _clean_part_id(payload.get("part"))
+    amp_started = session.start_take(part)
+    return {
+        "ok": True,
+        "part": part,
+        "amp_capturing": amp_started,
+        "takes": _list_takes(),
+    }
+
+
+@app.post("/api/takes/stop")
+async def api_takes_stop(payload: dict = None):
+    payload = payload or {}
+    wav_bytes, duration, amp_part = session.stop_take()
+    part = _clean_part_id(payload.get("part") or amp_part)
+    saved_from_amp = False
+    if wav_bytes and duration >= 0.15:
+        for ext in (".webm", ".ogg"):
+            old = RECORDINGS / f"{part}{ext}"
+            if old.exists():
+                old.unlink()
+        target = RECORDINGS / f"{part}.wav"
+        target.write_bytes(wav_bytes)
+        saved_from_amp = True
+    return {
+        "ok": True,
+        "part": part,
+        "saved_from_amp": saved_from_amp,
+        "duration": duration,
+        "takes": _list_takes(),
+    }
+
+
+@app.post("/api/takes/upload")
+async def api_takes_upload(payload: dict):
+    part = _clean_part_id(payload.get("part"))
+    raw_b64 = str(payload.get("audio_base64") or "").strip()
+    if "," in raw_b64 and raw_b64.startswith("data:"):
+        raw_b64 = raw_b64.split(",", 1)[1]
+    if not raw_b64:
+        return JSONResponse(status_code=400, content={"error": "Missing audio_base64"})
+    ext = str(payload.get("ext") or ".wav").lower()
+    if ext not in (".wav", ".webm", ".ogg"):
+        ext = ".wav"
+    try:
+        audio_bytes = base64.b64decode(raw_b64)
+    except Exception as error:
+        return JSONResponse(status_code=400, content={"error": f"Invalid base64: {error}"})
+    for other_ext in (".wav", ".webm", ".ogg"):
+        old = RECORDINGS / f"{part}{other_ext}"
+        if old.exists():
+            old.unlink()
+    target = RECORDINGS / f"{part}{ext}"
+    target.write_bytes(audio_bytes)
+    return {"ok": True, "part": part, "takes": _list_takes()}
+
+
+@app.delete("/api/takes/{part_id}")
+def api_takes_delete(part_id: str):
+    part = _clean_part_id(part_id)
+    for ext in (".wav", ".webm", ".ogg"):
+        target = RECORDINGS / f"{part}{ext}"
+        if target.exists():
+            target.unlink()
+    return {"ok": True, "part": part, "takes": _list_takes()}
+
+
+@app.get("/api/takes/{filename}")
+def api_takes_file(filename: str):
+    match = re.match(r"^([a-z0-9_-]+)\.(wav|webm|ogg)$", filename.strip().lower())
+    if not match:
+        return JSONResponse(status_code=404, content={"error": "Invalid take filename"})
+    part = _clean_part_id(match.group(1))
+    ext = "." + match.group(2)
+    target = RECORDINGS / f"{part}{ext}"
+    if not target.is_file():
+        return JSONResponse(status_code=404, content={"error": "Take not found"})
+    media = "audio/wav" if ext == ".wav" else ("audio/webm" if ext == ".webm" else "audio/ogg")
+    return FileResponse(target, media_type=media, headers={"Cache-Control": "no-store"})
 
 
 @app.get("/")
