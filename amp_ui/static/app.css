@@ -1,13 +1,19 @@
 :root {
   color-scheme: dark;
-  --bg: #0a0a0f;
-  --panel: #14121c;
-  --accent: #ff6b2c;
-  --accent2: #ffb347;
-  --text: #f2efe8;
-  --muted: #9a958c;
-  --border: #2e2a38;
-  --danger: #ff4d6d;
+  --teal: #176571;
+  --navy: #1A3567;
+  --gold: #D89F58;
+  --aqua: #A3D9D9;
+  --crimson: #C33F45;
+  --bg: #0e1e3b;
+  --panel: #1A3567;
+  --surface: #12264a;
+  --accent: #D89F58;
+  --accent2: #A3D9D9;
+  --text: #f3f9f9;
+  --muted: #A3D9D9;
+  --border: #176571;
+  --danger: #C33F45;
 }
 
 * { box-sizing: border-box; }
@@ -15,7 +21,7 @@
 body {
   margin: 0;
   font-family: "Segoe UI", system-ui, sans-serif;
-  background: radial-gradient(ellipse at top, #1a1020 0%, var(--bg) 55%);
+  background: radial-gradient(ellipse at top, #176571 0%, #1A3567 45%, var(--bg) 100%);
   color: var(--text);
   line-height: 1.5;
 }
@@ -32,21 +38,23 @@ h1 {
   margin: 0 0 6px;
   font-size: 2rem;
   letter-spacing: 0.02em;
+  color: var(--accent);
 }
 
 h2 {
   margin: 0 0 14px;
   font-size: 1.1rem;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
-.lede { color: var(--muted); margin-top: 0; }
+.lede { color: var(--muted); margin-top: 0; opacity: 0.9; }
 
 .panel {
-  background: var(--panel);
+  background: linear-gradient(160deg, var(--panel) 0%, #142a52 100%);
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 16px 18px 20px;
+  box-shadow: 0 10px 26px rgba(8, 17, 34, 0.4);
 }
 
 label {
@@ -57,9 +65,10 @@ label {
 }
 
 input[type="text"],
+input[type="search"],
 select {
   width: 100%;
-  background: #0f0d14;
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -70,13 +79,13 @@ select {
 select { font-size: 0.85rem; }
 
 select option {
-  background: #1a1724;
-  color: #f2efe8;
+  background: var(--panel);
+  color: var(--text);
 }
 
 button {
-  background: linear-gradient(135deg, var(--accent), #e85d04);
-  color: #1a0a00;
+  background: linear-gradient(135deg, var(--accent), #c4883d);
+  color: var(--panel);
   border: 0;
   border-radius: 999px;
   padding: 12px 22px;
@@ -87,7 +96,7 @@ button {
 }
 
 button.secondary {
-  background: transparent;
+  background: rgba(23, 101, 113, 0.28);
   color: var(--accent2);
   border: 1px solid var(--accent2);
   margin-left: 8px;
@@ -113,12 +122,12 @@ button:disabled {
   font-size: 0.85rem;
 }
 
-.pill.running { background: #1b4332; color: #95d5b2; }
-.pill.stopped { background: #3d1f2a; color: #ffb3c1; }
-.pill.clip-pill { background: #6b2d16; color: #ffd0a8; }
+.pill.running { background: #176571; color: #A3D9D9; border: 1px solid #A3D9D9; }
+.pill.stopped { background: #C33F45; color: #f3f9f9; }
+.pill.clip-pill { background: #C33F45; color: #f3f9f9; }
 
 .detail { color: var(--muted); font-size: 0.9rem; }
-.detail.is-hot { color: #ffb4a2; font-weight: 700; }
+.detail.is-hot { color: var(--accent); font-weight: 700; }
 
 .level-note {
   margin: 8px 0 0;
@@ -142,9 +151,9 @@ button:disabled {
 }
 
 .block-size select {
-  background: #16141c;
+  background: var(--surface);
   color: var(--text);
-  border: 1px solid #3a3548;
+  border: 1px solid var(--border);
   border-radius: 8px;
   padding: 6px 8px;
 }
@@ -183,7 +192,7 @@ meter {
 .note {
   margin-top: 20px;
   padding: 12px 14px;
-  background: #0f0d14;
+  background: var(--surface);
   border-left: 4px solid var(--accent);
   border-radius: 8px;
   color: var(--muted);
@@ -259,9 +268,9 @@ meter {
 }
 
 .xy-hold[aria-pressed="true"] {
-  background: var(--accent2);
-  color: #1a0a00;
-  border-color: var(--accent2);
+  background: var(--accent);
+  color: var(--panel);
+  border-color: var(--accent);
 }
 
 .xy-pad-wrap {
@@ -278,9 +287,9 @@ meter {
   border-radius: 16px;
   border: 1px solid var(--border);
   background:
-    radial-gradient(circle at 50% 50%, rgba(255, 107, 44, 0.12), transparent 55%),
-    linear-gradient(145deg, #1a1524 0%, #0c0a12 100%);
-  box-shadow: inset 0 0 0 1px rgba(255, 179, 71, 0.08);
+    radial-gradient(circle at 50% 50%, rgba(216, 159, 88, 0.18), rgba(23, 101, 113, 0.25) 55%, transparent 75%),
+    linear-gradient(145deg, #1A3567 0%, #0f2040 100%);
+  box-shadow: inset 0 0 0 1px rgba(163, 217, 217, 0.16);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -301,8 +310,8 @@ meter {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    linear-gradient(to right, rgba(163, 217, 217, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(163, 217, 217, 0.1) 1px, transparent 1px);
   background-size: 12.5% 12.5%;
   pointer-events: none;
 }
@@ -313,7 +322,7 @@ meter {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgba(255, 179, 71, 0.75);
+  color: var(--accent2);
   pointer-events: none;
   z-index: 1;
 }
@@ -336,10 +345,10 @@ meter {
   border-radius: 50%;
   left: 50%;
   top: 50%;
-  background: radial-gradient(circle at 35% 35%, #fff6e8, var(--accent));
+  background: radial-gradient(circle at 35% 35%, var(--accent2), var(--accent));
   box-shadow:
-    0 0 0 3px rgba(255, 107, 44, 0.35),
-    0 0 22px rgba(255, 107, 44, 0.55);
+    0 0 0 3px rgba(216, 159, 88, 0.35),
+    0 0 22px rgba(23, 101, 113, 0.65);
   pointer-events: none;
   z-index: 2;
   transition: box-shadow 0.12s ease;
@@ -347,8 +356,8 @@ meter {
 
 .xy-pad.is-active .xy-cursor {
   box-shadow:
-    0 0 0 4px rgba(255, 179, 71, 0.45),
-    0 0 28px rgba(255, 107, 44, 0.8);
+    0 0 0 4px rgba(163, 217, 217, 0.5),
+    0 0 28px rgba(216, 159, 88, 0.85);
 }
 
 .xy-readout {
@@ -363,7 +372,7 @@ meter {
 .xy-readout output {
   font-variant-numeric: tabular-nums;
   font-weight: 700;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .xy-cc {
@@ -405,11 +414,11 @@ meter {
 }
 
 .tuner-note.is-in {
-  color: #95d5b2;
+  color: var(--accent2);
 }
 
 .tuner-note.is-off {
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .tuner-hz,
@@ -438,7 +447,7 @@ meter {
   position: relative;
   height: 14px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #ff4d6d 0%, #1b4332 46%, #95d5b2 50%, #1b4332 54%, #ff4d6d 100%);
+  background: linear-gradient(90deg, #C33F45 0%, #176571 44%, #A3D9D9 50%, #176571 56%, #C33F45 100%);
   border: 1px solid var(--border);
 }
 
@@ -449,7 +458,7 @@ meter {
   width: 2px;
   height: 22px;
   margin-left: -1px;
-  background: #f2efe8;
+  background: var(--accent2);
 }
 
 .tuner-needle {
@@ -461,7 +470,7 @@ meter {
   margin-left: -7px;
   border-radius: 4px;
   background: var(--accent);
-  box-shadow: 0 0 12px rgba(255, 107, 44, 0.7);
+  box-shadow: 0 0 12px rgba(216, 159, 88, 0.75);
 }
 
 .tuner-cents {
@@ -481,14 +490,15 @@ meter {
   padding: 6px 0;
   border-radius: 999px;
   border: 1px solid var(--border);
+  background: var(--surface);
   color: var(--muted);
   font-weight: 700;
 }
 
 .tuner-strings span.is-target {
-  color: #1a0a00;
-  background: var(--accent2);
-  border-color: var(--accent2);
+  color: var(--panel);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .presets {

@@ -923,7 +923,7 @@
 
   function confetti(count) {
     var box = $("lab-confetti");
-    var colors = ["#ff6b2c", "#ffb347", "#ffe08a", "#7be0a5", "#7ab8ff", "#ff7ab8"];
+    var colors = ["#176571", "#1A3567", "#D89F58", "#A3D9D9", "#C33F45"];
     for (var i = 0; i < (count || 36); i++) {
       var bit = document.createElement("i");
       bit.style.left = Math.random() * 100 + "%";
