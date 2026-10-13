@@ -142,10 +142,18 @@ Interested in vibe coding? Are you an artist or musician looking to build your d
 
 **Reach out!** Let's create something that resonates.
 
-- 🎵 **Music & Vibes** - [@SamSoundsVibes](https://twitter.com/SamSoundsVibes)
-- **X** - [X](https://x.com/SamCast65215624)
-- 💻 **Tech & Data** - [LinkedIn](https://linkedin.com/in/samdcastillo)
-- 🎸 **Creative Projects** - [GitHub](https://github.com/sdcastillo)
+- [X](https://x.com/SamCast65215624)
+- [YouTube](https://www.youtube.com/@predictiveanalyst)
+- [YouTube Music](https://www.youtube.com/@GUILDSOUNDVIBES)
+- [Instagram](https://www.instagram.com/_sam_d_c_)
+- [Instagram](https://www.instagram.com/futuroinsight/)
+- [Facebook](https://www.facebook.com/SamSoundsVibes)
+- [Facebook](https://www.facebook.com/profile.php?id=100094642779092)
+- [LinkedIn](https://www.linkedin.com/in/samdcastillo)
+- [GitHub](https://github.com/sdcastillo)
+- [Bluesky](https://bsky.app/profile/supersam7.bsky.social)
+- [Substack](https://substack.com/@predictiveanalyst)
+- [SoundCloud](https://soundcloud.com/lonestarriot)
 
 ### More from Sam
 
@@ -172,10 +180,18 @@ People can send money to support Sam Castillo's work through the Predictive Mode
 ## Connect
 
 - [X](https://x.com/SamCast65215624)
+- [YouTube](https://www.youtube.com/@predictiveanalyst)
+- [YouTube Music](https://www.youtube.com/@GUILDSOUNDVIBES)
+- [Instagram](https://www.instagram.com/_sam_d_c_)
+- [Instagram](https://www.instagram.com/futuroinsight/)
+- [Facebook](https://www.facebook.com/SamSoundsVibes)
+- [Facebook](https://www.facebook.com/profile.php?id=100094642779092)
+- [LinkedIn](https://www.linkedin.com/in/samdcastillo)
+- [GitHub](https://github.com/sdcastillo)
+- [Bluesky](https://bsky.app/profile/supersam7.bsky.social)
+- [Substack](https://substack.com/@predictiveanalyst)
+- [SoundCloud](https://soundcloud.com/lonestarriot)
 - Website: https://www.predictiveinsightsai.com
-- YouTube: https://youtube.com/@PredictiveAnalyst
-- GitHub: https://github.com/sdcastillo
-- LinkedIn: https://www.linkedin.com/in/samdcastillo
 - RPubs: https://rpubs.com/samdcastillo
 - About page: https://sdcastillo.github.io/about
 - This project on GitHub Pages: https://sdcastillo.github.io/SamSoundsVibes/
