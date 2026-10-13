@@ -62,28 +62,34 @@ python3 direct_alsa_guitar_amp_fast.py --output-device Scarlett     # direct ALS
 
 ## Staff Lab
 
-Under the tuner. Each note you play is placed on the staff, with where to find it on a 12-fret neck.
+Under the tuner, across the full page width. Each note you play is placed on the staff and in guitar tab underneath it, with where to find it on a 12-fret neck. Wide screens show four bars per line, narrow ones two; notes are spaced by beat, so rhythms read the way they sound.
 
 | Mode | What you do |
 |------|-------------|
 | Free play | Play anything. The last eight notes stay on the staff with their names, the written pitch, and every fret that plays them. |
 | Note Quest | One note appears; play it. Six levels: open strings, low strings, high strings, all of first position, sharps and flats, and frets 5–12. **Practice** has no clock; the **60-second challenge** keeps a high score per level. 10 points a note, +5 within 10 cents, ×2 at a streak of 5, ×3 at 10. Two misses on a note shows it on the fretboard; **Hint** does the same (in the challenge it resets your streak). Notes you miss come up more often. |
 | Scale Climb | Up and back down: C, G, and D major, E minor pentatonic (open), A minor pentatonic box 1, and a chromatic spider walk. Fretboard dots show where the next note is. Stars: three for no misses. |
-| Songs | Public-domain melodies in written guitar pitch (Mary Had a Little Lamb, Twinkle Twinkle, Ode to Joy, Frère Jacques, Au clair de la lune, Jingle Bells, Happy Birthday) with real rhythms, bar lines, and time signatures. It waits for each note. **Hear the melody** plays it first. |
+| Songs | Public-domain melodies in written guitar pitch (Mary Had a Little Lamb, Twinkle Twinkle, Ode to Joy, Frère Jacques, Au clair de la lune, Jingle Bells, Happy Birthday) with real rhythms, bar lines, and time signatures. **Waits for me** goes note by note; **In time with the click** counts in one bar on the metronome and scores each note within 0.2 s early to 0.3 s late, with a playhead. **Hear the melody** plays it first. |
+| Riffs & leads | A riff and a lead for each Practice backing track, written for its key, mode, chords, and tempo. **With the backing track** starts the track after a one-bar count-in, highlights the current note on the staff, tab, and fretboard, and scores every pass of the loop. **Waits for me** steps through it without the track. **Recommended guitar preset + IR** loads a factory preset with a tempo-synced delay and the cab IR that suits the style. |
+
+The **Metronome** row sets BPM (type it, ±5, the slider, or **Tap tempo**) and time signature (2/4, 3/4, 4/4, 6/8 clicking eighths), with accented beat lights. Picking a song sets its tempo; a slower click is the easiest way to learn a hard passage. Clicks are pitched above the note detector, so they never register as notes.
 
 **Hear it** plays the target note so you can match it by ear. Trophies, best scores, stars, and per-note accuracy are saved in the browser (`localStorage`). **Drill my weak notes** starts a round from the notes you miss most.
 
 Under **Notation and input**:
 
 - **Guitar staff** (default) — treble clef with the small 8: guitar music is written an octave above how it sounds, as in every method book. Low E sits under three ledger lines. **Grand staff** shows sounding pitch on treble and bass, like piano music.
-- Note names under the staff, fretboard hints for scales and songs, and **Any octave counts** for beginners.
+- Note names under the staff, guitar tab under the staff, fretboard hints for scales and songs, and **Any octave counts** for beginners.
+- **Timing offset** shifts scoring if your notes keep registering late (plus) or early (minus). The amp tuner path already allows 150 ms and the mic 60 ms.
 - **Hear my guitar through** — the amp tuner (Scarlett, the default; the page polls faster while a lesson runs), **this device's microphone** (an acoustic guitar near a laptop; the browser only allows it on `http://127.0.0.1` or https, so not over plain Tailscale http), or **tap the fretboard** (no guitar, tapping plays the note).
 
 One pluck is one note: a held note counts once, and the same note counts again after a gap or a fresh pick attack, so repeated notes in a melody work.
 
 ```bash
 node amp_ui/practice/test_staff_core.js
+node amp_ui/practice/test_riffs.js
 python3 scripts/verify_amp_staff.py
+python3 scripts/verify_practice_tones.py
 ```
 
 ## Practice mode
@@ -95,6 +101,16 @@ Open the UI, then the **Practice** tab. The tuner and Staff Lab stay visible. Pl
 The style menu filters the library. Each track shows its key, tempo, progression, and scales. Orange fretboard dots are the root, gold dots are the other scale notes, and blue dots are notes a scale adds beyond its pentatonic box (the flat 5 in a blues scale, the 2nd and flat 6 in natural minor, and so on). The note under each scale says when to use it on that progression and which note clashes.
 
 **My file** loads a local audio file. Set the tonic and mode yourself. The page suggests scales and builds lessons from that key. Optional BPM and a space-separated progression (one chord per bar) enable the chord strip and live chord-tone highlighting. Key guessing is intentionally absent: the same pitches often fit the relative major, or the IV of a Dorian vamp, so an estimate would lie with confidence.
+
+### Recommended tone, riffs, and leads
+
+Each library track has a tone card with **Recommended guitar preset + IR**. It loads a factory preset that suits the style (Cold Shot for the blues, Brit 2204 for E minor rock, Taylor LIVE on a dreadnought IR for bluegrass, and so on), sets the delay to a note value at the track's tempo, and keeps your Volume where it is. The line under the button says why that tone fits. If the amp is stopped the sliders change and the tone is used when you press Start amp.
+
+**Riffs and leads**, above the fretboard, shows the track's riff and lead as tab with the chord over each bar. While the track plays, the current note lights up in the tab and a dashed blue ring marks it on the fretboard. **Play along (scored)** hands the phrase to Staff Lab's Riffs & leads mode: one bar of count-in, then every note from your guitar is scored against the backing track, pass by pass. **Learn it note by note** waits for each note instead.
+
+Every note you play shows up on the Practice fretboard too, with a line saying what it is over the current chord: green for a chord tone (with its degree, like ♭3 of Am7), gold for another scale note, red for outside the scale.
+
+Riffs live in `amp_ui/static/practice/riffs.json`, keyed by track id. `tab` is one token per note: string letter (`e B G D A E`), fret, duration (`w h. h q. q e. e s`, default `q`), `r` plus a duration for a rest, and `|` between bars. `tone` is a factory `slot` and `name`, optional `ir` and `overrides` (drive, EQ, delay, feedback, mix, wah, ir_mix, cuts), and `why`. `node amp_ui/practice/test_riffs.js` checks that bars add up and match the progression, every note is in the track's scales, every bar touches its chord, and the preset, IR, and synced delay are real; `python3 scripts/verify_practice_tones.py` loads every tone through the same code as `/api/preset`.
 
 ### Lessons
 
