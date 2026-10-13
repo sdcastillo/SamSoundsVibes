@@ -1,8 +1,8 @@
-"""Factory presets translated from the POD Go backup onto this amp.
+"""Factory presets translated from the Sam's backup onto this amp.
 
 The block list on each preset is the original POD Go chain. The ``play``
 object is what FastAmp can sound: drive, tone, delay, wah, and one of the
-cabinet impulse responses stored in the same backup. Line 6's amp models
+cabinet impulse responses stored in the same backup. Sam's amp models
 are not in the file, so those knobs are mapped onto this amp's drive and
 tone stack, and the cab block picks the closest impulse response we have.
 """
