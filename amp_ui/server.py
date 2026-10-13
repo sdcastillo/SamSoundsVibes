@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Local browser UI for the guitar amp. Default bind 0.0.0.0 (override with AMP_UI_HOST)."""
+"""Local browser UI for the guitar amp. Default bind 127.0.0.1 (override with AMP_UI_HOST)."""
 
 import json
 import os
@@ -12,7 +12,7 @@ STATIC = ROOT / "static"
 
 
 def _env_host():
-    return os.environ.get("AMP_UI_HOST", "0.0.0.0").strip() or "0.0.0.0"
+    return os.environ.get("AMP_UI_HOST", "127.0.0.1").strip() or "127.0.0.1"
 
 
 def _env_port():
@@ -232,10 +232,10 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="SamSounds guitar amp browser UI")
-    parser.add_argument("--host", default=_env_host(), help="Bind address (default 0.0.0.0 or AMP_UI_HOST)")
+    parser.add_argument("--host", default=_env_host(), help="Bind address (default 127.0.0.1 or AMP_UI_HOST)")
     parser.add_argument("--port", type=int, default=_env_port(), help="Port (default 8790 or AMP_UI_PORT)")
     args = parser.parse_args()
-    url_host = "127.0.0.1" if args.host in ("0.0.0.0", "::") else args.host
+    url_host = "127.0.0.1" if args.host in ("127.0.0.1", "::") else args.host
     print(f"Guitar Amp UI → http://{url_host}:{args.port}/")
     print(f"Repo root: {REPO_ROOT}")
     print("Leave this terminal open. Use Ctrl+C to stop.")
