@@ -214,6 +214,42 @@ def engine_params(preset: dict) -> dict:
     return params
 
 
+OVERRIDE_RANGES = {
+    "drive": (0.0, 40.0),
+    "bass": (0.0, 1.0),
+    "mid": (0.0, 1.0),
+    "treble": (0.0, 1.0),
+    "presence": (0.0, 1.0),
+    "delay_ms": (50.0, 800.0),
+    "feedback": (0.0, 0.9),
+    "mix": (0.0, 1.0),
+    "wah_freq": (120.0, 12000.0),
+    "wah_q": (0.4, 16.0),
+    "wah_mix": (0.0, 1.0),
+    "ir_mix": (0.0, 1.0),
+    "low_cut": (20.0, 800.0),
+    "high_cut": (1000.0, 20000.0),
+}
+
+
+def apply_overrides(params: dict, overrides=None, ir=None) -> dict:
+    """Returns params with a recommended tone's tweaks on top. Volume and the preset name stay put."""
+    out = dict(params)
+    for key, value in (overrides or {}).items():
+        if key not in OVERRIDE_RANGES:
+            raise ValueError(f"Cannot override {key!r}.")
+        low, high = OVERRIDE_RANGES[key]
+        number = float(value)
+        if not low <= number <= high:
+            raise ValueError(f"{key} must be {low:g}-{high:g}")
+        out[key] = int(number) if key == "delay_ms" else number
+    if ir:
+        if Path(str(ir)).name != ir or ir not in ir_names():
+            raise ValueError(f"Unknown cabinet impulse response: {ir}")
+        out["ir"] = ir
+    return out
+
+
 def _clip(value, lo, hi):
     return max(lo, min(hi, float(value)))
 

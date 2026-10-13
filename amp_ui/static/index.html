@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guitar Amp | SamSoundsVibes</title>
   <link rel="stylesheet" href="static/app.css?v=lab1">
-  <link rel="stylesheet" href="static/practice.css?v=practice3">
-  <link rel="stylesheet" href="static/staff-lab.css?v=lab1">
+  <link rel="stylesheet" href="static/practice.css?v=practice4">
+  <link rel="stylesheet" href="static/staff-lab.css?v=lab2">
 </head>
 <body>
   <main>
@@ -69,6 +69,7 @@
         <button type="button" role="tab" data-mode="quest" aria-selected="false">Note Quest</button>
         <button type="button" role="tab" data-mode="scale" aria-selected="false">Scale Climb</button>
         <button type="button" role="tab" data-mode="song" aria-selected="false">Songs</button>
+        <button type="button" role="tab" data-mode="riff" aria-selected="false">Riffs &amp; leads</button>
       </div>
 
       <div class="lab-setup">
@@ -87,13 +88,43 @@
         <label class="lab-field" data-for="song">Song
           <select id="lab-song"></select>
         </label>
+        <label class="lab-field" data-for="riff">Backing track
+          <select id="lab-riff-track"></select>
+        </label>
+        <label class="lab-field" data-for="riff">Phrase
+          <select id="lab-riff-phrase"></select>
+        </label>
+        <label class="lab-field" data-for="scale song riff">Timing
+          <select id="lab-timing">
+            <option value="wait">Waits for me</option>
+            <option value="time">In time with the click</option>
+          </select>
+        </label>
         <div class="lab-buttons">
-          <button type="button" id="lab-go" data-for="quest scale song">Start</button>
-          <button type="button" id="lab-hear" class="secondary" data-for="quest scale song">Hear it</button>
+          <button type="button" id="lab-go" data-for="quest scale song riff">Start</button>
+          <button type="button" id="lab-hear" class="secondary" data-for="quest scale song riff">Hear it</button>
           <button type="button" id="lab-hint" class="secondary" data-for="quest">Hint</button>
           <button type="button" id="lab-skip" class="secondary" data-for="quest">Skip</button>
-          <button type="button" id="lab-stop" class="secondary" data-for="quest scale song">Stop</button>
+          <button type="button" id="lab-stop" class="secondary" data-for="quest scale song riff">Stop</button>
+          <button type="button" id="lab-riff-tone" class="tone-btn" data-for="riff">Recommended guitar preset + IR</button>
         </div>
+        <p id="lab-tone-status" class="lab-tone-status" data-for="riff" aria-live="polite"></p>
+      </div>
+
+      <div class="lab-metro" aria-label="Metronome">
+        <span class="lab-metro-title">Metronome</span>
+        <button type="button" class="secondary lab-step" data-bpm-step="-5" aria-label="5 BPM slower">&minus;5</button>
+        <label class="lab-bpm">
+          <input id="lab-bpm" type="number" min="40" max="240" step="1" inputmode="numeric" aria-label="Tempo in BPM"> BPM
+        </label>
+        <button type="button" class="secondary lab-step" data-bpm-step="5" aria-label="5 BPM faster">+5</button>
+        <input id="lab-bpm-range" type="range" min="40" max="240" step="1" aria-label="Tempo">
+        <label class="lab-meter-pick">Time
+          <select id="lab-meter"></select>
+        </label>
+        <button type="button" id="lab-tap-tempo" class="secondary">Tap tempo</button>
+        <button type="button" id="lab-metro-go" aria-pressed="false">Start click</button>
+        <div id="lab-beats" class="lab-beats" aria-hidden="true"></div>
       </div>
 
       <div id="lab-hud" class="lab-hud" aria-live="polite"></div>
@@ -123,6 +154,10 @@
           </label>
           <label class="check"><input type="checkbox" id="lab-names"> Show note names under the staff</label>
           <label class="check"><input type="checkbox" id="lab-frets"> Show where to play on scales and songs</label>
+          <label class="check"><input type="checkbox" id="lab-tab"> Show guitar tab under the staff</label>
+          <label>Timing offset (ms, plus means my notes register late)
+            <input id="lab-offset" type="number" min="-300" max="300" step="10" inputmode="numeric">
+          </label>
           <label class="check"><input type="checkbox" id="lab-octave"> Any octave counts (easier)</label>
           <fieldset class="lab-inputs">
             <legend>Hear my guitar through</legend>
@@ -194,7 +229,7 @@
       </div>
       <div class="control" data-param="delay_ms">
         <div class="control-head"><span>Delay (ms)</span><output id="out-delay_ms">380</output></div>
-        <input type="range" id="delay_ms" min="50" max="800" step="5" value="380">
+        <input type="range" id="delay_ms" min="50" max="800" step="1" value="380">
       </div>
       <div class="control" data-param="feedback">
         <div class="control-head"><span>Feedback</span><output id="out-feedback">0.35</output></div>
@@ -396,11 +431,30 @@
         </div>
       </div>
 
+      <div id="practice-riffs" class="practice-riffs" hidden>
+        <div class="riff-head">
+          <h3>Riffs and leads</h3>
+          <div id="riff-phrases" class="riff-phrases" role="tablist" aria-label="Phrase"></div>
+        </div>
+        <p id="riff-tip" class="riff-tip"></p>
+        <div class="riff-tab-wrap">
+          <svg id="riff-tab" class="riff-tab" role="img" aria-label="Guitar tab for this phrase"></svg>
+        </div>
+        <div class="riff-actions">
+          <button type="button" id="riff-play">Play along (scored)</button>
+          <button type="button" id="riff-learn" class="secondary">Learn it note by note</button>
+          <button type="button" id="riff-hear" class="secondary">Hear it</button>
+          <button type="button" id="riff-stop" class="secondary" hidden>Stop</button>
+          <span id="riff-score" class="riff-score" aria-live="polite"></span>
+        </div>
+      </div>
+
       <div class="fret-head">
         <h3>Fretboard</h3>
         <button type="button" id="practice-neck" class="neck-btn">Full neck</button>
       </div>
       <p id="fretboard-caption" class="fret-caption"></p>
+      <p id="fret-live" class="fret-live" aria-live="polite"></p>
       <div id="fretboard" class="fretboard-scroll"></div>
       <div id="fret-legend" class="fret-legend"></div>
 
@@ -408,9 +462,9 @@
     </section>
   </main>
   <script src="static/practice-theory.js?v=practice3"></script>
-  <script src="static/staff-core.js?v=lab1"></script>
-  <script src="static/app.js?v=lab1"></script>
-  <script src="static/staff-lab.js?v=lab1"></script>
-  <script src="static/practice.js?v=practice3"></script>
+  <script src="static/staff-core.js?v=lab2"></script>
+  <script src="static/app.js?v=lab2"></script>
+  <script src="static/staff-lab.js?v=lab2"></script>
+  <script src="static/practice.js?v=practice4"></script>
 </body>
 </html>

@@ -232,6 +232,7 @@
       id: "a-minor-pent",
       title: "A minor pentatonic, box 1 (5th fret)",
       notes: upAndDown(["A2", "C3", "D3", "E3", "G3", "A3", "C4", "D4", "E4", "G4", "A4", "C5"]),
+      frets: [5, 8],
       tip: "Index finger on fret 5, ring or pinky on frets 7\u20138. Same box as the Practice tab.",
     },
     {
@@ -317,10 +318,11 @@
     },
   ];
 
-  var DUR_BEATS = { w: 4, "h.": 3, h: 2, "q.": 1.5, q: 1, e: 0.5 };
+  var DUR_BEATS = { w: 4, "h.": 3, h: 2, "q.": 1.5, q: 1, "e.": 0.75, e: 0.5, s: 0.25 };
+  var DUR_PATTERN = "(w|h\\.|h|q\\.|q|e\\.|e|s)";
 
   function parseToken(token) {
-    var m = /^([A-G])(#|b)?(\d)(w|h\.|h|q\.|q|e)?$/.exec(token);
+    var m = new RegExp("^([A-G])(#|b)?(\\d)" + DUR_PATTERN + "?$").exec(token);
     if (!m) throw new Error("Bad song token: " + token);
     var dur = m[4] || "q";
     var written = makeNote(m[1], m[2] || "", parseInt(m[3], 10));
@@ -345,16 +347,212 @@
           pos = 0;
         }
         item.bar = bar;
+        item.pos = pos;
+        item.beat = bar * perBar + pos;
+        item.midi = item.note.midi;
         pos += item.beats;
         return item;
       });
-    return { id: song.id, title: song.title, notes: notes, bars: bar + 1, perBar: perBar };
+    return {
+      id: song.id,
+      title: song.title,
+      notes: notes,
+      bars: bar + 1,
+      perBar: perBar,
+      meter: song.meter.slice(),
+      bpm: song.bpm,
+    };
   }
 
   function scaleNotes(scale) {
-    return scale.notes.map(function (name) {
-      return { note: parseNote(name), dur: "q", beats: 1, bar: 0 };
+    return scale.notes.map(function (name, i) {
+      var note = parseNote(name);
+      return { note: note, midi: note.midi, dur: "q", beats: 1, bar: Math.floor(i / 4), pos: i % 4, beat: i };
     });
+  }
+
+  /* Tab tokens: string letter (high e lowercase) + fret + optional duration, or r + duration
+     for a rest. "|" is a bar line. Returns notes with sounding pitch and timing in beats. */
+  var TAB_STRING = { e: 1, B: 2, G: 3, D: 4, A: 5, E: 6 };
+
+  function parseTab(tab, perBar) {
+    perBar = perBar || 4;
+    var notes = [];
+    var barSums = [0];
+    var bar = 0;
+    var tokenRe = new RegExp("^(?:([eBGDAE])(\\d{1,2})|r)" + DUR_PATTERN + "?$");
+    String(tab || "")
+      .split(/\s+/)
+      .filter(Boolean)
+      .forEach(function (token) {
+        if (token === "|") {
+          bar += 1;
+          barSums.push(0);
+          return;
+        }
+        var m = tokenRe.exec(token);
+        if (!m) throw new Error("Bad tab token: " + token);
+        var dur = m[3] || "q";
+        var item = { dur: dur, beats: DUR_BEATS[dur], bar: bar, pos: barSums[bar] };
+        item.beat = bar * perBar + item.pos;
+        if (m[1]) {
+          item.string = TAB_STRING[m[1]];
+          item.fret = parseInt(m[2], 10);
+          item.midi = STRINGS[6 - item.string].midi + item.fret;
+          item.note = noteFromMidi(item.midi, false);
+        } else {
+          item.rest = true;
+        }
+        barSums[bar] += item.beats;
+        notes.push(item);
+      });
+    return { notes: notes, bars: bar + 1, perBar: perBar, barSums: barSums };
+  }
+
+  /* Picks a string and fret for each note: stay near the hinted frets and move the hand as
+     little as possible. Open strings are free to reach from anywhere. */
+  function assignFrets(notes, hint) {
+    var lo = hint && hint[0] != null ? hint[0] : 0;
+    var hi = hint && hint[1] != null ? hint[1] : 4;
+    var steps = [];
+    notes.forEach(function (n, i) {
+      if (n.rest || !(n.midi > 0)) return;
+      var options = fretPositions(n.midi, 15);
+      if (!options.length) options = [{ string: n.midi < 40 ? 6 : 1, fret: 0, outside: true }];
+      steps.push({ index: i, options: options });
+    });
+    function place(p) {
+      if (p.fret === 0) return lo <= 2 ? 0 : 4;
+      return p.fret < lo ? (lo - p.fret) * 2 : p.fret > hi ? (p.fret - hi) * 2 : 0;
+    }
+    function move(a, b) {
+      var frets = a.fret === 0 || b.fret === 0 ? 0.5 : Math.abs(a.fret - b.fret);
+      return frets + 0.15 * Math.abs(a.string - b.string);
+    }
+    var prev = null;
+    steps.forEach(function (step) {
+      step.cost = step.options.map(function (opt, k) {
+        var base = place(opt);
+        if (!prev) return { total: base, from: -1 };
+        var best = { total: Infinity, from: -1 };
+        prev.options.forEach(function (popt, j) {
+          var total = prev.cost[j].total + move(popt, opt) + base;
+          if (total < best.total) best = { total: total, from: j };
+        });
+        return best;
+      });
+      prev = step;
+    });
+    var out = notes.map(function () {
+      return null;
+    });
+    if (!steps.length) return out;
+    var last = steps[steps.length - 1];
+    var pick = 0;
+    last.cost.forEach(function (c, k) {
+      if (c.total < last.cost[pick].total) pick = k;
+    });
+    for (var s = steps.length - 1; s >= 0; s--) {
+      var opt = steps[s].options[pick];
+      out[steps[s].index] = { string: opt.string, fret: opt.fret };
+      pick = steps[s].cost[pick].from;
+    }
+    return out;
+  }
+
+  /* Meters for the metronome. accents: 2 = downbeat, 1 = secondary pulse, 0 = plain click.
+     unit is the note value that gets the click (4 = quarter, 8 = eighth). */
+  var METERS = [
+    { id: "2/4", beats: 2, unit: 4, accents: [2, 0] },
+    { id: "3/4", beats: 3, unit: 4, accents: [2, 0, 0] },
+    { id: "4/4", beats: 4, unit: 4, accents: [2, 0, 1, 0] },
+    { id: "6/8", beats: 6, unit: 8, accents: [2, 0, 0, 1, 0, 0] },
+  ];
+
+  /* Scores notes played against a clock. Times are seconds; a note is due at beat * secPerBeat.
+     A pluck counts if it lands from `early` before to `late` after the note and matches its
+     pitch (any octave when anyOctave). Each note can be hit once. */
+  function createTimedJudge(notes, opts) {
+    opts = opts || {};
+    var secPerBeat = opts.secPerBeat || 0.5;
+    var early = opts.early == null ? 0.2 : opts.early;
+    var late = opts.late == null ? 0.3 : opts.late;
+    var anyOctave = !!opts.anyOctave;
+    var playable = [];
+    notes.forEach(function (n, i) {
+      if (!n.rest && n.midi > 0) playable.push(i);
+    });
+    var result = {};
+    var counts;
+    function reset() {
+      result = {};
+      counts = { hits: 0, misses: 0, strays: 0, total: playable.length, octave: 0 };
+    }
+    reset();
+    function due(i) {
+      return notes[i].beat * secPerBeat;
+    }
+    return {
+      onset: function (midi, t) {
+        var best = null;
+        var near = null;
+        playable.forEach(function (i) {
+          if (result[i]) return;
+          var off = t - due(i);
+          if (off < -early || off > late) return;
+          if (!near || Math.abs(off) < Math.abs(near.offset)) near = { index: i, offset: off };
+          if (!matches(notes[i].midi, midi, anyOctave)) return;
+          if (!best || Math.abs(off) < Math.abs(best.offset)) best = { index: i, offset: off };
+        });
+        if (best) {
+          result[best.index] = "hit";
+          counts.hits += 1;
+          if (notes[best.index].midi !== midi) counts.octave += 1;
+          return { type: "hit", index: best.index, offset: best.offset, octave: notes[best.index].midi !== midi };
+        }
+        counts.strays += 1;
+        return { type: "stray", index: near ? near.index : -1, offset: near ? near.offset : 0 };
+      },
+      sweep: function (t) {
+        var missed = [];
+        playable.forEach(function (i) {
+          if (!result[i] && t - due(i) > late) {
+            result[i] = "miss";
+            counts.misses += 1;
+            missed.push(i);
+          }
+        });
+        return missed;
+      },
+      at: function (t) {
+        var beat = t / secPerBeat;
+        for (var i = 0; i < notes.length; i++) {
+          if (beat >= notes[i].beat - 1e-9 && beat < notes[i].beat + notes[i].beats - 1e-9) return i;
+        }
+        return -1;
+      },
+      next: function (t) {
+        for (var k = 0; k < playable.length; k++) {
+          var i = playable[k];
+          if (!result[i] && t - due(i) <= late) return i;
+        }
+        return -1;
+      },
+      status: function (i) {
+        return result[i] || "";
+      },
+      stats: function () {
+        return {
+          hits: counts.hits,
+          misses: counts.misses,
+          strays: counts.strays,
+          total: counts.total,
+          octave: counts.octave,
+          accuracy: counts.hits + counts.misses ? counts.hits / (counts.hits + counts.misses) : 0,
+        };
+      },
+      reset: reset,
+    };
   }
 
   function findById(list, id) {
@@ -477,6 +675,7 @@
           midi: midi,
           cents: Number(frame.cents) || 0,
           hz: Number(frame.hz) || 0,
+          at: since,
         };
       },
       reset: function () {
@@ -577,6 +776,8 @@
     { id: "cleanclimb", title: "Clean climb", how: "Three stars on any scale." },
     { id: "firstsong", title: "First song", how: "Finish any song." },
     { id: "songbook", title: "Songbook", how: "Finish every song." },
+    { id: "intime", title: "In the pocket", how: "Finish a song in time with the click." },
+    { id: "riff90", title: "Locked to the band", how: "Score 90% or more on a riff or lead pass with a backing track." },
   ];
 
   return {
@@ -604,6 +805,10 @@
     ordinal: ordinal,
     parseSong: parseSong,
     scaleNotes: scaleNotes,
+    parseTab: parseTab,
+    assignFrets: assignFrets,
+    METERS: METERS,
+    createTimedJudge: createTimedJudge,
     findById: findById,
     matches: matches,
     missHint: missHint,

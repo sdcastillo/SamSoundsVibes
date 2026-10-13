@@ -436,3 +436,183 @@
     flex: 1 1 auto;
   }
 }
+
+/* ---------- recommended tone, riffs and leads, live notes ---------- */
+
+.tone-card {
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid #2c4d78;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(58, 123, 213, 0.14), rgba(122, 184, 255, 0.05));
+}
+
+.tone-card.is-loaded {
+  border-color: #1f9d55;
+}
+
+.tone-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+}
+
+.tone-name {
+  margin: 0;
+}
+
+.tone-name span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.tone-btn {
+  background: linear-gradient(135deg, #3a7bd5, #7ab8ff);
+  color: #04101f;
+  border: none;
+  font-weight: 700;
+}
+
+.tone-why {
+  margin: 6px 0 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.tone-status {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #7be0a5;
+}
+
+.tone-status:empty {
+  display: none;
+}
+
+.practice-riffs {
+  margin: 18px 0 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #17141f;
+}
+
+.riff-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.riff-head h3 {
+  margin: 0;
+}
+
+.riff-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.riff-phrases button {
+  background: #1d1a26;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.88rem;
+}
+
+.riff-phrases button[aria-selected="true"] {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-color: transparent;
+  color: #1a0a00;
+  font-weight: 700;
+}
+
+.riff-tip {
+  margin: 8px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.riff-tab-wrap {
+  border-radius: 10px;
+  background: linear-gradient(#fbf7ee, #f1eadb);
+  padding: 4px 6px;
+}
+
+.riff-tab {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.riff-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin-top: 10px;
+}
+
+.riff-actions [hidden] {
+  display: none;
+}
+
+.riff-score {
+  font-size: 0.88rem;
+  color: var(--accent2);
+  font-variant-numeric: tabular-nums;
+}
+
+.fret-live {
+  min-height: 1.4em;
+  margin: 2px 0 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.fret-live.is-chord {
+  color: #7be0a5;
+}
+
+.fret-live.is-scale {
+  color: var(--accent2);
+}
+
+.fret-live.is-outside {
+  color: #ff7a8a;
+}
+
+.live-target {
+  fill: none;
+  stroke: #7ab8ff;
+  stroke-width: 3;
+  stroke-dasharray: 4 3;
+}
+
+.live-note {
+  fill: rgba(255, 255, 255, 0.12);
+  stroke-width: 3;
+}
+
+.live-note.is-chord {
+  stroke: #7be0a5;
+}
+
+.live-note.is-scale {
+  stroke: #ffe08a;
+}
+
+.live-note.is-outside {
+  stroke: #ff4d6d;
+}
+
+.live-note.is-hit {
+  fill: rgba(123, 224, 165, 0.45);
+}
