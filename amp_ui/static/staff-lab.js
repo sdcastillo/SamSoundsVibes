@@ -908,6 +908,7 @@
     renderStaff();
     renderFret();
     inputStatus();
+    renderMetro();
   }
 
   /* ---------- effects ---------- */
@@ -1107,8 +1108,18 @@
       var track = riffTrack();
       var perBar = perBarOf(track);
       var tab = C.parseTab(riffPhrase().tab, perBar);
+      var flats = {};
+      (track.scales || []).forEach(function (s) {
+        (s.notes || []).forEach(function (name) {
+          if (/^[A-G]b$/.test(name)) flats[C.parseNote(name + "4").midi % 12] = true;
+        });
+      });
+      tab.notes.forEach(function (n) {
+        if (!n.rest && flats[n.midi % 12]) n.note = C.noteFromMidi(n.midi, true);
+      });
       state.seq = tab.notes;
       state.piece = { perBar: perBar, meter: [perBar, 4], pickup: 0, bars: tab.bars, bpm: track.bpm, chords: track.progression, track: track };
+      setBpm(track.bpm, true);
       state.frets = tab.notes.map(function (n) {
         return n.rest ? null : { string: n.string, fret: n.fret };
       });
@@ -1178,7 +1189,11 @@
     clearTimer();
     var wasJam = state.timed && state.timed.source === "track";
     stopTimed();
-    if (wasJam && player()) player().audio.pause();
+    if (wasJam && player()) {
+      var loopBox = document.getElementById("practice-loop");
+      player().audio.pause();
+      player().audio.loop = loopBox ? loopBox.checked : true;
+    }
     state.running = false;
     state.target = null;
     setMessage("Stopped. Press Start to go again.");
@@ -1225,6 +1240,8 @@
       endBeat: lastBeat(),
       countBeats: countBeats,
     };
+    S.meter = meterId;
+    $("lab-meter").value = meterId;
     metroStart({ bpm: piece.bpm, meter: meterId, at: ctx.currentTime + 0.15 });
     state.cursorBeat = -countBeats;
     state.index = 0;
@@ -1313,7 +1330,7 @@
     var newIndex = next < 0 ? state.seq.length : next;
     var bar = Math.floor(beat / state.piece.perBar);
     if (beat < 0) {
-      var left = Math.ceil(-beat);
+      var left = Math.min(tm.countBeats, Math.ceil(-beat));
       setMessage("Count-in\u2026 " + left, "");
     } else if (prevBar != null && prevBar < 0) {
       setMessage("Go! Play each note as the playhead reaches it.");

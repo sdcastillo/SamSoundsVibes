@@ -558,6 +558,11 @@
     ["stafflab:jam", "stafflab:tick", "stafflab:mode"].forEach(function (name) {
       document.addEventListener(name, function (event) {
         state.jam = event.detail;
+        var jam = state.jam;
+        if (jam.mode === "riff" && jam.running && state.track && jam.trackId === state.track.id && jam.phraseId && jam.phraseId !== state.phraseId) {
+          state.phraseId = jam.phraseId;
+          renderRiffs();
+        }
         if (name !== "stafflab:tick") updateRiffActions();
         if (jamIsOurs()) startRiffLoop();
         else if (name !== "stafflab:tick") riffTick();
@@ -640,11 +645,11 @@
         ring(p.string, p.fret, "live-note is-" + rel.kind + (hit ? " is-hit" : ""), 8.5);
       });
       if (line) {
-        line.textContent = rel.text + (target ? " · riff wants " + C.noteName(target.note) + (C.matches(target.midi, state.live.midi, false) ? " ✓" : "") : "");
+        line.textContent = rel.text + (target ? " · next note " + C.noteName(target.note) + (C.matches(target.midi, state.live.midi, false) ? " ✓" : "") : "");
         line.className = "fret-live is-" + rel.kind;
       }
     } else if (line) {
-      line.textContent = target ? "Riff note: " + C.noteName(target.note) + " — " + C.describePosition({ string: target.string, fret: target.fret }) : "";
+      line.textContent = target ? "Next note: " + C.noteName(target.note) + " — " + C.describePosition({ string: target.string, fret: target.fret }) : "";
       line.className = "fret-live";
     }
   }
