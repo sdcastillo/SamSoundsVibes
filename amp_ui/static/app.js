@@ -347,12 +347,17 @@
   }
 
   function loadPresetSlot(slot) {
+    return loadPreset({ slot: slot }).catch(function () {});
+  }
+
+  /* request: { slot } or { name }, plus optional overrides and ir from a recommended tone. */
+  function loadPreset(request) {
     const select = document.querySelector("#preset-list");
     showError("");
-    api("/api/preset", {
+    return api("/api/preset", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slot: slot }),
+      body: JSON.stringify(request),
     })
       .then(function (data) {
         if (data.params) {
@@ -365,11 +370,14 @@
         if (select && data.preset) select.value = String(data.preset.slot);
         applyStatus(data);
         if (typeof syncXyFromParams === "function") syncXyFromParams();
+        return data;
       })
       .catch(function (err) {
         showError(err.message);
+        throw err;
       });
   }
+  window.AmpUI.loadPreset = loadPreset;
 
   function stepPreset(direction) {
     const select = document.querySelector("#preset-list");

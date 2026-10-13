@@ -32,7 +32,7 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 try:
     from guitar_amp_engine import AmpSession, list_devices_json, validate_params
-    from amp_presets import engine_params, get_preset, list_presets
+    from amp_presets import apply_overrides, engine_params, get_preset, list_presets
 except ImportError as error:
     print(
         "Missing guitar_amp_engine.py — run from the SamSoundsVibes repo root "
@@ -204,7 +204,10 @@ async def api_preset(payload: dict):
         return JSONResponse(status_code=404, content={"error": str(error)})
     except (TypeError, ValueError) as error:
         return JSONResponse(status_code=400, content={"error": str(error)})
-    params = engine_params(preset)
+    try:
+        params = apply_overrides(engine_params(preset), payload.get("overrides"), payload.get("ir"))
+    except (TypeError, ValueError) as error:
+        return JSONResponse(status_code=400, content={"error": str(error)})
     if session.running:
         try:
             session.apply_params(**params)
