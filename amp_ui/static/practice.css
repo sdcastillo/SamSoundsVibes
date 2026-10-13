@@ -20,14 +20,15 @@
 
 .mode-tabs button[aria-selected="false"],
 .source-tabs button[aria-selected="false"] {
-  background: transparent;
+  background: rgba(23, 101, 113, 0.25);
   color: var(--accent2);
   border: 1px solid var(--border);
 }
 
 .practice-pill {
-  background: #3d2a14;
-  color: var(--accent2);
+  background: #176571;
+  color: #D89F58;
+  border: 1px solid #D89F58;
 }
 
 .practice[hidden],
@@ -62,7 +63,7 @@
 .practice input[type="number"],
 .practice input[type="text"] {
   width: 100%;
-  background: #0f0d14;
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -117,7 +118,7 @@
 .fret-head h3 {
   margin: 18px 0 8px;
   font-size: 1rem;
-  color: var(--accent2);
+  color: var(--accent);
 }
 
 .mix-note,
@@ -167,6 +168,7 @@
   font-weight: 800;
   letter-spacing: 0.03em;
   min-height: 2.2rem;
+  color: var(--accent);
 }
 
 .bars {
@@ -182,7 +184,7 @@
   min-width: 58px;
   padding: 8px 10px;
   border-radius: 10px;
-  background: #0f0d14;
+  background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
   font-weight: 800;
@@ -190,7 +192,7 @@
 
 .bars button.is-current {
   background: var(--accent);
-  color: #1a0a00;
+  color: var(--panel);
   border-color: var(--accent);
 }
 
@@ -213,7 +215,7 @@
 .lesson-detail {
   border: 1px solid var(--border);
   border-radius: 12px;
-  background: #0f0d14;
+  background: var(--surface);
 }
 
 .scale-card {
@@ -223,7 +225,7 @@
   padding: 10px 12px;
   margin: 0;
   border-radius: 12px;
-  background: #0f0d14;
+  background: var(--surface);
   color: var(--text);
   font-weight: 600;
 }
@@ -240,7 +242,7 @@
 }
 
 .scale-notes {
-  color: var(--accent2);
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -333,6 +335,7 @@
 
 .lesson-detail h4 {
   margin: 0 0 6px;
+  color: var(--accent);
 }
 
 .detail-text {
@@ -347,13 +350,14 @@
 .tab-block {
   margin: 0;
   padding: 10px 12px;
-  background: #07060b;
+  background: #0d1c38;
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow-x: auto;
   font-family: ui-monospace, "Cascadia Code", monospace;
   font-size: 0.92rem;
   line-height: 1.35;
-  color: #f2efe8;
+  color: var(--accent2);
 }
 
 #practice-genre,
@@ -370,7 +374,7 @@
 
 .neck-btn,
 .clear-progress {
-  background: transparent;
+  background: rgba(23, 101, 113, 0.25);
   color: var(--accent2);
   border: 1px solid var(--accent2);
   min-height: 40px;
@@ -381,7 +385,7 @@
   margin-top: 8px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #140f0c;
+  background: #0f2040;
 }
 
 .fretboard-scroll svg {
@@ -410,10 +414,10 @@
   vertical-align: -1px;
 }
 
-.swatch.root { background: #ff6b2c; }
-.swatch.tone { background: #ffb347; }
-.swatch.extra { background: #7eb6c9; }
-.swatch.chord { background: #fff6e8; box-shadow: 0 0 0 2px #ff6b2c; }
+.swatch.root { background: #C33F45; }
+.swatch.tone { background: #D89F58; }
+.swatch.extra { background: #A3D9D9; }
+.swatch.chord { background: #A3D9D9; box-shadow: 0 0 0 2px #D89F58; }
 
 .chord-legend {
   margin: 8px 0 0;
@@ -442,13 +446,13 @@
 .tone-card {
   margin: 10px 0 4px;
   padding: 10px 12px;
-  border: 1px solid #2c4d78;
+  border: 1px solid #176571;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(58, 123, 213, 0.14), rgba(122, 184, 255, 0.05));
+  background: linear-gradient(135deg, rgba(23, 101, 113, 0.42), rgba(26, 53, 103, 0.72));
 }
 
 .tone-card.is-loaded {
-  border-color: #1f9d55;
+  border-color: #A3D9D9;
 }
 
 .tone-head {
@@ -469,10 +473,10 @@
 }
 
 .tone-btn {
-  background: linear-gradient(135deg, #3a7bd5, #7ab8ff);
-  color: #04101f;
-  border: none;
-  font-weight: 700;
+  background: linear-gradient(135deg, #176571, #A3D9D9);
+  color: #1A3567;
+  border: 1px solid #A3D9D9;
+  font-weight: 800;
 }
 
 .tone-why {
@@ -484,7 +488,7 @@
 .tone-status {
   margin: 4px 0 0;
   font-size: 0.85rem;
-  color: #7be0a5;
+  color: #A3D9D9;
 }
 
 .tone-status:empty {
@@ -496,7 +500,7 @@
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: #17141f;
+  background: var(--surface);
 }
 
 .riff-head {
@@ -509,6 +513,7 @@
 
 .riff-head h3 {
   margin: 0;
+  color: var(--accent);
 }
 
 .riff-phrases {
@@ -518,7 +523,7 @@
 }
 
 .riff-phrases button {
-  background: #1d1a26;
+  background: #1A3567;
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 999px;
@@ -529,8 +534,8 @@
 .riff-phrases button[aria-selected="true"] {
   background: linear-gradient(135deg, var(--accent), var(--accent2));
   border-color: transparent;
-  color: #1a0a00;
-  font-weight: 700;
+  color: #1A3567;
+  font-weight: 800;
 }
 
 .riff-tip {
@@ -541,7 +546,8 @@
 
 .riff-tab-wrap {
   border-radius: 10px;
-  background: linear-gradient(#fbf7ee, #f1eadb);
+  border: 1px solid var(--border);
+  background: linear-gradient(#f3f9f9, #e1efef);
   padding: 4px 6px;
 }
 
@@ -565,7 +571,7 @@
 
 .riff-score {
   font-size: 0.88rem;
-  color: var(--accent2);
+  color: var(--accent);
   font-variant-numeric: tabular-nums;
 }
 
@@ -578,41 +584,41 @@
 }
 
 .fret-live.is-chord {
-  color: #7be0a5;
+  color: #A3D9D9;
 }
 
 .fret-live.is-scale {
-  color: var(--accent2);
+  color: #D89F58;
 }
 
 .fret-live.is-outside {
-  color: #ff7a8a;
+  color: #C33F45;
 }
 
 .live-target {
   fill: none;
-  stroke: #7ab8ff;
+  stroke: #A3D9D9;
   stroke-width: 3;
   stroke-dasharray: 4 3;
 }
 
 .live-note {
-  fill: rgba(255, 255, 255, 0.12);
+  fill: rgba(163, 217, 217, 0.16);
   stroke-width: 3;
 }
 
 .live-note.is-chord {
-  stroke: #7be0a5;
+  stroke: #A3D9D9;
 }
 
 .live-note.is-scale {
-  stroke: #ffe08a;
+  stroke: #D89F58;
 }
 
 .live-note.is-outside {
-  stroke: #ff4d6d;
+  stroke: #C33F45;
 }
 
 .live-note.is-hit {
-  fill: rgba(123, 224, 165, 0.45);
+  fill: rgba(163, 217, 217, 0.45);
 }

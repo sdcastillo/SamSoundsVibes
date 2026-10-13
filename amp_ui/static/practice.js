@@ -922,7 +922,7 @@
     board.setAttribute("y", "8");
     board.setAttribute("width", String(maxFret * fretSpace));
     board.setAttribute("height", String((stringCount - 1) * stringGap + 28));
-    board.setAttribute("fill", "#241810");
+    board.setAttribute("fill", "#12264a");
     svg.appendChild(board);
 
     if (state.box) {
@@ -933,7 +933,7 @@
       box.setAttribute("y", "12");
       box.setAttribute("width", String(Math.max(8, endX - startX)));
       box.setAttribute("height", String((stringCount - 1) * stringGap + 20));
-      box.setAttribute("fill", "rgba(255, 179, 71, 0.14)");
+      box.setAttribute("fill", "rgba(216, 159, 88, 0.18)");
       box.setAttribute("rx", "6");
       svg.appendChild(box);
     }
@@ -951,7 +951,7 @@
         dot.setAttribute("cx", String(cx));
         dot.setAttribute("cy", String(y));
         dot.setAttribute("r", "4");
-        dot.setAttribute("fill", "rgba(242, 239, 232, 0.18)");
+        dot.setAttribute("fill", "rgba(163, 217, 217, 0.25)");
         svg.appendChild(dot);
       });
     });
@@ -963,14 +963,14 @@
       wire.setAttribute("x2", String(x));
       wire.setAttribute("y1", String(top - 6));
       wire.setAttribute("y2", String(top + (stringCount - 1) * stringGap + 6));
-      wire.setAttribute("stroke", fret === maxFret ? "#8a8175" : "#5c5348");
+      wire.setAttribute("stroke", fret === maxFret ? "#A3D9D9" : "#176571");
       wire.setAttribute("stroke-width", fret % 12 === 0 ? "3" : "1");
       svg.appendChild(wire);
       var num = el("text");
       num.setAttribute("x", String(left + (fret - 0.5) * fretSpace));
       num.setAttribute("y", String(height - 8));
       num.setAttribute("text-anchor", "middle");
-      num.setAttribute("fill", "#9a958c");
+      num.setAttribute("fill", "#A3D9D9");
       num.setAttribute("font-size", "11");
       num.textContent = String(fret);
       svg.appendChild(num);
@@ -981,7 +981,7 @@
     nut.setAttribute("y", String(top - 8));
     nut.setAttribute("width", "6");
     nut.setAttribute("height", String((stringCount - 1) * stringGap + 16));
-    nut.setAttribute("fill", "#f2efe8");
+    nut.setAttribute("fill", "#D89F58");
     svg.appendChild(nut);
 
     theory.STRING_ORDER.forEach(function (stringName, index) {
@@ -991,13 +991,13 @@
       line.setAttribute("x2", String(left + maxFret * fretSpace));
       line.setAttribute("y1", String(y));
       line.setAttribute("y2", String(y));
-      line.setAttribute("stroke", "#d9c7a6");
+      line.setAttribute("stroke", "#A3D9D9");
       line.setAttribute("stroke-width", String(1 + (stringCount - 1 - index) * 0.35));
       svg.appendChild(line);
       var name = el("text");
       name.setAttribute("x", "8");
       name.setAttribute("y", String(y + 4));
-      name.setAttribute("fill", "#f2efe8");
+      name.setAttribute("fill", "#f3f9f9");
       name.setAttribute("font-size", "12");
       name.setAttribute("font-weight", "700");
       name.textContent = theory.STRING_LABEL[stringName];
@@ -1048,24 +1048,24 @@
       var extra = dot.dataset.extra === "1";
       var outside = state.box && (fret < state.box.start || fret > state.box.end);
       var inChord = chordMode && state.chordPcs[pc];
-      var fill = "#ffb347";
+      var fill = "#D89F58";
       var stroke = "none";
       var opacity = "1";
       if (outside) {
         opacity = "0.14";
       } else if (chordMode && inChord && root) {
-        fill = "#ff6b2c";
-        stroke = "#fff6e8";
+        fill = "#C33F45";
+        stroke = "#A3D9D9";
       } else if (chordMode && inChord) {
-        fill = "#fff6e8";
-        stroke = "#ff6b2c";
+        fill = "#A3D9D9";
+        stroke = "#D89F58";
       } else if (chordMode) {
-        fill = root ? "#ff6b2c" : extra ? "#7eb6c9" : "#ffb347";
+        fill = root ? "#C33F45" : extra ? "#A3D9D9" : "#D89F58";
         opacity = "0.28";
       } else if (root) {
-        fill = "#ff6b2c";
+        fill = "#C33F45";
       } else if (extra) {
-        fill = "#7eb6c9";
+        fill = "#A3D9D9";
       }
       dot.setAttribute("fill", fill);
       dot.setAttribute("stroke", stroke);
