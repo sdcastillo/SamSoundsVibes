@@ -232,6 +232,7 @@
       id: "a-minor-pent",
       title: "A minor pentatonic, box 1 (5th fret)",
       notes: upAndDown(["A2", "C3", "D3", "E3", "G3", "A3", "C4", "D4", "E4", "G4", "A4", "C5"]),
+      frets: [5, 8],
       tip: "Index finger on fret 5, ring or pinky on frets 7\u20138. Same box as the Practice tab.",
     },
     {
@@ -674,6 +675,7 @@
           midi: midi,
           cents: Number(frame.cents) || 0,
           hz: Number(frame.hz) || 0,
+          at: since,
         };
       },
       reset: function () {
@@ -774,6 +776,8 @@
     { id: "cleanclimb", title: "Clean climb", how: "Three stars on any scale." },
     { id: "firstsong", title: "First song", how: "Finish any song." },
     { id: "songbook", title: "Songbook", how: "Finish every song." },
+    { id: "intime", title: "In the pocket", how: "Finish a song in time with the click." },
+    { id: "riff90", title: "Locked to the band", how: "Score 90% or more on a riff or lead pass with a backing track." },
   ];
 
   return {

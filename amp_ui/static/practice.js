@@ -26,6 +26,13 @@
     fileName: "",
     objectUrl: "",
     seeking: false,
+    riffs: null,
+    phraseId: "riff",
+    riffNotes: [],
+    jam: null,
+    geo: null,
+    live: null,
+    liveTimer: null,
   };
 
   function $(id) {
@@ -299,6 +306,7 @@
     var data = store();
     data.trackId = track.id;
     save(data);
+    document.dispatchEvent(new CustomEvent("practice:track", { detail: { id: track.id } }));
     if (wasPlaying) {
       audio.play().catch(function (error) {
         showPracticeError(error.message || "Couldn't play that track.");
@@ -336,8 +344,309 @@
       tempo.textContent = bits.join(" · ");
       meta.appendChild(tempo);
     }
+    var entry = riffEntry();
+    if (entry && entry.tone && state.kind === "library") meta.appendChild(toneCard(entry.tone));
     renderBars();
     updateNow();
+    renderRiffs();
+  }
+
+  function riffEntry() {
+    if (!state.riffs || !state.track || state.kind !== "library") return null;
+    return state.riffs.tracks[state.track.id] || null;
+  }
+
+  function toneSummary(tone) {
+    var o = tone.overrides || {};
+    var bits = ["slot " + tone.slot];
+    if (tone.ir) bits.push(tone.ir.replace(/\.wav$/i, "").replace(/^\d+_?/, "").replace(/[_-]+/g, " ").trim() + " IR");
+    if (o.delay_ms) bits.push("delay " + o.delay_ms + " ms");
+    if (o.mix != null) bits.push("mix " + Math.round(o.mix * 100) + "%");
+    return bits.join(" · ");
+  }
+
+  function toneCard(tone) {
+    var card = document.createElement("div");
+    card.className = "tone-card";
+    var head = document.createElement("div");
+    head.className = "tone-head";
+    var name = document.createElement("p");
+    name.className = "tone-name";
+    name.innerHTML = "<strong></strong> <span></span>";
+    name.firstChild.textContent = tone.name;
+    name.lastChild.textContent = toneSummary(tone);
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "tone-btn";
+    button.textContent = "Recommended guitar preset + IR";
+    head.appendChild(name);
+    head.appendChild(button);
+    var why = document.createElement("p");
+    why.className = "tone-why";
+    why.textContent = tone.why;
+    var status = document.createElement("p");
+    status.className = "tone-status";
+    status.setAttribute("aria-live", "polite");
+    button.addEventListener("click", function () {
+      if (!window.AmpUI || !window.AmpUI.loadPreset) {
+        status.textContent = "The amp controls aren't loaded on this page.";
+        return;
+      }
+      button.disabled = true;
+      status.textContent = "Loading " + tone.name + "…";
+      window.AmpUI.loadPreset({ slot: tone.slot, overrides: tone.overrides, ir: tone.ir })
+        .then(function (data) {
+          var ir = (data.params && data.params.ir) || "";
+          status.textContent =
+            tone.name + " is on the amp" + (ir ? " with the " + ir.replace(/\.wav$/i, "") + " cab" : "") + (data.running ? "." : ". Press Start amp to hear it.");
+          card.classList.add("is-loaded");
+        })
+        .catch(function (error) {
+          status.textContent = "Couldn't load the tone: " + error.message;
+        })
+        .then(function () {
+          button.disabled = false;
+        });
+    });
+    card.appendChild(head);
+    card.appendChild(why);
+    card.appendChild(status);
+    return card;
+  }
+
+  /* ---------- riffs and leads ---------- */
+
+  function core() {
+    return window.StaffCore || null;
+  }
+
+  function currentPhrase() {
+    var entry = riffEntry();
+    if (!entry) return null;
+    return entry.phrases.filter(function (p) { return p.id === state.phraseId; })[0] || entry.phrases[0];
+  }
+
+  function perBar() {
+    return Number(String((state.track && state.track.timeSignature) || "4/4").split("/")[0]) || 4;
+  }
+
+  function jamIsOurs() {
+    var jam = state.jam;
+    var phrase = currentPhrase();
+    return !!(jam && jam.mode === "riff" && jam.running && state.track && jam.trackId === state.track.id && phrase && jam.phraseId === phrase.id);
+  }
+
+  function renderRiffs() {
+    var block = $("practice-riffs");
+    var entry = riffEntry();
+    var C = core();
+    if (!block) return;
+    block.hidden = !entry || !C;
+    if (block.hidden) {
+      state.riffNotes = [];
+      return;
+    }
+    var phrase = currentPhrase();
+    state.phraseId = phrase.id;
+    state.riffNotes = C.parseTab(phrase.tab, perBar()).notes;
+    var tabs = $("riff-phrases");
+    tabs.textContent = "";
+    entry.phrases.forEach(function (p) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.setAttribute("role", "tab");
+      b.setAttribute("aria-selected", p.id === phrase.id ? "true" : "false");
+      b.textContent = (p.kind === "lead" ? "Lead · " : "Riff · ") + p.title;
+      b.addEventListener("click", function () {
+        state.phraseId = p.id;
+        if (jamIsOurs() || (state.jam && state.jam.running && state.jam.mode === "riff")) window.StaffLab.stop();
+        renderRiffs();
+      });
+      tabs.appendChild(b);
+    });
+    $("riff-tip").textContent = phrase.tip;
+    drawRiffTab();
+    updateRiffActions();
+  }
+
+  function riffCursor() {
+    if (jamIsOurs() && state.jam.source === "track") return state.jam.cursorBeat;
+    if (!state.riffNotes.length || audio.paused || !state.track) return null;
+    return (audio.currentTime * state.track.bpm) / 60;
+  }
+
+  function riffCurrentIndex() {
+    if (jamIsOurs()) return state.jam.index;
+    var beat = riffCursor();
+    if (beat == null) return -1;
+    for (var i = 0; i < state.riffNotes.length; i++) {
+      var n = state.riffNotes[i];
+      if (beat >= n.beat - 0.02 && beat < n.beat + n.beats - 0.02) return n.rest ? -1 : i;
+    }
+    return -1;
+  }
+
+  function drawRiffTab() {
+    var svg = $("riff-tab");
+    if (!svg || !window.StaffLab || !state.riffNotes.length) return;
+    var ours = jamIsOurs();
+    window.StaffLab.renderTab(svg, state.riffNotes, {
+      perBar: perBar(),
+      bars: progression().length,
+      chords: progression(),
+      current: riffCurrentIndex(),
+      status: ours ? state.jam.status : null,
+      cursorBeat: riffCursor(),
+    });
+  }
+
+  function updateRiffActions() {
+    var ours = jamIsOurs();
+    $("riff-stop").hidden = !ours;
+    $("riff-play").textContent = ours && state.jam.timed ? "Restart" : "Play along (scored)";
+    var score = $("riff-score");
+    var jam = state.jam;
+    if (ours && jam.stats) {
+      var st = jam.stats;
+      score.textContent =
+        "Pass " + (jam.pass + 1) + " · " + st.hits + " of " + st.total + " hit" + (st.hits + st.misses ? " · " + Math.round(100 * st.accuracy) + "%" : "") + " · streak " + jam.streak + " · " + jam.score + " pts";
+    } else if (ours) {
+      score.textContent = "Learning mode: play each note when it lights up. Staff Lab above shows it on the staff.";
+    } else {
+      score.textContent = "Play along starts the track with a one-bar count-in and scores each note from your guitar.";
+    }
+  }
+
+  function riffTick() {
+    if (!state.riffNotes.length) return;
+    drawRiffTab();
+    drawLive();
+  }
+
+  function startRiffLoop() {
+    if (state.riffLoop) return;
+    state.riffLoop = true;
+    requestAnimationFrame(function frame() {
+      riffTick();
+      if (!audio.paused || jamIsOurs()) requestAnimationFrame(frame);
+      else {
+        state.riffLoop = false;
+        riffTick();
+      }
+    });
+  }
+
+  function initRiffs() {
+    $("riff-play").addEventListener("click", function () {
+      var phrase = currentPhrase();
+      if (!phrase || !window.StaffLab) return;
+      window.StaffLab.startJam(state.track.id, phrase.id, true);
+    });
+    $("riff-learn").addEventListener("click", function () {
+      var phrase = currentPhrase();
+      if (!phrase || !window.StaffLab) return;
+      window.StaffLab.startJam(state.track.id, phrase.id, false);
+      var lab = document.getElementById("staff-lab");
+      if (lab) lab.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    $("riff-hear").addEventListener("click", function () {
+      if (window.StaffLab && state.riffNotes.length) window.StaffLab.hear(state.riffNotes, state.track.bpm);
+    });
+    $("riff-stop").addEventListener("click", function () {
+      if (window.StaffLab) window.StaffLab.stop();
+    });
+    ["stafflab:jam", "stafflab:tick", "stafflab:mode"].forEach(function (name) {
+      document.addEventListener(name, function (event) {
+        state.jam = event.detail;
+        if (name !== "stafflab:tick") updateRiffActions();
+        if (jamIsOurs()) startRiffLoop();
+        else if (name !== "stafflab:tick") riffTick();
+      });
+    });
+    document.addEventListener("stafflab:note", function (event) {
+      showLive(event.detail.midi);
+    });
+    audio.addEventListener("play", startRiffLoop);
+    window.addEventListener("resize", function () {
+      drawRiffTab();
+    });
+  }
+
+  /* ---------- live notes on the fretboard ---------- */
+
+  var DEGREES = ["root", "\u266D2", "2", "\u266D3", "3", "4", "\u266D5", "5", "\u266D6", "6", "\u266D7", "7"];
+
+  function showLive(midi) {
+    state.live = { midi: midi, at: Date.now() };
+    clearTimeout(state.liveTimer);
+    state.liveTimer = setTimeout(function () {
+      state.live = null;
+      drawLive();
+    }, 1600);
+    drawLive();
+  }
+
+  function liveRelation(midi) {
+    var C = core();
+    var pc = ((midi % 12) + 12) % 12;
+    var name = C ? C.noteName(C.noteFromMidi(midi, false)) : String(midi);
+    var scale = currentScale();
+    var chord = chordAt(shownBar());
+    var parsed = chord ? theory.parseChord(chord) : null;
+    var parts = [];
+    var kind = "outside";
+    if (parsed) {
+      var degree = (pc - parsed.rootPc + 12) % 12;
+      var inChord = parsed.intervals.some(function (iv) { return iv % 12 === degree; });
+      parts.push((inChord ? DEGREES[degree] + " of " + chord + " (chord tone)" : DEGREES[degree] + " over " + chord));
+      if (inChord) kind = "chord";
+    }
+    if (scale) {
+      var inScale = theory.scalePitchClasses(scale).indexOf(pc) >= 0;
+      parts.push(inScale ? "in " + scale.name : "outside " + scale.name);
+      if (inScale && kind !== "chord") kind = "scale";
+    }
+    return { text: "You played " + name + (parts.length ? " — " + parts.join(" · ") : ""), kind: kind };
+  }
+
+  function drawLive() {
+    var geo = state.geo;
+    var line = $("fret-live");
+    if (!geo) return;
+    var layer = geo.layer;
+    while (layer.firstChild) layer.removeChild(layer.firstChild);
+    var ns = "http://www.w3.org/2000/svg";
+    function spotXY(string, fret) {
+      return { x: fret === 0 ? geo.left - 18 : geo.left + (fret - 0.5) * geo.fretSpace, y: geo.top + (string - 1) * geo.stringGap };
+    }
+    function ring(string, fret, cls, r) {
+      if (fret > geo.maxFret) return;
+      var p = spotXY(string, fret);
+      var c = document.createElementNS(ns, "circle");
+      c.setAttribute("cx", String(p.x));
+      c.setAttribute("cy", String(p.y));
+      c.setAttribute("r", String(r));
+      c.setAttribute("class", cls);
+      layer.appendChild(c);
+    }
+    var index = riffCurrentIndex();
+    var target = index >= 0 ? state.riffNotes[index] : null;
+    if (target && !target.rest) ring(target.string, target.fret, "live-target", 11);
+    var C = core();
+    if (state.live && C) {
+      var rel = liveRelation(state.live.midi);
+      C.fretPositions(state.live.midi, geo.maxFret).forEach(function (p) {
+        var hit = target && target.string === p.string && target.fret === p.fret;
+        ring(p.string, p.fret, "live-note is-" + rel.kind + (hit ? " is-hit" : ""), 8.5);
+      });
+      if (line) {
+        line.textContent = rel.text + (target ? " · riff wants " + C.noteName(target.note) + (C.matches(target.midi, state.live.midi, false) ? " ✓" : "") : "");
+        line.className = "fret-live is-" + rel.kind;
+      }
+    } else if (line) {
+      line.textContent = target ? "Riff note: " + C.noteName(target.note) + " — " + C.describePosition({ string: target.string, fret: target.fret }) : "";
+      line.className = "fret-live";
+    }
   }
 
   function renderBars() {
@@ -576,6 +885,7 @@
     var caption = $("fretboard-caption");
     host.textContent = "";
     state.dots = [];
+    state.geo = null;
     if (!scale) {
       caption.textContent = "";
       return;
@@ -699,6 +1009,7 @@
       dot.setAttribute("r", note.root ? "8" : "6.5");
       dot.dataset.pc = String(note.pc);
       dot.dataset.fret = String(note.fret);
+      dot.dataset.string = String(stringIndex + 1);
       dot.dataset.root = note.root ? "1" : "0";
       dot.dataset.extra = note.extra ? "1" : "0";
       var title = el("title");
@@ -708,7 +1019,12 @@
       state.dots.push(dot);
     });
 
+    var layer = el("g");
+    layer.setAttribute("class", "live-layer");
+    svg.appendChild(layer);
+    state.geo = { left: left, top: top, fretSpace: fretSpace, stringGap: stringGap, maxFret: maxFret, layer: layer };
     host.appendChild(svg);
+    drawLive();
     var extras = theory.extraIntervals(scale);
     caption.textContent = scale.name + " · " + labelNotes + (extras.length ? " · blue notes are the ones outside the pentatonic box" : "");
     paintDots();
@@ -992,6 +1308,16 @@
       })
       .then(function (catalog) {
         state.catalog = catalog.tracks || [];
+        return fetch(practiceAsset("practice/riffs.json"))
+          .then(function (response) {
+            return response.ok ? response.json() : null;
+          })
+          .catch(function () {
+            return null;
+          });
+      })
+      .then(function (riffs) {
+        state.riffs = riffs && riffs.tracks ? riffs : null;
         fillGenreSelect();
         fillTrackSelect(false);
         $("practice-track").addEventListener("change", function () {
@@ -1000,11 +1326,56 @@
           })[0];
           if (track) showLibraryTrack(track, !audio.paused);
         });
+        document.dispatchEvent(new CustomEvent("practice:ready"));
       })
       .catch(function (error) {
         showPracticeError(error.message || "Couldn't load practice tracks.");
       });
   }
+
+  function whenPlayable() {
+    return new Promise(function (resolve) {
+      if (audio.readyState >= 3) {
+        resolve();
+        return;
+      }
+      function done() {
+        audio.removeEventListener("canplay", done);
+        resolve();
+      }
+      audio.addEventListener("canplay", done);
+      setTimeout(done, 4000);
+    });
+  }
+
+  /* For Staff Lab: the backing-track player, its catalog, and the riffs. */
+  window.PracticePlayer = {
+    audio: audio,
+    catalog: function () {
+      return state.catalog;
+    },
+    riffs: function () {
+      return state.riffs;
+    },
+    track: function () {
+      return state.kind === "library" ? state.track : null;
+    },
+    selectTrack: function (id) {
+      var track = state.catalog.filter(function (item) { return item.id === id; })[0];
+      if (!track) return Promise.reject(new Error("No backing track " + id));
+      if (state.kind !== "library") $("source-library").click();
+      if (state.track !== track || state.kind !== "library") {
+        var select = $("practice-track");
+        if (!select.querySelector('option[value="' + id + '"]')) {
+          $("practice-genre").value = "";
+          fillTrackSelect(true);
+        }
+        select.value = id;
+        showLibraryTrack(track, false);
+      }
+      return whenPlayable();
+    },
+  };
 
   initTabs();
   initSources();
@@ -1012,5 +1383,6 @@
   initMixer();
   initLocal();
   initNeck();
+  initRiffs();
   loadCatalog();
 })();

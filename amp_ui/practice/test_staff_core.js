@@ -169,7 +169,7 @@ eq(core.weakestNotes(weighted).map((r) => r.midi), [40], "weakest notes");
   const frets = core.assignFrets(core.parseSong(core.findById(core.SONGS, "mary")).notes, [0, 4]);
   eq(frets.slice(0, 3), [{ string: 4, fret: 2 }, { string: 4, fret: 0 }, { string: 5, fret: 3 }], "Mary in first position");
   const box = core.scaleNotes(core.findById(core.SCALES, "a-minor-pent"));
-  const boxFrets = core.assignFrets(box, [5, 8]);
+  const boxFrets = core.assignFrets(box, core.findById(core.SCALES, "a-minor-pent").frets);
   assert(boxFrets.every((p) => p.fret >= 5 && p.fret <= 8), "A minor pentatonic stays in box 1");
   eq(core.assignFrets([{ rest: true, beat: 0, beats: 1 }]), [null], "rests get no fret");
 })();
@@ -193,6 +193,9 @@ eq(core.weakestNotes(weighted).map((r) => r.midi), [40], "weakest notes");
   judge.reset();
   eq(judge.stats().hits, 0, "reset clears scores");
   eq(core.METERS.map((m) => m.id), ["2/4", "3/4", "4/4", "6/8"], "meters");
+  const det = core.createOnsetDetector({ stableMs: 110 });
+  det.push({ active: true, midi: 45, level: 0.2 }, 1000);
+  eq(det.push({ active: true, midi: 45, level: 0.2 }, 1120).at, 1000, "onset time is when the note first appeared");
 })();
 
 console.log("staff-core: all checks passed");
