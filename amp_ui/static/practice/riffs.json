@@ -7,7 +7,7 @@
         "slot": 85,
         "name": "Cold Shot",
         "overrides": { "delay_ms": 208, "feedback": 0.15, "mix": 0.12 },
-        "why": "Texas blues: a Deluxe on the vibrato channel at the edge of breakup, through the 1x12 Deluxe-style IR. The delay is cut to an eighth-note triplet at 96 BPM so it slaps inside the shuffle instead of smearing it."
+        "why": "Texas blues: a Deluxe on the vibrato channel at the edge of breakup, through the LX TDR Marshall 1 cab IR. The delay is cut to an eighth-note triplet at 96 BPM so it slaps inside the shuffle instead of smearing it."
       },
       "phrases": [
         {
@@ -31,7 +31,7 @@
         "slot": 28,
         "name": "Brit 2204",
         "overrides": { "delay_ms": 250, "feedback": 0.2, "mix": 0.12 },
-        "why": "A JCM800-style crunch through the Marshall 4x12 IR: tight enough for eighth-note pedal tones, with a quiet eighth-note delay at 120 BPM."
+        "why": "A JCM800-style crunch through the LX TDR Marshall 2 cab IR: tight enough for eighth-note pedal tones, with a quiet eighth-note delay at 120 BPM."
       },
       "phrases": [
         {
@@ -55,7 +55,7 @@
         "slot": 17,
         "name": "Essex A30",
         "overrides": { "delay_ms": 417, "feedback": 0.3, "mix": 0.22 },
-        "why": "AC30 chime for open-chord pop, through the Marshall 2x12-style IR. A dotted-eighth delay at 108 BPM (417 ms) turns the arpeggios into a shimmer."
+        "why": "AC30 chime for open-chord pop, through the LX TDR Marshall 2 cab IR. A dotted-eighth delay at 108 BPM (417 ms) turns the arpeggios into a shimmer."
       },
       "phrases": [
         {
@@ -79,7 +79,7 @@
         "slot": 111,
         "name": "Funky Meercat",
         "overrides": { "delay_ms": 147, "feedback": 0.1, "mix": 0.06 },
-        "why": "A clean Deluxe with the treble up and the 1x12 Deluxe IR. Funk wants it dry, so the delay is a barely-there sixteenth (147 ms at 102 BPM)."
+        "why": "A clean Deluxe with the treble a little up, through the LX TDR Marshall 1 cab IR. Funk wants it dry, so the delay is a barely-there sixteenth (147 ms at 102 BPM)."
       },
       "phrases": [
         {
@@ -103,7 +103,7 @@
         "slot": 73,
         "name": "Open Chordus PH",
         "overrides": { "delay_ms": 357, "feedback": 0.35, "mix": 0.28 },
-        "why": "Clean and wide through the Mesa 4x12 IR. A dotted-eighth delay at 126 BPM (357 ms) locks to the four-on-the-floor."
+        "why": "Clean and wide through the Mesa Mark IIC+ cab IR. A dotted-eighth delay at 126 BPM (357 ms) locks to the four-on-the-floor."
       },
       "phrases": [
         {
@@ -127,7 +127,7 @@
         "slot": 83,
         "name": "Another Thing",
         "overrides": { "delay_ms": 221, "feedback": 0.18, "mix": 0.12 },
-        "why": "A 2204-style stack through the Marshall 4x12 IR, hot enough for open-E chugs. The delay is a short eighth at 136 BPM (221 ms), just enough to thicken leads."
+        "why": "A 2204-style stack through the LX TDR Marshall 2 cab IR, hot enough for open-E chugs. The delay is a short eighth at 136 BPM (221 ms), just enough to thicken leads."
       },
       "phrases": [
         {
@@ -151,7 +151,7 @@
         "slot": 7,
         "name": "MK IV lead 2",
         "overrides": { "delay_ms": 625, "feedback": 0.35, "mix": 0.3 },
-        "why": "A Mesa Mark IV lead through the Mesa 4x12 IR: smooth, singing sustain for neoclassical lines. Dotted-eighth delay at 72 BPM (625 ms)."
+        "why": "A Mesa Mark IV lead through the Mesa Mark IIC+ cab IR: smooth, singing sustain for neoclassical lines. Dotted-eighth delay at 72 BPM (625 ms)."
       },
       "phrases": [
         {
@@ -200,7 +200,7 @@
         "slot": 110,
         "name": "Dreamy Lead",
         "overrides": { "delay_ms": 703, "feedback": 0.55, "mix": 0.6 },
-        "why": "A clean Archetype with a long dotted-eighth delay at 64 BPM (703 ms) and high feedback, through the Mesa IR: notes bloom into the pad."
+        "why": "A clean Archetype with a long dotted-eighth delay at 64 BPM (703 ms) and high feedback, through the Mesa Mark IIC+ cab IR: notes bloom into the pad."
       },
       "phrases": [
         {

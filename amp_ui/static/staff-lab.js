@@ -1448,7 +1448,7 @@
       var want = res.index >= 0 ? state.seq[res.index] : null;
       setMessage(
         want && !want.rest
-          ? "That was " + C.noteName(note) + "; the riff wants " + C.noteName(want.note) + (state.frets[res.index] ? " (" + C.describePosition(state.frets[res.index]) + ")." : ".")
+          ? "That was " + C.noteName(note) + "; the note here is " + C.noteName(want.note) + (state.frets[res.index] ? " (" + C.describePosition(state.frets[res.index]) + ")." : ".")
           : "That was " + C.noteName(note) + " \u2014 nothing due right then. Wait for the playhead.",
         "bad"
       );

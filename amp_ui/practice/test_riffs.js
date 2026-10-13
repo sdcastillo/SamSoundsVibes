@@ -42,6 +42,12 @@ catalog.tracks.forEach((track) => {
     assert.ok(synced, track.id + " delay " + delay + " ms is a note value at " + track.bpm + " BPM");
   }
   assert.ok(tone.why && tone.why.length > 20, track.id + " explains the tone");
+  const cabWords = { Marshall: /Marshall/, Mesa: /Mesa/, HG: /\bHG\d/, acoustic: /Dtar/ };
+  Object.keys(cabWords).forEach((word) => {
+    const loads = cabWords[word].test(presetIr || "");
+    const says = word === "acoustic" ? /acoustic|dreadnought/i.test(tone.why) : new RegExp(word + "[^.]*\\b(cab|IR)\\b").test(tone.why);
+    if (says) assert.ok(loads, track.id + " says a " + word + " cab but loads " + presetIr);
+  });
 
   assert.deepStrictEqual(entry.phrases.map((p) => p.id), ["riff", "lead"], track.id + " has a riff and a lead");
   entry.phrases.forEach((phrase) => {
