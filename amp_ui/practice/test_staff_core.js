@@ -146,4 +146,53 @@ eq(core.weakestNotes(weighted).map((r) => r.midi), [40], "weakest notes");
   eq(core.detectPitch(new Float32Array(2048), rate), null, "silence");
 })();
 
+(function tabs() {
+  const tab = core.parseTab("A0e A3e D2q. rs G5s | e12w", 4);
+  eq(tab.bars, 2, "bar line splits bars");
+  eq(tab.barSums, [3, 4], "beats per bar");
+  eq(tab.notes[0].midi, 45, "open A");
+  eq(tab.notes[1].midi, 48, "A string 3rd fret is C");
+  eq(tab.notes[2].beat, 1, "beat counts from the bar start");
+  eq(tab.notes[3].rest, true, "rest");
+  eq(tab.notes[4].string, 3, "G string");
+  eq(tab.notes[5].midi, 76, "high e 12th fret");
+  eq(tab.notes[5].beat, 4, "second bar starts on beat 4");
+  assert.throws(() => core.parseTab("X3q"), /Bad tab token/);
+
+  const song = core.parseSong(core.findById(core.SONGS, "birthday"));
+  eq(song.notes[0].beat, 2, "pickup starts on beat 3 of bar 0");
+  eq(song.notes[2].beat, 3, "first full bar starts at beat 3");
+  eq(song.meter, [3, 4], "song meter");
+  const ode = core.parseSong(core.findById(core.SONGS, "ode"));
+  eq(ode.notes[4].beat, 4, "Ode bar 2 starts on beat 4");
+
+  const frets = core.assignFrets(core.parseSong(core.findById(core.SONGS, "mary")).notes, [0, 4]);
+  eq(frets.slice(0, 3), [{ string: 4, fret: 2 }, { string: 4, fret: 0 }, { string: 5, fret: 3 }], "Mary in first position");
+  const box = core.scaleNotes(core.findById(core.SCALES, "a-minor-pent"));
+  const boxFrets = core.assignFrets(box, [5, 8]);
+  assert(boxFrets.every((p) => p.fret >= 5 && p.fret <= 8), "A minor pentatonic stays in box 1");
+  eq(core.assignFrets([{ rest: true, beat: 0, beats: 1 }]), [null], "rests get no fret");
+})();
+
+(function timedJudge() {
+  const notes = core.parseTab("A0q A3q r A5q", 4).notes;
+  const judge = core.createTimedJudge(notes, { secPerBeat: 0.5 });
+  eq(judge.onset(45, 0.05).type, "hit", "on time");
+  eq(judge.onset(45, 0.1).type, "stray", "each note scores once");
+  eq(judge.onset(47, 0.55).type, "stray", "wrong pitch in the window");
+  eq(judge.at(1.1), 2, "the rest is current at beat 2");
+  eq(judge.next(0.6), 1, "next unplayed note");
+  eq(judge.sweep(0.79), [], "still inside the late window");
+  eq(judge.sweep(0.81), [1], "late window closes");
+  eq(judge.onset(50, 1.35).type, "hit", "early within 0.2 s");
+  eq(judge.stats().hits, 2, "two hits");
+  eq(judge.stats().misses, 1, "one miss");
+  eq(judge.stats().accuracy, 2 / 3, "accuracy");
+  const loose = core.createTimedJudge(notes, { secPerBeat: 0.5, anyOctave: true });
+  eq(loose.onset(57, 0).octave, true, "octave above counts when anyOctave");
+  judge.reset();
+  eq(judge.stats().hits, 0, "reset clears scores");
+  eq(core.METERS.map((m) => m.id), ["2/4", "3/4", "4/4", "6/8"], "meters");
+})();
+
 console.log("staff-core: all checks passed");

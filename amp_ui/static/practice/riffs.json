@@ -1,0 +1,223 @@
+{
+  "_readme": "Riffs, leads, and a recommended amp tone for each backing track in tracks.json, keyed by track id. Original phrases, CC0. tab is one token per note: string (e B G D A E, high e lowercase), fret, duration (w h. h q. q e. e s; default q). r plus a duration is a rest. | marks a bar line and must match the track's bars. tone.slot is a factory preset; overrides replace its delay, feedback, mix, drive, or cabinet IR.",
+  "version": 1,
+  "tracks": {
+    "a-minor-blues": {
+      "tone": {
+        "slot": 85,
+        "name": "Cold Shot",
+        "overrides": { "delay_ms": 208, "feedback": 0.15, "mix": 0.12 },
+        "why": "Texas blues: a Deluxe on the vibrato channel at the edge of breakup, through the 1x12 Deluxe-style IR. The delay is cut to an eighth-note triplet at 96 BPM so it slaps inside the shuffle instead of smearing it."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Shuffle boogie riff",
+          "tip": "Root, flat 3, 4 on the root's string, one shape per chord. Palm-mute lightly and swing the eighths.",
+          "tab": "A0e A0e A3e A0e A5e A3e A0e re | A0e A0e A3e A0e A5e A3e A0e re | A0e A0e A3e A0e A5e A3e A0e re | A0e A0e A3e A0e A5e A3e A0e re | D0e D0e D3e D0e D5e D3e D0e re | D0e D0e D3e D0e D5e D3e D0e re | A0e A0e A3e A0e A5e A3e A0e re | A0e A0e A3e A0e A5e A3e A0e re | E0e E0e E3e E0e E5e E3e E0e re | D0e D0e D3e D0e D5e D3e D0e re | A0e A0e A3e A0e A5e A3e A0e re | E0e E3e A0e A2e E0q rq"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Box 1 blues lead",
+          "tip": "A minor pentatonic at the 5th fret, with the flat 5 (Eb, G string 8th fret) in bar 3 and the F in bar 6 for the Dm7. Leave the rests empty: space is half of a blues solo.",
+          "tab": "rq B8e B5e G7q G5q | D7h G5e D7e D5q | rq G5e G7e G8e G7e G5q | D7w | rq e5q e8e e5e B8q | B6h B8q B5q | G7q G5q D7h | rh B5q G7q | B5q B8q e7q B5q | e5q B6q B5e G7e G7q | G5q D7q E8q E5q | A7h A5q rq"
+        }
+      ]
+    },
+    "e-minor-rock": {
+      "tone": {
+        "slot": 28,
+        "name": "Brit 2204",
+        "overrides": { "delay_ms": 250, "feedback": 0.2, "mix": 0.12 },
+        "why": "A JCM800-style crunch through the Marshall 4x12 IR: tight enough for eighth-note pedal tones, with a quiet eighth-note delay at 120 BPM."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Eighth-note pedal riff",
+          "tip": "Drive the root in straight eighths and walk up into the next chord on the last two. Downpicks only.",
+          "tab": "E0e E0e E0e E0e E0e E0e E2e E3e | A3e A3e A3e A3e A3e A3e A2e A0e | E3e E3e E3e E3e E3e E3e E5e E3e | D0e D0e D0e D0e D0e D2e D0e A2e | E0e E0e E0e E0e E0e E0e E2e E3e | A3e A3e A3e A3e A3e A3e A2e A0e | E3e E3e E3e E3e E3e E3e E5e E3e | D0e D0e D0e D0e D0e D2e D0e A2e"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Melodic lead, 7th position",
+          "tip": "Each bar lands on a chord tone of its chord: E-G-B for Em, C for C, G for G, D for D.",
+          "tab": "G9q B8q e7h | e8q e7e B8e B10h | B8q. B10e B8q G9q | G7h D9q D7q | rq G9e B8e e7q e10q | e8h. e7q | B8q B10q B8e G9e G7q | G7q. G9e G7h"
+        }
+      ]
+    },
+    "g-major": {
+      "tone": {
+        "slot": 17,
+        "name": "Essex A30",
+        "overrides": { "delay_ms": 417, "feedback": 0.3, "mix": 0.22 },
+        "why": "AC30 chime for open-chord pop, through the Marshall 2x12-style IR. A dotted-eighth delay at 108 BPM (417 ms) turns the arpeggios into a shimmer."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Open-chord arpeggios",
+          "tip": "Hold each chord shape and pick one string at a time so the notes ring over each other.",
+          "tab": "E3e D0e G0e B0e G0e D0e G0e B0e | D0e G2e B3e e2e B3e G2e B3e G2e | E0e D2e G0e B0e G0e D2e G0e B0e | A3e D2e G0e B1e G0e D2e G0e B1e | E3e D0e G0e B0e G0e D0e G0e B0e | D0e G2e B3e e2e B3e G2e B3e G2e | E0e D2e G0e B0e G0e D2e G0e B0e | A3e D2e G0e B1e G0e D2e G0e B1e"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Sing-along melody",
+          "tip": "A vocal-style line in open position. The F# in bars 2 and 6 is the 3rd of D.",
+          "tab": "G4q B3q B5q e3q | e2h B3q G2q | B5q. B3e G4q B5q | B5h B1h | e3q e2e e3e B5q B3q | e2q. e0e B3h | B5q G4q B3q B5q | B1h G0h"
+        }
+      ]
+    },
+    "d-dorian-funk": {
+      "tone": {
+        "slot": 111,
+        "name": "Funky Meercat",
+        "overrides": { "delay_ms": 147, "feedback": 0.1, "mix": 0.06 },
+        "why": "A clean Deluxe with the treble up and the 1x12 Deluxe IR. Funk wants it dry, so the delay is a barely-there sixteenth (147 ms at 102 BPM)."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Sixteenth-note funk line",
+          "tip": "Keep your picking hand moving in sixteenths even on the rests. Short, choked notes: lift the fretting finger right after each one.",
+          "tab": "A5s rs rs A5s D3e A5s rs A3s rs A5e rq | A5s rs rs A5s D3e A5s rs A3s rs A5e rq | E3s rs rs E3s A2e E3s rs D3s rs E3e rq | E3s rs rs E3s A2e E3s rs D3s rs E3e rq | A5s rs rs A5s D3e A5s rs A3s rs A5e rq | A5s rs rs A5s D3e A5s rs A3s rs A5e rq | E3s rs rs E3s A2e E3s rs D3s rs E3e rq | E3s rs rs E3s A2e E3s rs D3s rs E3e rq"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Dorian answer phrases",
+          "tip": "On G7, B and F are the chord's 3rd and flat 7. That is the Dorian sound: B natural over a minor groove.",
+          "tab": "rq G7e B6e G7e B6e G7q | B8e B6e G7q rh | e7q e5e B6e e7q rq | B8h B6q rq | e8q e7e e5e B6q G7q | D7h rh | B5e B6e B8e B6e B5q G7q | e7q B8q B6q rq"
+        }
+      ]
+    },
+    "a-dorian-house": {
+      "tone": {
+        "slot": 73,
+        "name": "Open Chordus PH",
+        "overrides": { "delay_ms": 357, "feedback": 0.35, "mix": 0.28 },
+        "why": "Clean and wide through the Mesa 4x12 IR. A dotted-eighth delay at 126 BPM (357 ms) locks to the four-on-the-floor."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Offbeat octave stabs",
+          "tip": "Play only the 'and' of each beat, root then octave. Mute the string between stabs so it pumps with the kick.",
+          "tab": "re E5e re D7e re E5e re D7e | re E5e re D7e re E5e re D7e | re E3e re D5e re E3e re D5e | re A5e re G7e re A5e re G7e | re E5e re D7e re E5e re D7e | re A7e re G9e re A7e re G9e | re E3e re D5e re E3e re D5e | re A5e re G7e re A5e re G7e"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Dorian hook",
+          "tip": "The F# (B string 7th fret) is the Dorian 6th. Let it hang over the Am7 bars.",
+          "tab": "e5q. e7e e8q e7q | B7h B5h | B8q. B7e B8q G7q | B7h e5h | e8q e7e e5e B5q B7q | e7h. B8q | B8q B7q B5q G7q | B7w"
+        }
+      ]
+    },
+    "e-hard-rock": {
+      "tone": {
+        "slot": 83,
+        "name": "Another Thing",
+        "overrides": { "delay_ms": 221, "feedback": 0.18, "mix": 0.12 },
+        "why": "A 2204-style stack through the Marshall 4x12 IR, hot enough for open-E chugs. The delay is a short eighth at 136 BPM (221 ms), just enough to thicken leads."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Open-E chug riff",
+          "tip": "Palm-mute the open E and lift the mute for the F# and D. The D is the flat 7 that makes this Mixolydian.",
+          "tab": "E0e E0e E0e E2e E0e E0e D0e E0e | E0e E0e E0e E2e E0e E0e D0e E0e | A5e A5e A5e A5e A5e A5e A7e A5e | A0e A0e A0e A0e A0e A0e A2e A4e | E0e E0e E0e E2e E0e E0e D0e E0e | A5e A5e A5e A5e A5e A5e A7e A5e | A0e A0e A0e A0e A0e A0e A2e A4e | E0e E0e E0e E2e E0e E0e D0e E0e"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Mixolydian lead, 9th position",
+          "tip": "G# (B string 9th fret) is the major 3rd. Lean on it over E, then slide to the A shape for the A bars.",
+          "tab": "G9q B9q e7q B9q | e10e e9e e7q B10q G9q | e10h B10h | B10q e9q e12q e9q | e12q. e10e e9e e7e G9q | e10q B10q G7h | B10e e9e B10e G9e B10h | G9w"
+        }
+      ]
+    },
+    "d-string-score": {
+      "tone": {
+        "slot": 7,
+        "name": "MK IV lead 2",
+        "overrides": { "delay_ms": 625, "feedback": 0.35, "mix": 0.3 },
+        "why": "A Mesa Mark IV lead through the Mesa 4x12 IR: smooth, singing sustain for neoclassical lines. Dotted-eighth delay at 72 BPM (625 ms)."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Arpeggio pattern",
+          "tip": "Up and back down each triad. On the A chord, C# (A string 4th fret) is the harmonic-minor leading tone.",
+          "tab": "A5e D3e D7e G7e D7e D3e A5e D3e | E3e A1e A5e D5e A5e A1e E3e A1e | A1e A5e D3e D8e D3e A5e A1e A5e | A0e A4e A7e D7e A7e A4e A0e A4e | A5e D3e D7e G7e D7e D3e A5e D3e | E3e A1e A5e D5e A5e A1e E3e A1e | A1e A5e D3e D8e D3e A5e A1e A5e | A0e A4e A7e D7e A7e A4e A0e A4e"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Harmonic-minor melody",
+          "tip": "Long notes with vibrato. The last bar holds C#, which pulls back up to D when the loop restarts.",
+          "tab": "G7h B6q e5q | e6h. B8q | B6q B8e e5e e6h | e5q G6q B5h | e5q B6q G7q B6q | B8q e6q G7h | B6h. B5q | G6w"
+        }
+      ]
+    },
+    "g-bluegrass": {
+      "tone": {
+        "slot": 3,
+        "name": "Taylor LIVE",
+        "ir": "107_Dtar_slope_dread-_ir.wav",
+        "overrides": { "ir_mix": 1.0, "delay_ms": 163, "feedback": 0.1, "mix": 0.08 },
+        "why": "The acoustic preset with no amp model, swapped onto the slope-shoulder dreadnought IR for a flatpicker's boom. A faint eighth-note slap at 184 BPM (163 ms) and almost no mix."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Boom-chuck bass",
+          "tip": "Bass note on beats 1 and 3, alternating root and fifth. Strum the chord on 2 and 4 (the rests).",
+          "tab": "E3q rq D0q rq | A3q rq E3q rq | E3q rq D0q rq | E3q rq D0q rq | D0q rq A0q rq | A3q rq E3q rq | E3q rq D0q rq | D0q rq A0q rq"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Fiddle-tune break",
+          "tip": "Steady alternate picking in open position. Start slow with the metronome and speed up a few BPM at a time.",
+          "tab": "G0e G2e B0e B3e e0e B3e B0e G2e | B1e B0e B1e B3e e0e B3e B1e G2e | G0e B0e B3e e3e e2e e3e B3e B0e | G0e G2e B0e G2e G0e D4e D5q | D0e D2e D4e G0e G2e G0e D4e D2e | A3e D0e D2e D0e A3e A2e A0e A2e | E3e A0e A2e A3e D0e D2e D4e D5e | D4q D0q A0q D0q"
+        }
+      ]
+    },
+    "d-lydian-ambient": {
+      "tone": {
+        "slot": 110,
+        "name": "Dreamy Lead",
+        "overrides": { "delay_ms": 703, "feedback": 0.55, "mix": 0.6 },
+        "why": "A clean Archetype with a long dotted-eighth delay at 64 BPM (703 ms) and high feedback, through the Mesa IR: notes bloom into the pad."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Slow chord arpeggios",
+          "tip": "One note per beat, letting every string ring. G# over E (G string 1st fret) is the Lydian color.",
+          "tab": "D0q G2q B3q e2q | A0q D2q G2q B2q | E0q A2q D2q G1q | D0q G2q B3q e2q | E2q A4q D4q G2q | A0q D2q G2q B2q | E0q A2q D2q G1q | D0q G2q B3q e2q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Floating Lydian melody",
+          "tip": "Half and whole notes. Swell into each one with the volume knob if you have one, and let the delay fill the gaps.",
+          "tab": "B3h e2h | B5h e5h | e4h. B5q | e2w | B2h e2h | B5q e4q e5h | e4h G4h | B3w"
+        }
+      ]
+    }
+  }
+}
