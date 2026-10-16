@@ -637,8 +637,25 @@ class FastAmp:
         high_cut=8000.0,
         preset="",
         octave_down=0.0,
+        solo=0.0,
+        autowah=0.0,
+        aw_sens=0.6,
+        aw_range=0.7,
+        aw_q=5.0,
+        aw_mix=0.8,
     ):
         self.rate = rate
+        self.solo = float(solo or 0.0)
+        self.autowah = float(autowah or 0.0)
+        self.aw_sens = float(aw_sens)
+        self.aw_range = float(aw_range)
+        self.aw_q = float(aw_q)
+        self.aw_mix = float(aw_mix)
+        self._aw_env = 0.0
+        self._aw_state = (np.float32(0.0),) * 4
+        self._solo_hp = (np.float32(0.0), np.float32(0.0))
+        self._solo_mid_state = (np.float32(0.0),) * 4
+        self._solo_lp = np.float32(0.0)
         self.drive = drive
         self.feedback = feedback
         self.mix = mix
@@ -782,6 +799,9 @@ class FastAmp:
             self.preset = str(kwargs["preset"])
         if "octave_down" in kwargs and kwargs["octave_down"] is not None:
             self.octave_down = float(np.clip(float(kwargs["octave_down"]), 0.0, 1.0))
+        for name in ("solo", "autowah", "aw_sens", "aw_range", "aw_q", "aw_mix"):
+            if name in kwargs and kwargs[name] is not None:
+                setattr(self, name, float(kwargs[name]))
 
     def params_snapshot(self):
         return {
@@ -803,6 +823,12 @@ class FastAmp:
             "high_cut": self.high_cut,
             "preset": self.preset,
             "octave_down": self.octave_down,
+            "solo": self.solo,
+            "autowah": self.autowah,
+            "aw_sens": self.aw_sens,
+            "aw_range": self.aw_range,
+            "aw_q": self.aw_q,
+            "aw_mix": self.aw_mix,
         }
 
     def _cab_nfft(self, frames, kernel_len):
@@ -953,6 +979,76 @@ class FastAmp:
         wet = out * np.float32(1.35)
         dry = source
         return (np.float32(1.0 - mix) * dry + np.float32(mix) * wet).astype(np.float32, copy=False)
+
+    def _bandpass_coeffs(self, freq, q):
+        w0 = 2.0 * np.pi * float(freq) / float(self.rate)
+        alpha = np.sin(w0) / (2.0 * float(q))
+        inv = 1.0 / (1.0 + alpha)
+        return (np.float32(alpha * inv), np.float32(-alpha * inv), np.float32(-2.0 * np.cos(w0) * inv), np.float32((1.0 - alpha) * inv))
+
+    def _apply_autowah(self, source):
+        """Envelope-follower auto-wah: RMS per 32-sample slice drives a resonant bandpass sweep (~400 Hz-2.5 kHz)."""
+        if self.autowah < 0.5 or source.size == 0:
+            return source
+        mix = float(np.clip(self.aw_mix, 0.0, 1.0))
+        q = float(np.clip(self.aw_q, 1.0, 12.0))
+        sens = float(np.clip(self.aw_sens, 0.0, 1.0))
+        rng = float(np.clip(self.aw_range, 0.0, 1.0))
+        lo = 400.0
+        hi = lo + (2500.0 - lo) * max(0.1, rng)
+        gain = 2.0 + 28.0 * sens
+        slice_len = 32
+        att = 1.0 - np.exp(-slice_len / (0.004 * self.rate))
+        rel = 1.0 - np.exp(-slice_len / (0.120 * self.rate))
+        env = self._aw_env
+        x1, x2, y1, y2 = self._aw_state
+        out = np.empty_like(source)
+        for start in range(0, source.size, slice_len):
+            seg = source[start:start + slice_len]
+            rms = float(np.sqrt(np.mean(seg * seg))) if seg.size else 0.0
+            target = min(1.0, rms * gain)
+            env += (target - env) * (att if target > env else rel)
+            freq = lo * (hi / lo) ** env
+            b0, b2, a1, a2 = self._bandpass_coeffs(freq, q)
+            for i, x0 in enumerate(seg):
+                y0 = _ftz(b0 * x0 + b2 * x2 - a1 * y1 - a2 * y2)
+                out[start + i] = y0
+                x2, x1 = x1, x0
+                y2, y1 = y1, y0
+        self._aw_env = env
+        self._aw_state = (_ftz(x1), _ftz(x2), _ftz(y1), _ftz(y2))
+        wet = out * np.float32(1.0 + 0.25 * q)
+        return (np.float32(1.0 - mix) * source + np.float32(mix) * wet).astype(np.float32, copy=False)
+
+    def _solo_pre(self, source):
+        """High Gain Solo front end: tight 100 Hz low-cut, +7 dB mid hump at 900 Hz, 2.5x pre-gain."""
+        hp_a = np.float32(np.exp(-2.0 * np.pi * 100.0 / float(self.rate)))
+        hx, hy = self._solo_hp
+        b0, b1, b2, a1, a2 = self._biquad("peak", 900.0, 7.0, 0.9)
+        x1, x2, y1, y2 = self._solo_mid_state
+        out = np.empty_like(source)
+        for i, x0 in enumerate(source):
+            hy = hp_a * (hy + x0 - hx)
+            hx = x0
+            m = hy
+            y0 = _ftz(b0 * m + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2)
+            x2, x1 = x1, m
+            y2, y1 = y1, y0
+            out[i] = y0
+        self._solo_hp = (_ftz(hx), _ftz(hy))
+        self._solo_mid_state = (_ftz(x1), _ftz(x2), _ftz(y1), _ftz(y2))
+        return out * np.float32(2.5)
+
+    def _solo_post(self, source):
+        """6.5 kHz high-cut to tame fizz, then level compensation so the boost does not blast."""
+        lp_a = np.float32(np.exp(-2.0 * np.pi * 6500.0 / float(self.rate)))
+        lp = self._solo_lp
+        out = np.empty_like(source)
+        for i, x0 in enumerate(source):
+            lp = (np.float32(1.0) - lp_a) * x0 + lp_a * lp
+            out[i] = lp
+        self._solo_lp = _ftz(lp)
+        return out * np.float32(0.62)
 
     def _biquad(self, kind, freq, db, q=0.707):
         if abs(db) < 0.25:
@@ -1179,7 +1275,8 @@ class FastAmp:
         up, self._os_up_state = _stream_fir(up, kernel, self._os_up_state)
         up *= np.float32(factor)
         driven = up * np.float32(self.drive)
-        shaped = driven + np.float32(0.18) * driven * np.abs(driven)
+        asym = np.float32(0.38 if self.solo >= 0.5 else 0.18)
+        shaped = driven + asym * driven * np.abs(driven)
         clipped = np.tanh(shaped).astype(np.float32)
         clipped, self._os_down_state = _stream_fir(clipped, kernel, self._os_down_state)
         return np.ascontiguousarray(clipped[::factor], dtype=np.float32)
@@ -1237,7 +1334,14 @@ class FastAmp:
         source = self._apply_octave_down(source)
         # Wah / resonant EQ before drive (Cry Baby-style into the amp).
         source = self._apply_wah(source)
+        # Auto-wah (envelope follower) also sits before the drive.
+        source = self._apply_autowah(source)
+        solo_on = self.solo >= 0.5
+        if solo_on:
+            source = self._solo_pre(source)
         distorted = self._distort(source)
+        if solo_on:
+            distorted = self._solo_post(distorted)
         distorted = self._apply_tone(distorted)
         distorted = self._apply_cab(distorted)
         self.cab_peak = float(np.max(np.abs(distorted))) if distorted.size else 0.0
@@ -1948,6 +2052,12 @@ class AmpSession:
             high_cut=float(config.get("high_cut", 8000.0)),
             preset=str(config.get("preset") or ""),
             octave_down=float(config.get("octave_down", 0.0)),
+            solo=float(config.get("solo", 0.0)),
+            autowah=float(config.get("autowah", 0.0)),
+            aw_sens=float(config.get("aw_sens", 0.6)),
+            aw_range=float(config.get("aw_range", 0.7)),
+            aw_q=float(config.get("aw_q", 5.0)),
+            aw_mix=float(config.get("aw_mix", 0.8)),
         )
         stored = {
             "device": dev_meta["device"],

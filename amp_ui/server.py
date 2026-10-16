@@ -68,6 +68,12 @@ PARAM_DEFAULTS = {
     "low_cut": 80.0,
     "high_cut": 8000.0,
     "octave_down": 0.0,
+    "solo": 0.0,
+    "autowah": 0.0,
+    "aw_sens": 0.6,
+    "aw_range": 0.7,
+    "aw_q": 5.0,
+    "aw_mix": 0.8,
 }
 
 

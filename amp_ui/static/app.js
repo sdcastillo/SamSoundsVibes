@@ -1,5 +1,5 @@
 (function () {
-  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix", "octave_down"];
+  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix", "octave_down", "solo", "autowah", "aw_sens", "aw_range", "aw_q", "aw_mix"];
   let toneExtra = { low_cut: 80, high_cut: 8000, preset: "" };
   let presetCatalog = [];
   const runState = document.querySelector("#run-state");
@@ -71,6 +71,8 @@
     if (params.octave_down !== undefined) {
       syncOctaveButtons(Number(params.octave_down) >= 0.5);
     }
+    if (params.solo !== undefined) syncToggle("solo", Number(params.solo) >= 0.5);
+    if (params.autowah !== undefined) syncToggle("autowah", Number(params.autowah) >= 0.5);
   }
 
   function syncOctaveButtons(on) {
@@ -97,6 +99,41 @@
       paramTimer = setTimeout(pushParams, 30);
     }
   }
+
+  const TOGGLE_LABELS = { solo: "High Gain Solo", autowah: "Auto-Wah" };
+  function syncToggle(name, on) {
+    const btn = document.getElementById(name + "-btn");
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    btn.textContent = TOGGLE_LABELS[name] + ": " + (on ? "ON" : "OFF");
+  }
+  function setToggle(name, on) {
+    setParamValueSafe(name, on ? 1 : 0);
+    syncToggle(name, on);
+    if (name === "solo" && on) {
+      // A touch of delay for leads.
+      setParamValueSafe("delay_ms", 420);
+      setParamValueSafe("feedback", 0.28);
+      setParamValueSafe("mix", 0.2);
+    }
+    clearTimeout(paramTimer);
+    paramTimer = setTimeout(pushParams, 30);
+  }
+  function setParamValueSafe(name, value) {
+    const el = document.querySelector("#" + name);
+    if (!el) return;
+    el.value = value;
+    const label = document.querySelector("#out-" + name);
+    if (label) label.textContent = formatParam(name, value);
+  }
+  ["solo", "autowah"].forEach(function (name) {
+    const btn = document.getElementById(name + "-btn");
+    if (!btn) return;
+    btn.addEventListener("click", function () {
+      setToggle(name, btn.getAttribute("aria-pressed") !== "true");
+    });
+  });
+  window.AmpUISetToggle = setToggle;
 
   let tunerCents = 0;
   function applyTuner(tuner) {
