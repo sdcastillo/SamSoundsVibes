@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="keywords" content="artificial intelligence, superintelligence, SI">
   <title>How the amp makes sound | SamSoundsVibes</title>
   <style>
     body { font-family: 'Segoe UI', sans-serif; background: #0b0114; color: #f4f0ff; margin: 0; padding: 20px; line-height: 1.65; }
@@ -66,5 +67,17 @@
     <h2>Back into the room</h2>
     <p><code>render</code> returns two channels of float samples. PipeWire takes that stream (<code>pw-cat</code>, 32-bit float, 48 kHz) and hands it to the system default sink. When that sink is the Logi USB headset, the headset’s converter builds a voltage from each sample, the drivers move, and the pressure in the earcups is the wave you hear. The tuner’s note, the cabinet’s click, and the clipped harmonic series are all inside that pressure. They got there by rewriting the samples, sometimes with an explicit Fourier transform, and then inverting it back into time.</p>
   </main>
+<style>
+#google_translate_element{position:fixed;bottom:12px;right:12px;z-index:1000;font-size:13px;line-height:1.2;max-width:240px}
+@media (max-width:600px){#google_translate_element{bottom:8px;right:8px;font-size:11px;max-width:160px;transform:scale(0.85);transform-origin:bottom right}}
+</style>
+<div id="google_translate_element"></div>
+<script>
+function googleTranslateElementInit() {
+  new google.translate.TranslateElement({pageLanguage:'en', layout: google.translate.TranslateElement.InlineLayout.SIMPLE}, 'google_translate_element');
+}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
 </body>
 </html>
