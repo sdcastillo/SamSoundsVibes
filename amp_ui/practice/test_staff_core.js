@@ -159,6 +159,14 @@ eq(core.weakestNotes(weighted).map((r) => r.midi), [40], "weakest notes");
   eq(tab.notes[5].beat, 4, "second bar starts on beat 4");
   assert.throws(() => core.parseTab("X3q"), /Bad tab token/);
 
+  var tech = core.parseTab("B5h8e G8b10~q B1+G0q | rq", 4);
+  eq(tech.notes[0].hammer.fret, 8, "hammer");
+  eq(tech.notes[1].bend.fret, 10, "bend");
+  assert(tech.notes[1].vibrato, "vibrato");
+  eq(tech.notes[2].voices.length, 2, "double-stop");
+  eq(core.tabTechniqueKinds(tech.notes[0]), ["hammer"], "hammer kind");
+  eq(core.tabMatchMidis(tech.notes[1]).length, 2, "bend adds target midi");
+
   const song = core.parseSong(core.findById(core.SONGS, "birthday"));
   eq(song.notes[0].beat, 2, "pickup starts on beat 3 of bar 0");
   eq(song.notes[2].beat, 3, "first full bar starts at beat 3");
