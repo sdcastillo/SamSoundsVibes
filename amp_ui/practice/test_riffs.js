@@ -15,6 +15,8 @@ const riffs = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "static", "p
 const factory = JSON.parse(fs.readFileSync(path.join(root, "presets", "factory.json"), "utf8"));
 const irs = new Set(fs.readdirSync(path.join(root, "irs")).filter((n) => n.endsWith(".wav")));
 const ALLOWED = new Set(["drive", "bass", "mid", "treble", "presence", "delay_ms", "feedback", "mix", "wah_freq", "wah_q", "wah_mix", "ir_mix", "low_cut", "high_cut"]);
+const TECH_LEADS = new Set(["a-minor-blues", "g-major", "d-dorian-funk"]);
+const TECH_NEED = new Set(["hammer", "pull", "bend", "slide", "vibrato", "double"]);
 
 let checked = 0;
 assert.strictEqual(Object.keys(riffs.tracks).length, catalog.tracks.length, "one riffs entry per track");
@@ -58,8 +60,22 @@ catalog.tracks.forEach((track) => {
     parsed.notes.forEach((n) => {
       if (n.rest) return;
       assert.ok(n.fret >= 0 && n.fret <= 15, label + " fret range");
-      assert.ok(scalePcs.has(n.midi % 12), label + " bar " + (n.bar + 1) + ": " + core.noteName(n.note) + " is outside " + track.key);
+      core.tabMatchMidis(n).forEach((midi) => {
+        assert.ok(scalePcs.has(midi % 12), label + " bar " + (n.bar + 1) + ": " + core.noteName(core.noteFromMidi(midi, false)) + " is outside " + track.key);
+      });
+      if (n.bend) assert.ok(n.bend.fret > n.fret, label + " bend target above start");
+      if (n.hammer) assert.ok(n.hammer.fret !== n.fret, label + " hammer target");
+      if (n.pull) assert.ok(n.pull.fret !== n.fret, label + " pull target");
     });
+    if (phrase.kind === "lead" && TECH_LEADS.has(track.id)) {
+      const kinds = new Set();
+      parsed.notes.forEach((n) => core.tabTechniqueKinds(n).forEach((k) => kinds.add(k)));
+      TECH_NEED.forEach((need) => assert.ok(kinds.has(need), label + " uses " + need));
+      assert.ok(Array.isArray(phrase.techniqueTips) && phrase.techniqueTips.length >= 4, label + " technique tips");
+      phrase.techniqueTips.forEach((tip) => {
+        assert.ok(tip.technique && tip.text && tip.text.length > 12, label + " tip " + (tip.technique || "?"));
+      });
+    }
     track.progression.forEach((symbol, bar) => {
       const chord = theory.parseChord(symbol);
       const pcs = new Set(chord.intervals.map((iv) => (chord.rootPc + iv) % 12));

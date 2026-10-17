@@ -2,3 +2,4 @@ publisher/local.env
 publisher/tokens.json
 publisher/__pycache__/
 __pycache__/
+amp_ui/recordings/

@@ -340,7 +340,7 @@
   function drawTabNumber(svg, tab, item) {
     if (!item.tab) return;
     var y = tab.y(item.tab.string);
-    var label = String(item.tab.fret);
+    var label = item.label != null ? String(item.label) : String(item.tab.fret);
     var g = el("g", { class: "lab-tabnum " + (item.cls || "") });
     g.appendChild(el("rect", { x: item.x - 4 - label.length * 3.6, y: y - 7, width: 8 + label.length * 7.2, height: 14, rx: 3 }));
     g.appendChild(el("text", { x: item.x, y: y + 4.5 }, label));
@@ -1281,7 +1281,8 @@
       if (!state.timed || state.timed.source !== "track") return;
       var a = p.audio;
       a.pause();
-      a.loop = true;
+      a.loop = !p.phraseLoop || !p.phraseLoop();
+      if (p.playbackRate) a.playbackRate = p.playbackRate();
       a.currentTime = 0;
       var at = ctx.currentTime + 0.15;
       metroStart({ bpm: track.bpm, meter: perBarOf(track) === 3 ? "3/4" : "4/4", at: at, clicks: countBeats });
@@ -1313,8 +1314,17 @@
       return;
     }
     var t = pieceTime();
-    if (tm.source === "track") {
-      if (t + 0.5 < tm.lastT) endPass();
+    var p = player();
+    if (tm.source === "track" && p) {
+      if (p.phraseLoop && p.phraseLoop()) {
+        var range = p.phraseLoopRange && p.phraseLoopRange();
+        if (range && t >= range.end - 0.03) {
+          p.audio.currentTime = range.start;
+          tm.lastT = range.start;
+          endPass();
+          return;
+        }
+      } else if (t + 0.5 < tm.lastT) endPass();
       tm.lastT = t;
     }
     var tJudge = t - latency();
@@ -2199,7 +2209,22 @@
       var x = x0 + (n.bar - row * perRow) * barW + 16 + (n.pos / perBar) * (barW - 26);
       var st = opts.status ? opts.status[i] : "";
       var cls = st === "hit" ? "is-hit" : st === "miss" ? "is-missed" : i === opts.current ? "is-target" : "";
-      drawTabNumber(svg, p.tab, { x: x, tab: { string: n.string, fret: n.fret }, cls: cls });
+      var label = String(n.fret);
+      if (n.voices && n.voices.length > 1) {
+        label = n.voices
+          .map(function (v) {
+            return v.fret;
+          })
+          .join("/");
+      }
+      var ann = [];
+      if (n.hammer) ann.push("h");
+      if (n.pull) ann.push("p");
+      if (n.bend) ann.push("b");
+      if (n.slide) ann.push("s");
+      if (n.vibrato) ann.push("~");
+      if (ann.length) label += ann.join("");
+      drawTabNumber(svg, p.tab, { x: x, tab: { string: n.string, fret: n.fret }, cls: cls, label: label });
     });
     if (opts.cursorBeat != null && opts.cursorBeat >= 0) {
       var cb = Math.floor(opts.cursorBeat / perBar);

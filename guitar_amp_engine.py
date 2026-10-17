@@ -2,12 +2,14 @@
 """Guitar amp DSP and audio I/O. Used by the CLI and the browser UI server."""
 
 import fcntl
+import io
 import os
 import queue
 import subprocess
 import sys
 import threading
 import time
+import wave
 
 import numpy as np
 import sounddevice as sd
@@ -634,6 +636,7 @@ class FastAmp:
         low_cut=80.0,
         high_cut=8000.0,
         preset="",
+        octave_down=0.0,
     ):
         self.rate = rate
         self.drive = drive
@@ -652,6 +655,18 @@ class FastAmp:
         self.low_cut = float(low_cut)
         self.high_cut = float(high_cut)
         self.preset = str(preset or "")
+        self.octave_down = float(np.clip(float(octave_down or 0.0), 0.0, 1.0))
+        self._oct_lp1 = np.float32(0.0)
+        self._oct_prev = np.float32(0.0)
+        self._oct_sign = np.float32(1.0)
+        self._oct_sub1 = np.float32(0.0)
+        self._oct_sub2 = np.float32(0.0)
+        self._rec_lock = threading.Lock()
+        self._rec_active = False
+        self._rec_part = ""
+        self._rec_chunks = []
+        self._rec_samples = 0
+        self._rec_max_samples = int(self.rate * 300)
         self._wah_x1 = np.float32(0.0)
         self._wah_x2 = np.float32(0.0)
         self._wah_y1 = np.float32(0.0)
@@ -765,6 +780,8 @@ class FastAmp:
             self._set_ir(kwargs["ir"])
         if "preset" in kwargs and kwargs["preset"] is not None:
             self.preset = str(kwargs["preset"])
+        if "octave_down" in kwargs and kwargs["octave_down"] is not None:
+            self.octave_down = float(np.clip(float(kwargs["octave_down"]), 0.0, 1.0))
 
     def params_snapshot(self):
         return {
@@ -785,6 +802,7 @@ class FastAmp:
             "low_cut": self.low_cut,
             "high_cut": self.high_cut,
             "preset": self.preset,
+            "octave_down": self.octave_down,
         }
 
     def _cab_nfft(self, frames, kernel_len):
@@ -841,6 +859,74 @@ class FastAmp:
             np.float32(a2 * inv_a0),
         )
         self._wah_coeff_key = key
+
+    def _apply_octave_down(self, source):
+        """Classic OC-2 style analog sub-octave divider (-1 octave) for playing bass parts on guitar."""
+        mix = float(np.clip(self.octave_down, 0.0, 1.0))
+        if mix <= 1e-4 or source.size == 0:
+            return source
+        track_a = np.float32(np.exp(-2.0 * np.pi * 220.0 / float(self.rate)))
+        track_b = np.float32(1.0) - track_a
+        sub_a = np.float32(np.exp(-2.0 * np.pi * 165.0 / float(self.rate)))
+        sub_b = np.float32(1.0) - sub_a
+        lp1 = self._oct_lp1
+        prev = self._oct_prev
+        sign = self._oct_sign
+        sub1 = self._oct_sub1
+        sub2 = self._oct_sub2
+        out = np.empty_like(source)
+        dry_gain = np.float32(1.0 - 0.82 * mix)
+        wet_gain = np.float32(1.35 * mix)
+        for i, x0 in enumerate(source):
+            lp1 = track_b * x0 + track_a * lp1
+            if prev <= 0.0 and lp1 > 0.0:
+                sign = -sign
+            prev = lp1
+            raw_sub = x0 * sign
+            sub1 = sub_b * raw_sub + sub_a * sub1
+            sub2 = sub_b * sub1 + sub_a * sub2
+            out[i] = dry_gain * x0 + wet_gain * sub2
+        self._oct_lp1 = _ftz(lp1)
+        self._oct_prev = _ftz(prev)
+        self._oct_sign = sign
+        self._oct_sub1 = _ftz(sub1)
+        self._oct_sub2 = _ftz(sub2)
+        return out
+
+    def start_recording(self, part_id="guitar"):
+        with self._rec_lock:
+            self._rec_chunks = []
+            self._rec_samples = 0
+            self._rec_part = str(part_id or "guitar")
+            self._rec_active = True
+
+    def stop_recording(self):
+        with self._rec_lock:
+            self._rec_active = False
+            chunks = list(self._rec_chunks)
+            self._rec_chunks = []
+            self._rec_samples = 0
+            part = self._rec_part
+        if not chunks:
+            return b"", 0.0, part
+        audio = np.concatenate(chunks, axis=0)
+        pcm = np.clip(audio * 32767.0, -32768.0, 32767.0).astype(np.int16)
+        buf = io.BytesIO()
+        with wave.open(buf, "wb") as wf:
+            wf.setnchannels(int(pcm.shape[1]) if pcm.ndim == 2 else 1)
+            wf.setsampwidth(2)
+            wf.setframerate(int(self.rate))
+            wf.writeframes(pcm.tobytes())
+        duration = float(audio.shape[0]) / float(self.rate)
+        return buf.getvalue(), round(duration, 2), part
+
+    def recording_status(self):
+        with self._rec_lock:
+            return {
+                "active": bool(self._rec_active),
+                "part": self._rec_part,
+                "seconds": round(float(self._rec_samples) / float(self.rate), 2) if self.rate else 0.0,
+            }
 
     def _apply_wah(self, source):
         mix = float(np.clip(self.wah_mix, 0.0, 1.0))
@@ -1060,6 +1146,13 @@ class FastAmp:
             if self._tune_hold <= 0:
                 self.tuner = _idle_tuner()
             return
+        if self.octave_down >= 0.5:
+            found = dict(found)
+            found["midi"] = max(0, int(found["midi"]) - 12)
+            found["octave"] = int(found["octave"]) - 1
+            found["hz"] = round(float(found["hz"]) * 0.5, 2)
+            found["staff"] = staff_from_tuner(found["note"], found["octave"])
+            found["octave_shifted"] = True
         self._tune_hold = int(0.35 * self.rate)
         self.tuner = found
 
@@ -1140,6 +1233,8 @@ class FastAmp:
         if os.environ.get("AMP_GATE_OFF") != "1":
             # Slightly gentler open so quiet notes are less chopped (Warmath / clean DI).
             source = source * np.clip((self.gate - np.float32(0.015)) / np.float32(0.04), 0.0, 1.0)
+        # Sub-octave divider (-1 octave) so a regular guitar can track bass parts.
+        source = self._apply_octave_down(source)
         # Wah / resonant EQ before drive (Cry Baby-style into the amp).
         source = self._apply_wah(source)
         distorted = self._distort(source)
@@ -1180,6 +1275,11 @@ class FastAmp:
             0.4,
         )
         ears = np.column_stack((_output_limit(left), _output_limit(right))).astype(np.float32)
+        if self._rec_active:
+            with self._rec_lock:
+                if self._rec_active and self._rec_samples < self._rec_max_samples:
+                    self._rec_chunks.append(ears.copy())
+                    self._rec_samples += int(ears.shape[0])
         self.ring[positions] = distorted
         self.write = (self.write + frames) % self.ring_size
         out_peak = float(np.max(np.abs(ears))) if ears.size else 0.0
@@ -1674,6 +1774,7 @@ def validate_params(
     ir_mix=None,
     low_cut=None,
     high_cut=None,
+    octave_down=None,
 ):
     if not 0.0 <= feedback <= 0.9 or not 0.0 <= mix <= 1.0 or not 0.0 <= volume <= 4.0:
         raise ValueError("feedback must be 0-0.9; mix must be 0-1; volume must be 0-4")
@@ -1683,7 +1784,14 @@ def validate_params(
         raise ValueError("wah_q must be 0.4-16")
     if wah_freq is not None and not 120.0 <= float(wah_freq) <= 12000.0:
         raise ValueError("wah_freq must be 120-12000 Hz")
-    for name, value in (("bass", bass), ("mid", mid), ("treble", treble), ("presence", presence), ("ir_mix", ir_mix)):
+    for name, value in (
+        ("bass", bass),
+        ("mid", mid),
+        ("treble", treble),
+        ("presence", presence),
+        ("ir_mix", ir_mix),
+        ("octave_down", octave_down),
+    ):
         if value is not None and not 0.0 <= float(value) <= 1.0:
             raise ValueError(f"{name} must be 0-1")
     if low_cut is not None and not 20.0 <= float(low_cut) <= 800.0:
@@ -1721,7 +1829,21 @@ class AmpSession:
                 "params": self.amp.params_snapshot(),
                 "meters": meters,
                 "tuner": tuner,
+                "recording": self.amp.recording_status(),
             }
+
+    def start_take(self, part_id="guitar"):
+        with self._lock:
+            if not self.amp or not self.amp.running:
+                return False
+            self.amp.start_recording(part_id)
+            return True
+
+    def stop_take(self):
+        with self._lock:
+            if not self.amp:
+                return b"", 0.0, ""
+            return self.amp.stop_recording()
 
     def apply_params(self, **kwargs):
         with self._lock:
@@ -1741,6 +1863,7 @@ class AmpSession:
             ir_mix = kwargs["ir_mix"] if kwargs.get("ir_mix") is not None else self.amp.ir_mix
             low_cut = kwargs["low_cut"] if kwargs.get("low_cut") is not None else self.amp.low_cut
             high_cut = kwargs["high_cut"] if kwargs.get("high_cut") is not None else self.amp.high_cut
+            octave_down = kwargs["octave_down"] if kwargs.get("octave_down") is not None else self.amp.octave_down
             validate_params(
                 feedback,
                 mix,
@@ -1755,6 +1878,7 @@ class AmpSession:
                 ir_mix=ir_mix,
                 low_cut=low_cut,
                 high_cut=high_cut,
+                octave_down=octave_down,
             )
             self.amp.apply_params(**kwargs)
 
@@ -1777,6 +1901,7 @@ class AmpSession:
             ir_mix=config.get("ir_mix", 0.0),
             low_cut=config.get("low_cut", 80.0),
             high_cut=config.get("high_cut", 8000.0),
+            octave_down=config.get("octave_down", 0.0),
         )
         rate = int(config.get("rate", 48000))
         blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 256)
@@ -1822,6 +1947,7 @@ class AmpSession:
             low_cut=float(config.get("low_cut", 80.0)),
             high_cut=float(config.get("high_cut", 8000.0)),
             preset=str(config.get("preset") or ""),
+            octave_down=float(config.get("octave_down", 0.0)),
         )
         stored = {
             "device": dev_meta["device"],

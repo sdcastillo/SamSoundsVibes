@@ -1,0 +1,670 @@
+/* Song Studio & Multi-Track Guitar Recorder ("Sunset Redline") */
+
+.song-studio {
+  border-color: var(--teal);
+  background:
+    radial-gradient(ellipse at 18% 0%, rgba(216, 159, 88, 0.14), transparent 55%),
+    radial-gradient(ellipse at 85% 100%, rgba(195, 63, 69, 0.14), transparent 55%),
+    var(--panel);
+}
+
+.song-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.song-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.25rem;
+  color: var(--accent-soft);
+}
+
+.song-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.song-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid var(--line);
+  background: var(--navy-deep);
+  color: var(--accent-soft);
+}
+
+.song-badge.is-crimson {
+  border-color: var(--crimson);
+  background: rgba(195, 63, 69, 0.22);
+  color: var(--text);
+}
+
+.song-badge.is-gold {
+  border-color: var(--gold);
+  background: rgba(216, 159, 88, 0.2);
+  color: var(--gold);
+}
+
+/* Octave-Down (Bass Mode) Button — used in both Amp panel and Song Studio */
+.octave-down-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: 1px solid var(--gold);
+  background: var(--navy-deep);
+  color: var(--gold);
+  cursor: pointer;
+  transition: background 120ms ease, color 120ms ease, box-shadow 120ms ease;
+}
+
+.octave-down-btn:hover {
+  background: var(--teal);
+  color: var(--text);
+}
+
+.octave-down-btn[aria-pressed="true"] {
+  background: var(--crimson);
+  border-color: var(--gold);
+  color: var(--text);
+  box-shadow: 0 0 14px rgba(195, 63, 69, 0.55);
+}
+
+.octave-down-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--muted);
+  display: inline-block;
+}
+
+.octave-down-btn[aria-pressed="true"] .octave-down-dot {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}
+
+/* 5 Part Tabs */
+.song-part-tabs {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 12px 0;
+}
+
+@media (max-width: 820px) {
+  .song-part-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.song-part-tabs button {
+  margin-top: 0;
+  padding: 10px 10px;
+  background: var(--navy-deep);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.song-part-tabs button .part-sub {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+.song-part-tabs button[aria-selected="true"] {
+  background: var(--teal);
+  color: var(--text);
+  border-color: var(--gold);
+  box-shadow: inset 0 -2px 0 var(--gold);
+}
+
+.song-part-tabs button[aria-selected="true"] .part-sub {
+  color: var(--gold);
+  opacity: 1;
+}
+
+/* Transport + Recording Control Bar */
+.song-control-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  background: var(--navy-deep);
+  border: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.song-control-bar button {
+  margin-top: 0;
+}
+
+.song-rec-btn {
+  background: var(--crimson);
+  color: var(--text);
+  border: 1px solid var(--gold);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.song-rec-btn.is-recording {
+  background: var(--gold);
+  color: var(--navy-deep);
+  animation: song-rec-pulse 0.9s infinite alternate;
+}
+
+@keyframes song-rec-pulse {
+  from { box-shadow: 0 0 4px rgba(195, 63, 69, 0.5); }
+  to { box-shadow: 0 0 16px rgba(216, 159, 88, 0.9); }
+}
+
+.song-section-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.song-sections {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.song-sections button {
+  margin-top: 0;
+  padding: 6px 11px;
+  font-size: 0.8rem;
+  background: var(--navy-deep);
+  color: var(--muted);
+  border: 1px solid var(--line);
+}
+
+.song-sections button[aria-pressed="true"] {
+  background: var(--teal);
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+.song-tempo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.song-tempo-wrap input[type="range"] {
+  width: 110px;
+}
+
+/* Info Banner for Current Part */
+.song-part-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: rgba(23, 101, 113, 0.28);
+  border: 1px solid var(--line);
+  margin-bottom: 10px;
+}
+
+.song-part-banner-text {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
+.song-part-banner-meta {
+  font-size: 0.8rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+/* Full-width Notation + Tab + Lyrics Stage */
+.song-stage {
+  position: relative;
+  border-radius: 6px;
+  background: var(--navy-deep);
+  border: 1px solid var(--line);
+  padding: 8px;
+  overflow-x: auto;
+}
+
+.song-staff-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 680px;
+}
+
+.song-lyric-word {
+  fill: var(--gold);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.song-lyric-note {
+  fill: var(--accent-soft);
+  font-size: 10px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+.song-section-tag {
+  fill: var(--crimson);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.song-live-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+  margin: 10px 0 8px;
+}
+
+.song-contrast-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+
+.song-contrast-toggle input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--gold);
+}
+
+.song-live-score {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.song-live-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.song-stage-label {
+  margin: 0 0 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent2);
+}
+
+.song-tab-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 680px;
+}
+
+/* WCAG-friendly notation on navy stage (default song tab palette) */
+.song-studio .song-stage {
+  background: #0a1228;
+}
+
+.song-studio .lab-staff-lines line,
+.song-studio .lab-bar {
+  stroke: #A3D9D9;
+  opacity: 0.92;
+}
+
+.song-studio .lab-clef {
+  fill: #D89F58;
+}
+
+.song-studio .lab-chord {
+  fill: #D89F58;
+}
+
+.song-studio .lab-tab-lines line {
+  stroke: #A3D9D9;
+  opacity: 0.88;
+}
+
+.song-studio .lab-tab-clef {
+  fill: #D89F58;
+}
+
+.song-studio .lab-tabnum rect {
+  fill: #f3f9f9;
+}
+
+.song-studio .lab-tabnum text {
+  fill: #0a1228;
+}
+
+.song-studio .lab-note .lab-head,
+.song-studio .lab-note .lab-stem {
+  fill: #f3f9f9;
+  stroke: #f3f9f9;
+}
+
+.song-studio .lab-note.is-target .lab-head,
+.song-studio .lab-note.is-target .lab-stem {
+  fill: #D89F58;
+  stroke: #1A3567;
+}
+
+.song-studio .song-lyric-note {
+  fill: #A3D9D9;
+}
+
+.song-studio.is-high-contrast .song-stage {
+  background: #050a14;
+  border-color: #D89F58;
+}
+
+.song-studio.is-high-contrast .lab-staff-lines line,
+.song-studio.is-high-contrast .lab-bar,
+.song-studio.is-high-contrast .lab-tab-lines line {
+  stroke: #f3f9f9;
+  opacity: 1;
+}
+
+.song-studio.is-high-contrast .lab-clef,
+.song-studio.is-high-contrast .lab-chord,
+.song-studio.is-high-contrast .lab-tab-clef,
+.song-studio.is-high-contrast .song-section-tag {
+  fill: #D89F58;
+}
+
+.song-studio.is-high-contrast .lab-tabnum rect {
+  fill: #D89F58;
+}
+
+.song-studio.is-high-contrast .lab-tabnum text {
+  fill: #050a14;
+}
+
+.song-studio.is-high-contrast .lab-note .lab-head,
+.song-studio.is-high-contrast .lab-note .lab-stem {
+  fill: #f3f9f9;
+  stroke: #f3f9f9;
+}
+
+.song-studio.is-high-contrast .lab-note.is-target .lab-head,
+.song-studio.is-high-contrast .lab-note.is-target .lab-stem {
+  fill: #176571;
+  stroke: #f3f9f9;
+}
+
+.song-studio.is-high-contrast .song-lyric-word {
+  fill: #f3f9f9;
+}
+
+.song-studio.is-high-contrast .song-lyric-note {
+  fill: #A3D9D9;
+}
+
+.song-studio.is-high-contrast .lab-playhead {
+  stroke: #C33F45;
+  stroke-width: 3;
+}
+
+/* Multi-Track Stem Mixer & Recorder Matrix */
+.song-mixer-grid {
+  display: grid;
+  /* stacked: the take recorder gets the full width so every stem's buttons sit on one line */
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  .song-mixer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.song-box {
+  background: var(--navy-deep);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.song-box h3 {
+  margin: 0 0 8px;
+  font-size: 0.96rem;
+  color: var(--gold);
+}
+
+.song-track-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.song-track-row {
+  display: grid;
+  grid-template-columns: minmax(140px, 1.2fr) auto minmax(90px, 0.9fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: rgba(26, 53, 103, 0.55);
+  border: 1px solid rgba(163, 217, 217, 0.16);
+}
+
+@media (max-width: 640px) {
+  .song-track-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.song-track-row.is-focused {
+  border-color: var(--gold);
+  background: rgba(23, 101, 113, 0.42);
+}
+
+.song-track-name {
+  font-weight: 700;
+  font-size: 0.86rem;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.song-track-state {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.song-track-state.has-take {
+  color: var(--gold);
+}
+
+.song-track-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.song-track-btns button {
+  margin-top: 0;
+  padding: 5px 9px;
+  font-size: 0.76rem;
+}
+
+.song-track-btns button.is-muted {
+  background: var(--crimson);
+  color: var(--text);
+  border-color: var(--gold);
+}
+
+.song-track-vol {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+/* Drum Machine Step Sequencer Grid */
+.drum-grid-wrap {
+  margin-top: 8px;
+  overflow-x: auto;
+}
+
+.drum-pattern-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.drum-grid {
+  display: grid;
+  grid-template-columns: 78px repeat(16, minmax(18px, 1fr));
+  gap: 3px;
+  align-items: center;
+  font-size: 0.73rem;
+}
+
+.drum-row-label {
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.drum-cell {
+  height: 20px;
+  border-radius: 3px;
+  background: rgba(26, 53, 103, 0.7);
+  border: 1px solid rgba(163, 217, 217, 0.16);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.drum-cell.is-beat {
+  border-color: rgba(216, 159, 88, 0.4);
+}
+
+.drum-cell.is-on {
+  background: var(--teal);
+  border-color: var(--gold);
+}
+
+.drum-cell.is-on.is-accent {
+  background: var(--crimson);
+  border-color: var(--gold);
+}
+
+.drum-cell.is-step {
+  outline: 2px solid var(--gold);
+}
+
+/* Lyrics + Notes Sheet */
+.song-lyrics-sheet {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 780px) {
+  .song-lyrics-sheet {
+    grid-template-columns: 1fr;
+  }
+}
+
+.lyric-section-card {
+  background: var(--navy-deep);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.lyric-section-card.is-active {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px rgba(216, 159, 88, 0.4);
+}
+
+.lyric-section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.lyric-section-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--gold);
+}
+
+.lyric-section-chords {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.lyric-line-row {
+  padding: 5px 0;
+  border-top: 1px solid rgba(163, 217, 217, 0.12);
+}
+
+.lyric-line-row:first-of-type {
+  border-top: 0;
+}
+
+.lyric-words {
+  margin: 0 0 2px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.lyric-notes {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.76rem;
+  color: var(--accent-soft);
+}

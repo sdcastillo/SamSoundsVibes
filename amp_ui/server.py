@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """Local browser UI for the guitar amp. Default bind 127.0.0.1 (override with AMP_UI_HOST)."""
 
+import base64
 import json
 import os
+import re
 import sys
+import time
+import wave
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 REPO_ROOT = ROOT.parent
 STATIC = ROOT / "static"
+RECORDINGS = ROOT / "recordings"
+RECORDINGS.mkdir(parents=True, exist_ok=True)
+VALID_TAKE_PARTS = ("rhythm", "lead", "solo", "bass", "vocals")
 
 
 def _env_host():
@@ -60,6 +67,7 @@ PARAM_DEFAULTS = {
     "ir_mix": 0.0,
     "low_cut": 80.0,
     "high_cut": 8000.0,
+    "octave_down": 0.0,
 }
 
 
@@ -135,6 +143,7 @@ async def api_start(payload: dict):
             ir_mix=config["ir_mix"],
             low_cut=config["low_cut"],
             high_cut=config["high_cut"],
+            octave_down=config["octave_down"],
         )
         session.start(config)
     except (ValueError, RuntimeError) as error:
@@ -222,6 +231,171 @@ async def api_preset(payload: dict):
         "ir": params.get("ir") or "",
     }
     return {"preset": view, "params": params, **session.status()}
+
+
+def _clean_part_id(part_id):
+    cleaned = re.sub(r"[^a-z0-9_-]", "", str(part_id or "").strip().lower())
+    return cleaned if cleaned in VALID_TAKE_PARTS else "rhythm"
+
+
+def _wav_duration(path: Path) -> float:
+    try:
+        with wave.open(str(path), "rb") as wf:
+            frames = wf.getnframes()
+            rate = wf.getframerate()
+            return round(float(frames) / float(rate), 2) if rate else 0.0
+    except Exception:
+        return 0.0
+
+
+def _take_meta(part: str) -> dict:
+    path = RECORDINGS / f"{part}.json"
+    try:
+        return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+    except (OSError, ValueError):
+        return {}
+
+
+_PENDING_TAKE_META = {}
+
+
+def _clean_take_meta(part: str, payload: dict) -> dict:
+    meta = {"part": part}
+    for key, cast, low, high in (
+        ("start_bar", int, 0, 64),
+        ("end_bar", int, 1, 64),
+        ("bpm", float, 30.0, 300.0),
+        ("count_in_beats", int, 0, 16),
+        ("latency_ms", float, 0.0, 1000.0),
+    ):
+        try:
+            value = cast(payload.get(key))
+        except (TypeError, ValueError):
+            continue
+        meta[key] = min(high, max(low, value))
+    return meta
+
+
+def _save_take_meta(part: str, payload: dict):
+    """Which bars / tempo / count-in a take covers, so the browser can line it up with the drums."""
+    meta = _clean_take_meta(part, payload)
+    (RECORDINGS / f"{part}.json").write_text(json.dumps(meta), encoding="utf-8")
+
+
+def _drop_take_files(part: str, keep_meta=False):
+    for ext in (".wav", ".webm", ".ogg") + (() if keep_meta else (".json",)):
+        target = RECORDINGS / f"{part}{ext}"
+        if target.exists():
+            target.unlink()
+
+
+def _list_takes():
+    takes = {}
+    for part in VALID_TAKE_PARTS:
+        for ext in (".wav", ".webm", ".ogg"):
+            candidate = RECORDINGS / f"{part}{ext}"
+            if candidate.is_file() and candidate.stat().st_size > 44:
+                mtime = int(candidate.stat().st_mtime * 1000)
+                takes[part] = {
+                    "part": part,
+                    "url": f"api/takes/{part}{ext}?t={mtime}",
+                    "duration": _wav_duration(candidate) if ext == ".wav" else 0.0,
+                    "size": candidate.stat().st_size,
+                    "updated_ms": mtime,
+                    "meta": _take_meta(part),
+                }
+                break
+    return takes
+
+
+@app.get("/api/takes")
+def api_takes():
+    return {"takes": _list_takes(), "recording": session.status().get("recording")}
+
+
+@app.post("/api/takes/start")
+async def api_takes_start(payload: dict):
+    part = _clean_part_id(payload.get("part"))
+    amp_started = session.start_take(part)
+    if amp_started:
+        # Written only once the take is actually saved, so a failed re-record keeps the old take's timing.
+        _PENDING_TAKE_META[part] = dict(payload)
+    return {
+        "ok": True,
+        "part": part,
+        "amp_capturing": amp_started,
+        "takes": _list_takes(),
+    }
+
+
+@app.post("/api/takes/stop")
+async def api_takes_stop(payload: dict = None):
+    payload = payload or {}
+    wav_bytes, duration, amp_part = session.stop_take()
+    part = _clean_part_id(payload.get("part") or amp_part)
+    saved_from_amp = False
+    if wav_bytes and duration >= 0.15:
+        for ext in (".webm", ".ogg"):
+            old = RECORDINGS / f"{part}{ext}"
+            if old.exists():
+                old.unlink()
+        target = RECORDINGS / f"{part}.wav"
+        target.write_bytes(wav_bytes)
+        _save_take_meta(part, _PENDING_TAKE_META.pop(part, {}))
+        saved_from_amp = True
+    return {
+        "ok": True,
+        "part": part,
+        "saved_from_amp": saved_from_amp,
+        "duration": duration,
+        "takes": _list_takes(),
+    }
+
+
+@app.post("/api/takes/upload")
+async def api_takes_upload(payload: dict):
+    part = _clean_part_id(payload.get("part"))
+    raw_b64 = str(payload.get("audio_base64") or "").strip()
+    if "," in raw_b64 and raw_b64.startswith("data:"):
+        raw_b64 = raw_b64.split(",", 1)[1]
+    if not raw_b64:
+        return JSONResponse(status_code=400, content={"error": "Missing audio_base64"})
+    if len(raw_b64) > 120 * 1024 * 1024:
+        return JSONResponse(status_code=413, content={"error": "Take too large"})
+    ext = str(payload.get("ext") or ".wav").lower()
+    if ext not in (".wav", ".webm", ".ogg"):
+        ext = ".wav"
+    try:
+        audio_bytes = base64.b64decode(raw_b64)
+    except Exception as error:
+        return JSONResponse(status_code=400, content={"error": f"Invalid base64: {error}"})
+    _drop_take_files(part, keep_meta=False)
+    target = RECORDINGS / f"{part}{ext}"
+    target.write_bytes(audio_bytes)
+    if isinstance(payload.get("meta"), dict):
+        _save_take_meta(part, payload["meta"])
+    return {"ok": True, "part": part, "takes": _list_takes()}
+
+
+@app.delete("/api/takes/{part_id}")
+def api_takes_delete(part_id: str):
+    part = _clean_part_id(part_id)
+    _drop_take_files(part)
+    return {"ok": True, "part": part, "takes": _list_takes()}
+
+
+@app.get("/api/takes/{filename}")
+def api_takes_file(filename: str):
+    match = re.match(r"^([a-z0-9_-]+)\.(wav|webm|ogg)$", filename.strip().lower())
+    if not match:
+        return JSONResponse(status_code=404, content={"error": "Invalid take filename"})
+    part = _clean_part_id(match.group(1))
+    ext = "." + match.group(2)
+    target = RECORDINGS / f"{part}{ext}"
+    if not target.is_file():
+        return JSONResponse(status_code=404, content={"error": "Take not found"})
+    media = "audio/wav" if ext == ".wav" else ("audio/webm" if ext == ".webm" else "audio/ogg")
+    return FileResponse(target, media_type=media, headers={"Cache-Control": "no-store"})
 
 
 @app.get("/")
