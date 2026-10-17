@@ -1,5 +1,5 @@
 {
-  "_readme": "Riffs, leads, and a recommended amp tone for each backing track in tracks.json, keyed by track id. Original phrases, CC0. tab is one token per note: string (e B G D A E, high e lowercase), fret, duration (w h. h q. q e. e s; default q). r plus a duration is a rest. | marks a bar line and must match the track's bars. tone.slot is a factory preset; overrides replace its delay, feedback, mix, drive, or cabinet IR.",
+  "_readme": "Riffs, leads, and a recommended amp tone for each backing track in tracks.json, keyed by track id. Original phrases, CC0. tab is one token per note: string (e B G D A E, high e lowercase), fret, optional techniques (hN hammer, pN pull-off, bN bend to fret N, sN or /N slide to fret N, ~ vibrato), duration (w h. h q. q e. e s; default q). Double-stops: B5+G7e. r plus a duration is a rest. | marks a bar line and must match the track's bars. tone.slot is a factory preset; overrides replace its delay, feedback, mix, drive, or cabinet IR.",
   "version": 1,
   "tracks": {
     "a-minor-blues": {
@@ -20,9 +20,17 @@
         {
           "id": "lead",
           "kind": "lead",
-          "title": "Box 1 blues lead",
-          "tip": "A minor pentatonic at the 5th fret, with the flat 5 (Eb, G string 8th fret) in bar 3 and the F in bar 6 for the Dm7. Leave the rests empty: space is half of a blues solo.",
-          "tab": "rq B8e B5e G7q G5q | D7h G5e D7e D5q | rq G5e G7e G8e G7e G5q | D7w | rq e5q e8e e5e B8q | B6h B8q B5q | G7q G5q D7h | rh B5q G7q | B5q B8q e7q B5q | e5q B6q B5e G7e G7q | G5q D7q E8q E5q | A7h A5q rq"
+          "title": "Texas shuffle solo",
+          "tip": "Box 1 at the 5th fret: pick the first note in each pair, then hammer or pull the rest. The G8b10 bend is the flat 5 crying up toward the 5th — support with three fingers behind the bend.",
+          "techniqueTips": [
+            { "technique": "hammer-on", "text": "Bars 1–2: B5h8 and G5h7 — one pick, two notes. Keep the hammer finger low so it snaps the string." },
+            { "technique": "bend", "text": "Bar 3: G8b10 over Am7 — bend to the pitch of fret 10 (B). Release on the rest so the shuffle pocket stays open." },
+            { "technique": "double-stop", "text": "Bar 5: B5+G7e over Dm7 — both notes are in the scale; strum lightly with the pick edge." },
+            { "technique": "pull-off", "text": "Bar 9: e8p5p8 — trill flavor on the turnaround; pull toward the floor." },
+            { "technique": "slide", "text": "Bar 11: B5s8 — slide into the root for the last Am7 bar before the V." },
+            { "technique": "vibrato", "text": "Bar 12: hold G7~h on Em7 — slow wrist vibrato on the flat 7 (D)." }
+          ],
+          "tab": "B5h8e B5e G5h7e G7e B8q G7q | B8e G7e D7e D5e B5e G7e B5q | G8b10~q B5q G7q B5e G7e | D7h G5e D7e D5q | B5+G7e G5e D7e D5e B5e G7e B5q | B8e G7e D7e D5e B5e G7e B5q | G7q G5q D7h | B5q G7q B5q G7q | e8p5e B8e G7q B5e G7e B5q | B5e G7e D7e D5e B5e G7e B5q | B5s8q G7q B5q G7q | G7~h rq rq"
         }
       ]
     },
@@ -68,9 +76,17 @@
         {
           "id": "lead",
           "kind": "lead",
-          "title": "Sing-along melody",
-          "tip": "A vocal-style line in open position. The F# in bars 2 and 6 is the 3rd of D.",
-          "tab": "G4q B3q B5q e3q | e2h B3q G2q | B5q. B3e G4q B5q | B5h B1h | e3q e2e e3e B5q B3q | e2q. e0e B3h | B5q G4q B3q B5q | B1h G0h"
+          "title": "Pop hook with slides",
+          "tip": "Open-position G major: slides connect chord tones across the I–V–vi–IV. Let dotted-eighth delay carry notes you sustain.",
+          "techniqueTips": [
+            { "technique": "slide", "text": "Bar 1: G0/G2 — slide from open G to A on the G string for a vocal pickup into the G chord." },
+            { "technique": "hammer-on", "text": "Bar 2: e0h2 over D — hammer the 2nd fret (F#) without a second pick; that's the major 3rd of D." },
+            { "technique": "bend", "text": "Bar 3: B3b5 over Em — quarter-step feel bend toward C; stay short so you land on B for the chord." },
+            { "technique": "double-stop", "text": "Bar 4: B1+G0q over C — 3rd and root of C; pick both strings with one stroke." },
+            { "technique": "pull-off", "text": "Bar 6: B3p0 — pull off to open B string for a bell-like decay on D." },
+            { "technique": "vibrato", "text": "Bar 8: G0~h — slow vibrato on the root ending the form." }
+          ],
+          "tab": "G0s2q B3q B5q e3q | e0h2e B3q G2q B3q e2e | B3b5q B3e G4q B5q B3e | B1+G0q B3q B1q G0q | e3q e2e e3e B5q B3q | B3p0q e0e B3h e0e | B5q G4q B3q B5q | G0~h B1h"
         }
       ]
     },
@@ -92,9 +108,17 @@
         {
           "id": "lead",
           "kind": "lead",
-          "title": "Dorian answer phrases",
-          "tip": "On G7, B and F are the chord's 3rd and flat 7. That is the Dorian sound: B natural over a minor groove.",
-          "tab": "rq G7e B6e G7e B6e G7q | B8e B6e G7q rh | e7q e5e B6e e7q rq | B8h B6q rq | e8q e7e e5e B6q G7q | D7h rh | B5e B6e B8e B6e B5q G7q | e7q B8q B6q rq"
+          "title": "Dorian call and response",
+          "tip": "Sixteenth-grid funk: stay muted between hits. On G7 bars, B natural is the Dorian color — hammer and slide into it, never bend it sharp.",
+          "techniqueTips": [
+            { "technique": "hammer-on", "text": "Bar 1: G5h7 — pick once, then hammer to the 7th fret on the same string." },
+            { "technique": "double-stop", "text": "Bar 3: B6+G7e on G7 — 3rd and flat 7 together; short and percussive." },
+            { "technique": "slide", "text": "Bar 5: e5s7 — slide up into the Dorian 6th over Dm7." },
+            { "technique": "pull-off", "text": "Bar 6: B8p6p5 — descending answer on the B string; keep the picking hand in sixteenths." },
+            { "technique": "bend", "text": "Bar 7: G7b9 over G7 — bend to the 9th fret pitch (A); release before the next stab." },
+            { "technique": "vibrato", "text": "Bar 8: e7~q — one sustained target with wrist vibrato to fill the last G7 bar." }
+          ],
+          "tab": "G5h7e B6e G7e B6e G7q B6q | B8e B6e G7q rh | B6+G7e B6e G7q B6e G7e B6q | B8h B6q rq | e5s7e e5e B6e G7q e5e B6q | B8p6e B5e D7q B6q G7q | G7b9e B6e B8e G7q B6e G7q | e7~h B8q B6q"
         }
       ]
     },

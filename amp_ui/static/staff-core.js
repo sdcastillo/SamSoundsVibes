@@ -371,16 +371,90 @@
     });
   }
 
-  /* Tab tokens: string letter (high e lowercase) + fret + optional duration, or r + duration
-     for a rest. "|" is a bar line. Returns notes with sounding pitch and timing in beats. */
+  /* Tab tokens: string letter (high e lowercase) + fret + optional techniques + duration, or r +
+     duration for a rest. Double-stops join pairs with + (B5+G7e). Techniques after the fret:
+     hN hammer-on, pN pull-off, bN bend to fret N, sN or /N slide to fret N, ~ vibrato. "|" is a
+     bar line. Returns notes with sounding pitch and timing in beats. */
   var TAB_STRING = { e: 1, B: 2, G: 3, D: 4, A: 5, E: 6 };
+  var TECH_PATTERN = "(?:h\\d{1,2}|p\\d{1,2}|b\\d{1,2}|s\\d{1,2}|\\/\\d{1,2}|~)+";
+
+  function tabMidi(stringLetter, fret) {
+    var stringNum = TAB_STRING[stringLetter];
+    return STRINGS[6 - stringNum].midi + fret;
+  }
+
+  function parseTabTechniques(tech) {
+    var out = { vibrato: false };
+    if (!tech) return out;
+    var re = /h(\d{1,2})|p(\d{1,2})|b(\d{1,2})|s(\d{1,2})|\/(\d{1,2})|~/g;
+    var m;
+    while ((m = re.exec(tech))) {
+      if (m[0] === "~") out.vibrato = true;
+      else if (m[1]) out.hammer = parseInt(m[1], 10);
+      else if (m[2]) out.pull = parseInt(m[2], 10);
+      else if (m[3]) out.bend = parseInt(m[3], 10);
+      else if (m[4] || m[5]) out.slide = parseInt(m[4] || m[5], 10);
+    }
+    return out;
+  }
+
+  function attachTechniques(item, tech, stringLetter) {
+    if (tech.vibrato) item.vibrato = true;
+    if (tech.hammer != null) {
+      item.hammer = { fret: tech.hammer, midi: tabMidi(stringLetter, tech.hammer) };
+    }
+    if (tech.pull != null) {
+      item.pull = { fret: tech.pull, midi: tabMidi(stringLetter, tech.pull) };
+    }
+    if (tech.bend != null) {
+      item.bend = { fret: tech.bend, midi: tabMidi(stringLetter, tech.bend) };
+    }
+    if (tech.slide != null) {
+      item.slide = { fret: tech.slide, midi: tabMidi(stringLetter, tech.slide) };
+    }
+  }
+
+  function parseTabToken(token) {
+    if (token === "r" || token.charAt(0) === "r") {
+      var restDur = token === "r" ? "q" : token.slice(1);
+      if (!DUR_BEATS[restDur]) throw new Error("Bad tab token: " + token);
+      return { rest: true, dur: restDur };
+    }
+    var tail = "(?:(" + DUR_PATTERN + ")?~?|~(" + DUR_PATTERN + ")?)$";
+    var doubleRe = new RegExp("^((?:[eBGDAE]\\d{1,2})(?:\\+[eBGDAE]\\d{1,2})+)(" + TECH_PATTERN + ")?" + tail);
+    var dm = doubleRe.exec(token);
+    if (dm) {
+      var parts = dm[1].split("+");
+      var voices = parts.map(function (pair) {
+        var sm = /^([eBGDAE])(\d{1,2})$/.exec(pair);
+        if (!sm) throw new Error("Bad tab token: " + token);
+        var fret = parseInt(sm[2], 10);
+        return { string: TAB_STRING[sm[1]], fret: fret, midi: tabMidi(sm[1], fret), letter: sm[1] };
+      });
+      var tech = parseTabTechniques((dm[2] || "") + (token.indexOf("~") >= 0 ? "~" : ""));
+      var dur = dm[3] || dm[4] || "q";
+      return { dur: dur, voices: voices, tech: tech, primary: voices[0] };
+    }
+    var singleRe = new RegExp("^([eBGDAE])(\\d{1,2})(" + TECH_PATTERN + ")?" + tail);
+    var m = singleRe.exec(token);
+    if (!m) throw new Error("Bad tab token: " + token);
+    var fret = parseInt(m[2], 10);
+    var techStr = (m[3] || "") + (token.indexOf("~") >= 0 ? "~" : "");
+    return {
+      dur: m[4] || m[5] || "q",
+      string: TAB_STRING[m[1]],
+      fret: fret,
+      letter: m[1],
+      midi: tabMidi(m[1], fret),
+      tech: parseTabTechniques(techStr),
+    };
+  }
 
   function parseTab(tab, perBar) {
     perBar = perBar || 4;
     var notes = [];
     var barSums = [0];
     var bar = 0;
-    var tokenRe = new RegExp("^(?:([eBGDAE])(\\d{1,2})|r)" + DUR_PATTERN + "?$");
     String(tab || "")
       .split(/\s+/)
       .filter(Boolean)
@@ -390,23 +464,58 @@
           barSums.push(0);
           return;
         }
-        var m = tokenRe.exec(token);
-        if (!m) throw new Error("Bad tab token: " + token);
-        var dur = m[3] || "q";
+        var parsed = parseTabToken(token);
+        var dur = parsed.dur;
         var item = { dur: dur, beats: DUR_BEATS[dur], bar: bar, pos: barSums[bar] };
         item.beat = bar * perBar + item.pos;
-        if (m[1]) {
-          item.string = TAB_STRING[m[1]];
-          item.fret = parseInt(m[2], 10);
-          item.midi = STRINGS[6 - item.string].midi + item.fret;
-          item.note = noteFromMidi(item.midi, false);
-        } else {
+        if (parsed.rest) {
           item.rest = true;
+        } else if (parsed.voices) {
+          item.voices = parsed.voices.map(function (v) {
+            return { string: v.string, fret: v.fret, midi: v.midi, note: noteFromMidi(v.midi, false) };
+          });
+          item.string = parsed.primary.string;
+          item.fret = parsed.primary.fret;
+          item.midi = parsed.primary.midi;
+          item.note = noteFromMidi(item.midi, false);
+          attachTechniques(item, parsed.tech, parsed.primary.letter);
+        } else {
+          item.string = parsed.string;
+          item.fret = parsed.fret;
+          item.midi = parsed.midi;
+          item.note = noteFromMidi(item.midi, false);
+          attachTechniques(item, parsed.tech, parsed.letter);
         }
         barSums[bar] += item.beats;
         notes.push(item);
       });
     return { notes: notes, bars: bar + 1, perBar: perBar, barSums: barSums };
+  }
+
+  /* Midis that count as a hit for scoring and validation (primary, double-stop, bend target). */
+  function tabMatchMidis(note) {
+    if (!note || note.rest) return [];
+    var midis = [note.midi];
+    if (note.voices) note.voices.forEach(function (v) {
+      if (midis.indexOf(v.midi) < 0) midis.push(v.midi);
+    });
+    if (note.bend) midis.push(note.bend.midi);
+    if (note.hammer) midis.push(note.hammer.midi);
+    if (note.pull) midis.push(note.pull.midi);
+    if (note.slide) midis.push(note.slide.midi);
+    return midis;
+  }
+
+  function tabTechniqueKinds(note) {
+    var kinds = [];
+    if (!note || note.rest) return kinds;
+    if (note.voices && note.voices.length > 1) kinds.push("double");
+    if (note.hammer) kinds.push("hammer");
+    if (note.pull) kinds.push("pull");
+    if (note.bend) kinds.push("bend");
+    if (note.slide) kinds.push("slide");
+    if (note.vibrato) kinds.push("vibrato");
+    return kinds;
   }
 
   /* Picks a string and fret for each note: stay near the hinted frets and move the hand as
@@ -480,8 +589,13 @@
     var anyOctave = !!opts.anyOctave;
     var playable = [];
     notes.forEach(function (n, i) {
-      if (!n.rest && n.midi > 0) playable.push(i);
+      if (!n.rest && tabMatchMidis(n).length) playable.push(i);
     });
+    function pitchOk(n, midi) {
+      return tabMatchMidis(n).some(function (m) {
+        return matches(m, midi, anyOctave);
+      });
+    }
     var result = {};
     var counts;
     function reset() {
@@ -501,7 +615,7 @@
           var off = t - due(i);
           if (off < -early || off > late) return;
           if (!near || Math.abs(off) < Math.abs(near.offset)) near = { index: i, offset: off };
-          if (!matches(notes[i].midi, midi, anyOctave)) return;
+          if (!pitchOk(notes[i], midi)) return;
           if (!best || Math.abs(off) < Math.abs(best.offset)) best = { index: i, offset: off };
         });
         if (best) {
@@ -806,6 +920,8 @@
     parseSong: parseSong,
     scaleNotes: scaleNotes,
     parseTab: parseTab,
+    tabMatchMidis: tabMatchMidis,
+    tabTechniqueKinds: tabTechniqueKinds,
     assignFrets: assignFrets,
     METERS: METERS,
     createTimedJudge: createTimedJudge,

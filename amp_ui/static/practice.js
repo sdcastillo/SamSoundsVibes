@@ -171,18 +171,29 @@
   function initTabs() {
     var rig = $("tab-rig");
     var practice = $("tab-practice");
+    var song = $("tab-song");
     var rigPanels = $("rig-panels");
+    var songPanel = $("song-panel");
+    var staffLab = $("staff-lab");
     if (!rig || !practice || !rigPanels) return;
     function show(which) {
       var practiceOn = which === "practice";
-      rig.setAttribute("aria-selected", practiceOn ? "false" : "true");
+      var songOn = which === "song";
+      rig.setAttribute("aria-selected", !practiceOn && !songOn ? "true" : "false");
       practice.setAttribute("aria-selected", practiceOn ? "true" : "false");
-      rigPanels.hidden = practiceOn;
+      if (song) song.setAttribute("aria-selected", songOn ? "true" : "false");
+      rigPanels.hidden = practiceOn || songOn;
       panel.hidden = !practiceOn;
+      if (songPanel) songPanel.hidden = !songOn;
+      if (staffLab) staffLab.hidden = songOn;
       if (practiceOn) syncGuitarFromAmp();
+      if (songOn && window.SongStudio && window.SongStudio.controller()) {
+        window.SongStudio.controller().renderSongScore();
+      }
     }
     rig.addEventListener("click", function () { show("rig"); });
     practice.addEventListener("click", function () { show("practice"); });
+    if (song) song.addEventListener("click", function () { show("song"); });
   }
 
   function initSources() {
@@ -465,6 +476,21 @@
       tabs.appendChild(b);
     });
     $("riff-tip").textContent = phrase.tip;
+    var techList = $("riff-techniques");
+    techList.textContent = "";
+    if (phrase.kind === "lead" && phrase.techniqueTips && phrase.techniqueTips.length) {
+      techList.hidden = false;
+      phrase.techniqueTips.forEach(function (tip) {
+        var li = document.createElement("li");
+        var strong = document.createElement("strong");
+        strong.textContent = tip.technique + ": ";
+        li.appendChild(strong);
+        li.appendChild(document.createTextNode(tip.text));
+        techList.appendChild(li);
+      });
+    } else {
+      techList.hidden = true;
+    }
     drawRiffTab();
     updateRiffActions();
   }
@@ -555,6 +581,31 @@
     $("riff-stop").addEventListener("click", function () {
       if (window.StaffLab) window.StaffLab.stop();
     });
+    var tempo = $("riff-practice-tempo");
+    if (tempo) {
+      tempo.addEventListener("input", function () {
+        $("out-riff-practice-tempo").textContent = tempo.value + "%";
+        applyRiffPracticeRate();
+        var data = store();
+        data.riffPracticeTempo = Number(tempo.value);
+        save(data);
+      });
+    }
+    var phraseLoop = $("riff-phrase-loop");
+    if (phraseLoop) {
+      phraseLoop.addEventListener("change", function () {
+        var data = store();
+        data.riffPhraseLoop = phraseLoop.checked;
+        save(data);
+      });
+    }
+    var saved = store();
+    if (typeof saved.riffPracticeTempo === "number" && tempo) {
+      tempo.value = String(saved.riffPracticeTempo);
+      $("out-riff-practice-tempo").textContent = tempo.value + "%";
+      applyRiffPracticeRate();
+    }
+    if (saved.riffPhraseLoop && phraseLoop) phraseLoop.checked = true;
     ["stafflab:jam", "stafflab:tick", "stafflab:mode"].forEach(function (name) {
       document.addEventListener(name, function (event) {
         state.jam = event.detail;
@@ -1101,7 +1152,32 @@
     legend.appendChild(range);
   }
 
+  function riffPracticeRate() {
+    var slider = $("riff-practice-tempo");
+    return slider ? Number(slider.value) / 100 : 1;
+  }
+
+  function applyRiffPracticeRate() {
+    audio.playbackRate = riffPracticeRate();
+  }
+
+  function phraseLoopRange() {
+    if (!$("riff-phrase-loop") || !$("riff-phrase-loop").checked || !state.riffNotes.length || !state.track) return null;
+    var last = state.riffNotes[state.riffNotes.length - 1];
+    var totalBeats = progression().length * perBar();
+    if (!totalBeats || !isFinite(audio.duration)) return null;
+    var secPerBeat = audio.duration / totalBeats;
+    return { start: 0, end: (last.beat + last.beats) * secPerBeat };
+  }
+
+  function maybePhraseLoopSeek() {
+    var range = phraseLoopRange();
+    if (!range || audio.paused) return;
+    if (audio.currentTime >= range.end - 0.02) audio.currentTime = range.start;
+  }
+
   function onTime() {
+    maybePhraseLoopSeek();
     if (!state.seeking) {
       var duration = audio.duration;
       var seek = $("practice-seek");
@@ -1163,7 +1239,10 @@
     audio.addEventListener("play", onTime);
     audio.addEventListener("pause", onTime);
     audio.addEventListener("ended", onTime);
-    audio.addEventListener("loadedmetadata", onTime);
+    audio.addEventListener("loadedmetadata", function () {
+      applyRiffPracticeRate();
+      onTime();
+    });
     audio.addEventListener("error", function () {
       showPracticeError("That audio file wouldn't load.");
     });
@@ -1365,6 +1444,12 @@
     track: function () {
       return state.kind === "library" ? state.track : null;
     },
+    playbackRate: riffPracticeRate,
+    phraseLoop: function () {
+      var box = $("riff-phrase-loop");
+      return !!(box && box.checked);
+    },
+    phraseLoopRange: phraseLoopRange,
     selectTrack: function (id) {
       var track = state.catalog.filter(function (item) { return item.id === id; })[0];
       if (!track) return Promise.reject(new Error("No backing track " + id));
