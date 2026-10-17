@@ -14,6 +14,9 @@
   --muted: #A3D9D9;
   --border: #176571;
   --danger: #C33F45;
+  --navy-deep: #0f2040;
+  --accent-soft: #A3D9D9;
+  --line: #176571;
 }
 
 * { box-sizing: border-box; }
