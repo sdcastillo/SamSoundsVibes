@@ -3,6 +3,631 @@
   "version": 1,
   "tracks": [
     {
+      "id": "paradise-road",
+      "title": "Paradise Road (with lead)",
+      "genre": "Sam Sounds",
+      "file": "audio/paradise-road-with-lead.mp3",
+      "key": "C major",
+      "tonic": "C",
+      "mode": "major",
+      "bpm": 94,
+      "timeSignature": "4/4",
+      "feel": "straight",
+      "progression": [
+        "C",
+        "G",
+        "Am",
+        "F"
+      ],
+      "chords": [
+        {
+          "t": 0.0,
+          "chord": "C"
+        },
+        {
+          "t": 5.87,
+          "chord": "G"
+        },
+        {
+          "t": 7.13,
+          "chord": "Am"
+        },
+        {
+          "t": 9.01,
+          "chord": "G"
+        },
+        {
+          "t": 10.24,
+          "chord": "C"
+        },
+        {
+          "t": 11.59,
+          "chord": "G"
+        },
+        {
+          "t": 12.86,
+          "chord": "Am"
+        },
+        {
+          "t": 14.14,
+          "chord": "F"
+        },
+        {
+          "t": 15.42,
+          "chord": "C"
+        },
+        {
+          "t": 16.7,
+          "chord": "G"
+        },
+        {
+          "t": 17.97,
+          "chord": "Am"
+        },
+        {
+          "t": 19.25,
+          "chord": "F"
+        },
+        {
+          "t": 20.5,
+          "chord": "C"
+        },
+        {
+          "t": 21.78,
+          "chord": "G"
+        },
+        {
+          "t": 23.08,
+          "chord": "Am"
+        },
+        {
+          "t": 24.33,
+          "chord": "F"
+        },
+        {
+          "t": 25.63,
+          "chord": "C"
+        },
+        {
+          "t": 26.91,
+          "chord": "G"
+        },
+        {
+          "t": 28.21,
+          "chord": "Am"
+        },
+        {
+          "t": 29.47,
+          "chord": "F"
+        },
+        {
+          "t": 30.77,
+          "chord": "C"
+        },
+        {
+          "t": 32.0,
+          "chord": "G"
+        },
+        {
+          "t": 33.3,
+          "chord": "Am"
+        },
+        {
+          "t": 34.55,
+          "chord": "F"
+        },
+        {
+          "t": 35.83,
+          "chord": "C"
+        },
+        {
+          "t": 37.11,
+          "chord": "G"
+        },
+        {
+          "t": 38.38,
+          "chord": "Am"
+        },
+        {
+          "t": 39.68,
+          "chord": "F"
+        },
+        {
+          "t": 40.96,
+          "chord": "C"
+        },
+        {
+          "t": 42.24,
+          "chord": "G"
+        },
+        {
+          "t": 43.51,
+          "chord": "Am"
+        },
+        {
+          "t": 45.42,
+          "chord": "F"
+        },
+        {
+          "t": 46.07,
+          "chord": "C"
+        },
+        {
+          "t": 47.35,
+          "chord": "G"
+        },
+        {
+          "t": 48.6,
+          "chord": "Am"
+        },
+        {
+          "t": 50.53,
+          "chord": "F"
+        },
+        {
+          "t": 51.18,
+          "chord": "C"
+        },
+        {
+          "t": 52.43,
+          "chord": "G"
+        },
+        {
+          "t": 53.73,
+          "chord": "Am"
+        },
+        {
+          "t": 55.64,
+          "chord": "F"
+        },
+        {
+          "t": 56.29,
+          "chord": "C"
+        },
+        {
+          "t": 57.54,
+          "chord": "G"
+        },
+        {
+          "t": 58.84,
+          "chord": "Am"
+        },
+        {
+          "t": 60.74,
+          "chord": "F"
+        },
+        {
+          "t": 61.37,
+          "chord": "C"
+        },
+        {
+          "t": 62.65,
+          "chord": "G"
+        },
+        {
+          "t": 63.92,
+          "chord": "Am"
+        },
+        {
+          "t": 65.18,
+          "chord": "F"
+        },
+        {
+          "t": 66.48,
+          "chord": "C"
+        },
+        {
+          "t": 67.76,
+          "chord": "G"
+        },
+        {
+          "t": 69.03,
+          "chord": "Am"
+        },
+        {
+          "t": 70.29,
+          "chord": "F"
+        },
+        {
+          "t": 71.59,
+          "chord": "C"
+        },
+        {
+          "t": 72.84,
+          "chord": "G"
+        },
+        {
+          "t": 74.14,
+          "chord": "Am"
+        },
+        {
+          "t": 75.42,
+          "chord": "F"
+        },
+        {
+          "t": 76.7,
+          "chord": "C"
+        },
+        {
+          "t": 77.95,
+          "chord": "G"
+        },
+        {
+          "t": 79.25,
+          "chord": "Am"
+        },
+        {
+          "t": 80.55,
+          "chord": "F"
+        },
+        {
+          "t": 81.8,
+          "chord": "C"
+        },
+        {
+          "t": 83.08,
+          "chord": "G"
+        },
+        {
+          "t": 84.38,
+          "chord": "Am"
+        },
+        {
+          "t": 85.64,
+          "chord": "F"
+        },
+        {
+          "t": 86.91,
+          "chord": "C"
+        },
+        {
+          "t": 88.17,
+          "chord": "G"
+        },
+        {
+          "t": 89.44,
+          "chord": "Am"
+        },
+        {
+          "t": 90.74,
+          "chord": "F"
+        },
+        {
+          "t": 92.02,
+          "chord": "C"
+        },
+        {
+          "t": 93.32,
+          "chord": "G"
+        },
+        {
+          "t": 94.6,
+          "chord": "Am"
+        },
+        {
+          "t": 95.88,
+          "chord": "F"
+        },
+        {
+          "t": 97.13,
+          "chord": "C"
+        },
+        {
+          "t": 98.41,
+          "chord": "G"
+        },
+        {
+          "t": 99.68,
+          "chord": "Am"
+        },
+        {
+          "t": 100.96,
+          "chord": "F"
+        },
+        {
+          "t": 102.26,
+          "chord": "C"
+        },
+        {
+          "t": 103.51,
+          "chord": "G"
+        },
+        {
+          "t": 104.79,
+          "chord": "Am"
+        },
+        {
+          "t": 106.67,
+          "chord": "F"
+        },
+        {
+          "t": 107.32,
+          "chord": "C"
+        },
+        {
+          "t": 108.62,
+          "chord": "G"
+        },
+        {
+          "t": 109.9,
+          "chord": "Am"
+        },
+        {
+          "t": 111.8,
+          "chord": "F"
+        },
+        {
+          "t": 112.45,
+          "chord": "C"
+        },
+        {
+          "t": 113.73,
+          "chord": "G"
+        },
+        {
+          "t": 114.99,
+          "chord": "Am"
+        },
+        {
+          "t": 116.26,
+          "chord": "F"
+        },
+        {
+          "t": 117.56,
+          "chord": "C"
+        },
+        {
+          "t": 118.82,
+          "chord": "G"
+        },
+        {
+          "t": 120.12,
+          "chord": "Am"
+        },
+        {
+          "t": 122.02,
+          "chord": "F"
+        },
+        {
+          "t": 122.67,
+          "chord": "C"
+        },
+        {
+          "t": 123.95,
+          "chord": "G"
+        },
+        {
+          "t": 125.2,
+          "chord": "Am"
+        },
+        {
+          "t": 126.46,
+          "chord": "F"
+        },
+        {
+          "t": 127.73,
+          "chord": "C"
+        },
+        {
+          "t": 129.03,
+          "chord": "G"
+        },
+        {
+          "t": 130.24,
+          "chord": "Am"
+        },
+        {
+          "t": 131.4,
+          "chord": "F"
+        },
+        {
+          "t": 132.59,
+          "chord": "C"
+        },
+        {
+          "t": 134.47,
+          "chord": "G"
+        },
+        {
+          "t": 137.67,
+          "chord": "Am"
+        },
+        {
+          "t": 140.25,
+          "chord": "F"
+        },
+        {
+          "t": 142.78,
+          "chord": "C"
+        },
+        {
+          "t": 144.06,
+          "chord": "G"
+        },
+        {
+          "t": 147.89,
+          "chord": "Am"
+        },
+        {
+          "t": 149.79,
+          "chord": "F"
+        },
+        {
+          "t": 153.62,
+          "chord": "C"
+        },
+        {
+          "t": 154.25,
+          "chord": "G"
+        },
+        {
+          "t": 155.53,
+          "chord": "Am"
+        },
+        {
+          "t": 157.29,
+          "chord": "F"
+        },
+        {
+          "t": 158.45,
+          "chord": "C"
+        },
+        {
+          "t": 159.68,
+          "chord": "G"
+        },
+        {
+          "t": 160.94,
+          "chord": "Am"
+        },
+        {
+          "t": 162.21,
+          "chord": "F"
+        },
+        {
+          "t": 163.56,
+          "chord": "C"
+        },
+        {
+          "t": 164.82,
+          "chord": "G"
+        },
+        {
+          "t": 166.07,
+          "chord": "Am"
+        },
+        {
+          "t": 167.97,
+          "chord": "F"
+        },
+        {
+          "t": 168.62,
+          "chord": "C"
+        },
+        {
+          "t": 169.88,
+          "chord": "G"
+        },
+        {
+          "t": 171.15,
+          "chord": "Am"
+        },
+        {
+          "t": 173.08,
+          "chord": "F"
+        },
+        {
+          "t": 173.73,
+          "chord": "C"
+        },
+        {
+          "t": 175.01,
+          "chord": "G"
+        },
+        {
+          "t": 176.29,
+          "chord": "Am"
+        },
+        {
+          "t": 178.19,
+          "chord": "F"
+        },
+        {
+          "t": 178.84,
+          "chord": "C"
+        },
+        {
+          "t": 180.12,
+          "chord": "G"
+        },
+        {
+          "t": 181.37,
+          "chord": "Am"
+        },
+        {
+          "t": 182.65,
+          "chord": "F"
+        },
+        {
+          "t": 183.93,
+          "chord": "C"
+        },
+        {
+          "t": 185.23,
+          "chord": "G"
+        },
+        {
+          "t": 186.48,
+          "chord": "Am"
+        },
+        {
+          "t": 187.73,
+          "chord": "F"
+        },
+        {
+          "t": 189.03,
+          "chord": "C"
+        },
+        {
+          "t": 190.33,
+          "chord": "G"
+        },
+        {
+          "t": 191.61,
+          "chord": "Am"
+        },
+        {
+          "t": 192.84,
+          "chord": "F"
+        },
+        {
+          "t": 194.14,
+          "chord": "C"
+        },
+        {
+          "t": 195.42,
+          "chord": "G"
+        },
+        {
+          "t": 196.7,
+          "chord": "Am"
+        },
+        {
+          "t": 197.95,
+          "chord": "F"
+        },
+        {
+          "t": 199.27,
+          "chord": "C"
+        },
+        {
+          "t": 200.53,
+          "chord": "G"
+        },
+        {
+          "t": 201.8,
+          "chord": "Am"
+        },
+        {
+          "t": 203.04,
+          "chord": "F"
+        },
+        {
+          "t": 204.24,
+          "chord": "C"
+        },
+        {
+          "t": 206.68,
+          "chord": "G"
+        },
+        {
+          "t": 210.47,
+          "chord": "C"
+        }
+      ],
+      "chordsNote": "Timed from the recording's bassline (librosa beat grid ~94.5 bpm, low-pass <250 Hz CQT, Viterbi-smoothed); see ~/tools/paradise_bass."
+    },
+    {
       "id": "a-minor-blues",
       "title": "A Minor Blues",
       "genre": "Blues",
@@ -131,7 +756,7 @@
             {
               "id": "box-1",
               "box": 1,
-              "text": "Home box. Start and end every pass on an orange root. Say the five notes once \u2014 A, C, D, E, G \u2014 then play the shape until you do not need to look."
+              "text": "Home box. Start and end every pass on an orange root. Say the five notes once — A, C, D, E, G — then play the shape until you do not need to look."
             },
             {
               "id": "box-2",
@@ -166,7 +791,7 @@
               "id": "pentatonic",
               "title": "Inside the pentatonic",
               "scaleId": "a-minor-pentatonic",
-              "text": "On Am7 every pentatonic note except D is a chord tone. D is the 11th, a passing note, not a place to end. On Dm7 the pentatonic gives you D, A, and C. E and G are not chord tones of Dm7, and F \u2014 the flat 3 of Dm \u2014 is not in the pentatonic. On Em7 you have E, G, and D. B, the 5th of Em, is missing until you use the full minor scale."
+              "text": "On Am7 every pentatonic note except D is a chord tone. D is the 11th, a passing note, not a place to end. On Dm7 the pentatonic gives you D, A, and C. E and G are not chord tones of Dm7, and F — the flat 3 of Dm — is not in the pentatonic. On Em7 you have E, G, and D. B, the 5th of Em, is missing until you use the full minor scale."
             },
             {
               "id": "full-scale",
@@ -381,7 +1006,7 @@
             {
               "id": "box-1",
               "box": 1,
-              "text": "Box 1 uses the open strings. Open low E and open high e are roots. Do not skip the open notes \u2014 they are part of the shape, not a separate trick."
+              "text": "Box 1 uses the open strings. Open low E and open high e are roots. Do not skip the open notes — they are part of the shape, not a separate trick."
             },
             {
               "id": "box-2",
@@ -422,7 +1047,7 @@
               "id": "full-scale",
               "title": "Put the missing roots back",
               "scaleId": "e-natural-minor",
-              "text": "E natural minor adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord and the 2nd of the key. Those are the blue dots. C# is not in this scale \u2014 that would be E Dorian, and it fights the C chord."
+              "text": "E natural minor adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord and the 2nd of the key. Those are the blue dots. C# is not in this scale — that would be E Dorian, and it fights the C chord."
             }
           ]
         },
@@ -500,7 +1125,7 @@
             {
               "id": "call",
               "title": "Call and response across C",
-              "text": "Play the question over Em and end it on E or G. Answer over the C chord, and end that answer on E or G as well \u2014 those two notes belong to both chords. If you want the answer to say the C chord's name, end on C, which means using E natural minor for that bar."
+              "text": "Play the question over Em and end it on E or G. Answer over the C chord, and end that answer on E or G as well — those two notes belong to both chords. If you want the answer to say the C chord's name, end on C, which means using E natural minor for that bar."
             }
           ]
         }
@@ -551,7 +1176,7 @@
             "F#"
           ],
           "home": true,
-          "why": "The key of the loop. F# is the 3rd of the D chord, C is the root of the C chord, and E is the root of Em. Nothing in G\u2013D\u2013Em\u2013C sits outside this scale."
+          "why": "The key of the loop. F# is the 3rd of the D chord, C is the root of the C chord, and E is the root of Em. Nothing in G–D–Em–C sits outside this scale."
         },
         {
           "id": "g-major-pentatonic",
@@ -591,7 +1216,7 @@
             "B",
             "D"
           ],
-          "why": "The same five notes as G major pentatonic, with E treated as the root. Starting phrases on E is the usual rock lead sound over a major I\u2013V\u2013vi\u2013IV. You are not in E minor; the chords are still G major."
+          "why": "The same five notes as G major pentatonic, with E treated as the root. Starting phrases on E is the usual rock lead sound over a major I–V–vi–IV. You are not in E minor; the chords are still G major."
         },
         {
           "id": "g-mixolydian",
@@ -634,7 +1259,7 @@
             {
               "id": "box-2",
               "box": 2,
-              "text": "Shift up. Shared frets with box 1 are the same notes \u2014 do not relearn them, just move your hand."
+              "text": "Shift up. Shared frets with box 1 are the same notes — do not relearn them, just move your hand."
             },
             {
               "id": "box-3",
@@ -664,13 +1289,13 @@
               "id": "pentatonic",
               "title": "Major pentatonic against the loop",
               "scaleId": "g-major-pentatonic",
-              "text": "Over G you have the whole triad, G B D. Over Em you have E, G, and B. Over D you have D and A, but not F#, the 3rd \u2014 G, if you hold it, is a suspended 4th on that chord. Over C you have E and G, the 3rd and the 5th, but not the root C. Land on bright dots."
+              "text": "Over G you have the whole triad, G B D. Over Em you have E, G, and B. Over D you have D and A, but not F#, the 3rd — G, if you hold it, is a suspended 4th on that chord. Over C you have E and G, the 3rd and the 5th, but not the root C. Land on bright dots."
             },
             {
               "id": "full-scale",
               "title": "G major puts the 3rd and the root back",
               "scaleId": "g-major-scale",
-              "text": "The full G major scale adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord. Those are the blue dots. F natural is not in this scale \u2014 that is G Mixolydian, and it fights the D chord."
+              "text": "The full G major scale adds C and F#. C is the root of the C chord. F# is the 3rd of the D chord. Those are the blue dots. F natural is not in this scale — that is G Mixolydian, and it fights the D chord."
             }
           ]
         },
@@ -685,7 +1310,7 @@
               "id": "lick-1",
               "title": "Box 1, up to G",
               "box": 1,
-              "text": "Even eighth notes. Every note is in G major pentatonic, and the last note is G. Play it over the G bar, then hold that G as D arrives \u2014 G is the 4th of D, so let it fall to F# if you switch to the full major scale.",
+              "text": "Even eighth notes. Every note is in G major pentatonic, and the last note is G. Play it over the G bar, then hold that G as D arrives — G is the 4th of D, so let it fall to F# if you switch to the full major scale.",
               "notes": [
                 {
                   "string": "A",
@@ -743,7 +1368,7 @@
                 "fret": 2,
                 "semitones": 2
               },
-              "text": "B is the major 3rd, and it is already the sweet note. Bend up to it and stop. Do not push B further \u2014 a whole step above B is C#, which is not in G major. A hammer from fret 2 to fret 4 on the same string is the picked version of this bend."
+              "text": "B is the major 3rd, and it is already the sweet note. Bend up to it and stop. Do not push B further — a whole step above B is C#, which is not in G major. A hammer from fret 2 to fret 4 on the same string is the picked version of this bend."
             },
             {
               "id": "call",
@@ -920,7 +1545,7 @@
               "id": "pentatonic",
               "title": "The safe box",
               "scaleId": "d-minor-pentatonic",
-              "text": "D minor pentatonic never fights either chord, because it simply omits B and E. On G7 you still have G, D, and F \u2014 the root, 5th, and flat 7 \u2014 but not the 3rd. Use this scale when you want to play through the vamp without placing the 6th. Switch back to Dorian when you want B."
+              "text": "D minor pentatonic never fights either chord, because it simply omits B and E. On G7 you still have G, D, and F — the root, 5th, and flat 7 — but not the 3rd. Use this scale when you want to play through the vamp without placing the 6th. Switch back to Dorian when you want B."
             }
           ]
         },
@@ -989,7 +1614,7 @@
                 "fret": 10,
                 "semitones": 2
               },
-              "text": "F up a whole step is G, and both notes are in the scale. A smaller vocal version is to nudge F about a quarter step sharp and come back, without reaching G. Save B \u2014 B string, fret 12 in this box \u2014 for the G7 bars. Slide into it from the A at fret 10 rather than bending."
+              "text": "F up a whole step is G, and both notes are in the scale. A smaller vocal version is to nudge F about a quarter step sharp and come back, without reaching G. Save B — B string, fret 12 in this box — for the G7 bars. Slide into it from the A at fret 10 rather than bending."
             },
             {
               "id": "call",
@@ -1291,7 +1916,7 @@
             "D"
           ],
           "home": true,
-          "why": "The home scale for this I\u2013bVII\u2013IV power-chord loop. D is the flat 7, and it is the root of the D5. G# is the major 3rd of E. The track's power chords have no 3rd, so G# is yours to add when you want the chord to sound major."
+          "why": "The home scale for this I–bVII–IV power-chord loop. D is the flat 7, and it is the root of the D5. G# is the major 3rd of E. The track's power chords have no 3rd, so G# is yours to add when you want the chord to sound major."
         },
         {
           "id": "e-minor-pentatonic",

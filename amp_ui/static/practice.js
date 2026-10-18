@@ -131,6 +131,24 @@
     return progression().length;
   }
 
+  // Timed chords: a track may carry "chords": [{"t": seconds, "chord": "C"}, ...]
+  // (e.g. mapped from a real recording). Tracks without it keep the even split below.
+  function timedChords() {
+    var list = state.track && state.track.chords;
+    return Array.isArray(list) && list.length ? list : null;
+  }
+
+  function timedIndexAt(seconds) {
+    var list = timedChords();
+    if (!list) return -1;
+    var lo = 0, hi = list.length - 1, found = 0;
+    while (lo <= hi) {
+      var mid = (lo + hi) >> 1;
+      if (list[mid].t <= seconds + 0.0001) { found = mid; lo = mid + 1; } else hi = mid - 1;
+    }
+    return found;
+  }
+
   function barLength() {
     var count = barCount();
     if (!count || !isFinite(audio.duration) || audio.duration <= 0) return 0;
@@ -138,6 +156,7 @@
   }
 
   function currentBar() {
+    if (timedChords()) return timedIndexAt(audio.currentTime);
     var length = barLength();
     if (!length) return -1;
     return Math.max(0, Math.min(barCount() - 1, Math.floor((audio.currentTime + 0.0001) / length)));
@@ -145,10 +164,13 @@
 
   function shownBar() {
     if (state.bar >= 0) return state.bar;
+    if (timedChords()) return 0;
     return progression().length ? 0 : -1;
   }
 
   function chordAt(index) {
+    var timed = timedChords();
+    if (timed) return index >= 0 && index < timed.length ? timed[index].chord : "";
     var chords = progression();
     if (index < 0 || index >= chords.length) return "";
     return chords[index];
@@ -715,6 +737,19 @@
       button.textContent = chord;
       button.dataset.index = String(index);
       button.addEventListener("click", function () {
+        var timed = timedChords();
+        if (timed) {
+          // jump to the next time this chord comes around (wraps to its first entry)
+          var from = timedIndexAt(audio.currentTime) + 1, hit = -1;
+          for (var k = 0; k < timed.length && hit < 0; k++) {
+            var j = (from + k) % timed.length;
+            if (timed[j].chord === chord) hit = j;
+          }
+          if (hit >= 0) audio.currentTime = timed[hit].t;
+          state.bar = -1;
+          onTime();
+          return;
+        }
         var length = barLength();
         if (length) audio.currentTime = index * length;
         state.bar = -1;
@@ -728,10 +763,16 @@
   function updateNow() {
     var now = $("practice-now");
     var chord = chordAt(shownBar());
-    now.textContent = chord;
+    var timed = timedChords();
+    if (timed) {
+      var nextChord = chordAt(shownBar() + 1);
+      now.textContent = chord + (nextChord ? "  →  next " + nextChord : "");
+    } else {
+      now.textContent = chord;
+    }
     var buttons = $("practice-bars").querySelectorAll("button");
     buttons.forEach(function (button, index) {
-      button.classList.toggle("is-current", index === shownBar());
+      button.classList.toggle("is-current", timed ? button.textContent === chord : index === shownBar());
     });
     var scale = currentScale();
     var legend = $("chord-legend");
