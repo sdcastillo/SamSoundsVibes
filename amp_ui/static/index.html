@@ -32,7 +32,7 @@
     <div class="mode-tabs" role="tablist" aria-label="Amp sections">
       <button type="button" id="tab-rig" role="tab" aria-selected="true">Amp</button>
       <button type="button" id="tab-practice" role="tab" aria-selected="false">Practice</button>
-      <button type="button" id="tab-song" role="tab" aria-selected="false">Song Studio · Sunrise Redline</button>
+      <button type="button" id="tab-song" role="tab" aria-selected="false">Song Studio</button>
     </div>
 
     <section class="panel tuner" aria-label="Tuner">
@@ -482,16 +482,21 @@
       <p id="practice-error" class="error" hidden></p>
     </section>
 
-    <section id="song-panel" class="panel song-studio" hidden aria-label="Song Studio: Sunrise Redline">
+    <section id="song-panel" class="panel song-studio" hidden aria-label="Song Studio">
       <div class="song-header">
         <div>
-          <h2>Sunrise Redline — Melodic Metal / Hard Rock Song &amp; Multi-Track Guitar Recorder</h2>
-          <p class="lede">Fast cars racing down the shoreline at sunset. Select any part below to view its notation, guitar tab, and lyrics, load its amp tone, toggle the Down-Octave button so your guitar sounds like a bass, and record your takes over the metal drum machine.</p>
+          <label class="song-picker-wrap" for="song-picker">
+            <span>Song</span>
+            <select id="song-picker" aria-label="Choose song"></select>
+          </label>
+          <h2 id="song-title">Song Studio</h2>
+          <p id="song-subtitle" class="detail" hidden></p>
+          <p id="song-lede" class="lede">Load a song from the catalog to view notation, tab, and record takes.</p>
         </div>
         <div class="song-badges">
-          <span class="song-badge is-crimson">Key: E Minor</span>
-          <span class="song-badge is-gold" id="song-bpm-out">132 BPM</span>
-          <span class="song-badge">4/4 · 16 Bars</span>
+          <span class="song-badge is-crimson" id="song-key-badge">Key</span>
+          <span class="song-badge is-gold" id="song-bpm-out">120 BPM</span>
+          <span class="song-badge" id="song-bars-badge">4/4</span>
         </div>
       </div>
 
@@ -531,13 +536,7 @@
       </div>
 
       <div class="song-section-bar">
-        <div id="song-sections" class="song-sections" role="group" aria-label="Song section loop">
-          <button type="button" data-section="all" aria-pressed="true">Full Song (1–16)</button>
-          <button type="button" data-section="verse" aria-pressed="false">Verse Riff (1–4)</button>
-          <button type="button" data-section="prechorus" aria-pressed="false">Pre-Chorus (5–8)</button>
-          <button type="button" data-section="chorus" aria-pressed="false">Chorus (9–12)</button>
-          <button type="button" data-section="solo" aria-pressed="false">Guitar Solo (13–16)</button>
-        </div>
+        <div id="song-sections" class="song-sections" role="group" aria-label="Song section loop"></div>
         <label class="song-tempo-wrap" for="song-bpm">
           <span>Tempo</span>
           <input type="range" id="song-bpm" min="80" max="180" step="2" value="132">
@@ -565,7 +564,7 @@
           <svg id="song-staff-svg" class="song-staff-svg" role="img" aria-label="Song staff notation with play-along cursor"></svg>
         </div>
         <div class="song-stage song-stage-tab" id="song-tab-wrap">
-          <h3 class="song-stage-label">Guitar tab (16 bars · by section)</h3>
+          <h3 class="song-stage-label" id="song-tab-stage-label">Guitar tab (by section)</h3>
           <svg id="song-tab-svg" class="song-tab-svg" role="img" aria-label="Guitar tab grouped by song section"></svg>
         </div>
       </div>
@@ -595,7 +594,7 @@
       </div>
 
       <div class="song-box" style="margin-top: 14px;">
-        <h3>5) Complete Lyrics: Notes + Words ("Sunrise Redline" — Fast Cars Racing on the Beach at Sunset)</h3>
+        <h3 id="song-lyrics-heading">5) Complete Lyrics: Notes + Words</h3>
         <div id="song-lyrics-sheet" class="song-lyrics-sheet"></div>
       </div>
     </section>
@@ -606,7 +605,10 @@
   <script src="static/staff-lab.js?v=theme4"></script>
   <script src="static/practice.js?v=theme4"></script>
   <script src="static/song-midi.js?v=theme4"></script>
-  <script src="static/song-studio.js?v=theme4"></script>
+  <script src="static/songs/sunrise-redline.js?v=neo1"></script>
+  <script src="static/songs/sams-neo-classical.js?v=neo1"></script>
+  <script src="static/song-catalog.js?v=neo1"></script>
+  <script src="static/song-studio.js?v=neo1"></script>
 <style>
 #google_translate_element{position:fixed;bottom:12px;right:12px;z-index:1000;font-size:13px;line-height:1.2;max-width:240px}
 @media (max-width:600px){#google_translate_element{bottom:8px;right:8px;font-size:11px;max-width:160px;transform:scale(0.85);transform-origin:bottom right}}
