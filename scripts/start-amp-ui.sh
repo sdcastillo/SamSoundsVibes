@@ -17,6 +17,6 @@ fi
 
 HOST="${AMP_UI_HOST:-127.0.0.1}"
 PORT="${AMP_UI_PORT:-8790}"
-# Optional: AMP_BLOCKSIZE=512 for more stability; AMP_GATE_OFF=1 to disable the gate.
+# Optional: AMP_BLOCKSIZE=256 for lower latency (default 512); AMP_GATE_OFF=1 to disable the gate.
 echo "Starting server on http://${HOST}:${PORT}/ (Tailscale peers: use this machine's Tailscale IP)"
 exec python3 -m amp_ui --host "$HOST" --port "$PORT"

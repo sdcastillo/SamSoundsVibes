@@ -318,6 +318,192 @@
     },
   ];
 
+  /* A chord song: lyrics with [Chord] marks, played as a picked pattern of tab per chord.
+     Each feel gives every chord `beats` beats of tab tokens; sections start on a bar line. */
+  var PARADISE_ROAD = {
+    id: "paradise-road",
+    title: "Paradise Road",
+    by: "Sam and his brother",
+    meter: [4, 4],
+    bpm: 94,
+    key: "C major",
+    shapes: { C: "x32010", G: "320003", Am: "x02210", F: "xx3211" },
+    feels: {
+      pick: { beats: 2, C: "A3e G0e B1e G0e", G: "E3e G0e B0e G0e", Am: "A0e G2e B1e G2e", F: "D3e G2e B1e G2e" },
+      roll: { beats: 2, C: "A3e G0e B1e e0e", G: "E3e G0e B0e e3e", Am: "A0e G2e B1e e0e", F: "D3e G2e B1e e1e" },
+      half: { beats: 4, C: "A3 G0 B1 e0", G: "E3 G0 B0 e3", Am: "A0 G2 B1 e0", F: "D3 G2 B1 e1" },
+      ring: { beats: 4, C: "A3 B1 e0h" },
+    },
+    /* Chords as charted in Paradise Road.pdf. Sections marked inferred have no chords on the
+       chart; their chords and the half-time bridge follow the recording. */
+    sections: [
+      { name: "Intro", feel: "pick", lines: ["[C] [G] [Am] [F]"] },
+      {
+        name: "Verse 1",
+        feel: "pick",
+        lines: [
+          "[C]His heart has [G]been tattooed",
+          "[Am]By what he\u2019s been [F]through",
+          "[C]And in the [G]thick of it he\u2019s [Am]fallen for a [F]lie",
+          "[C]Smokin\u2019 a [G]cigarette",
+          "[Am]Bankrupt of [F]happiness",
+          "[C]He takes a [G]swig to calm [Am]his fraying [F]mind",
+          "[C]It seems he [G]always wins",
+          "[Am]A prize of [F]someone's sins",
+          "[C]Even [G]though it hurts he can\u2019t [Am]leave it all [F]behind",
+        ],
+      },
+      { name: "Chorus 1", feel: "roll", lines: "chorus" },
+      { name: "Post-chorus 1", feel: "pick", inferred: true, lines: "post" },
+      {
+        name: "Verse 2",
+        feel: "pick",
+        lines: [
+          "[C]Flickering city [G]lights",
+          "[Am]Shine in the window [F]as he",
+          "[C]Drives [G]away from all the [Am]glamor and [F]strife",
+          "[C]His foot is heavy [G]and his",
+          "[Am]Eyes are so [F]weary as he",
+          "[C]Searches [G]the highway [Am]for an exit [F]sign",
+          "[C]Breaking the [G]silence is a",
+          "[Am]Song on the [F]radio",
+          "[C]Someone [G]singing [Am]of better [F]life",
+        ],
+      },
+      { name: "Chorus 2", feel: "roll", lines: "chorus" },
+      { name: "Post-chorus 2", feel: "pick", inferred: true, lines: "post" },
+      {
+        name: "Bridge",
+        feel: "half",
+        inferred: true,
+        lines: [
+          "[C]Fading in the night",
+          "[G]He\u2019s lost in the lights",
+          "[Am]Still rolling the dice",
+          "[F]Losing all that\u2019s left and",
+          "[C]Blind to the theft cause",
+          "[G]He\u2019s so bereft",
+          "[Am] [F]",
+        ],
+      },
+      {
+        name: "Chorus 3",
+        feel: "roll",
+        lines: [
+          "[C]In hot pursuit [G]",
+          "[Am]Of nothin\u2019 [F]new",
+          "[C]Cruisin\u2019 a [G]boulevard [Am]of unrequited [F]dues",
+          "[C]His neon dream [G]has",
+          "[Am]Ripped at the [F]seams while",
+          "[C]The siren [G]promises that [Am]better luck [F]ensues",
+        ],
+      },
+      { name: "Post-chorus 3", feel: "pick", inferred: true, lines: "post" },
+      {
+        name: "Outro",
+        feel: "pick",
+        inferred: true,
+        lines: [
+          "[C]Just keep on [G]",
+          "[Am]Keepin\u2019 on [F]",
+          "[C]Driving down [G]",
+          "[Am]Paradise road [F]",
+          "[C]Just keep on [G]",
+          "[Am]Keepin\u2019 on [F]",
+          "[C]Driving down [G]",
+          "[Am]Paradise road [F]",
+          "[C]Paradise road [G]",
+        ],
+      },
+      {
+        name: "Verse 3",
+        feel: "pick",
+        lines: [
+          "[C]His mind has [G]been restored",
+          "[Am]Like waves upon [F]the shore",
+          "[C]Each [G]morning brings a [Am]brand new [F]light",
+          "[C]Meditating [G]peacefully",
+          "[Am]His soul now [F]breaking free",
+          "[C]As [G]darkness fades into [Am]the night [F]",
+          "[C]The race he's [G]overcome",
+          "[Am]The victory has [F]been won",
+          "[C]His story [G]shines so clear [Am]and bright [F]",
+        ],
+      },
+      { name: "Post-chorus 4", feel: "pick", inferred: true, lines: "post" },
+      { name: "End", feel: "ring", inferred: true, lines: ["[C]"] },
+    ],
+    parts: {
+      chorus: [
+        "[C]He\u2019s in pursuit [G]",
+        "[Am]Of nothin\u2019 [F]new",
+        "[C]Cruisin\u2019 a [G]boulevard [Am]of unrequited [F]dues",
+        "[C]His neon dream [G]has",
+        "[Am]Ripped at the [F]seams while",
+        "[C]The siren [G]promises that [Am]better luck [F]ensues",
+      ],
+      post: ["[C]So keep on [G]", "[Am]Keepin\u2019 on [F]", "[C]Drivin\u2019 down [G]", "[Am]Paradise Road [F]"],
+    },
+    tip:
+      "Pick each chord: bass note, then the G, B, G strings; choruses roll up to the high e. Shapes: C x32010, G 320003, Am x02210, F xx3211. The judge scores every picked note. * = no chords on Sam's chart, so they follow the recording.",
+  };
+  SONGS.push(PARADISE_ROAD);
+
+  /* Builds tab, chord marks, lyric marks, and section marks from a chord song. */
+  function buildChordSong(song) {
+    var perBar = song.meter[0] * (4 / song.meter[1]);
+    var tokens = [];
+    var marks = { chords: [], lyrics: [], sections: [] };
+    var beat = 0;
+    function mark(list, item) {
+      item.bar = Math.floor(beat / perBar + 1e-9);
+      item.pos = beat - item.bar * perBar;
+      item.beat = beat;
+      list.push(item);
+    }
+    song.sections.forEach(function (section) {
+      if (Math.abs(beat % perBar) > 1e-9) throw new Error(song.id + ": " + section.name + " starts mid-bar");
+      var feel = song.feels[section.feel];
+      var lines = typeof section.lines === "string" ? song.parts[section.lines] : section.lines;
+      mark(marks.sections, { text: section.name + (section.inferred ? " *" : "") });
+      lines.forEach(function (line) {
+        var re = /\[([^\]]+)\]([^\[]*)/g;
+        var lead = line.split("[")[0];
+        var m;
+        var first = true;
+        while ((m = re.exec(line))) {
+          var chord = m[1];
+          var pattern = feel[chord];
+          if (!pattern) throw new Error(song.id + ": no " + section.feel + " pattern for " + chord);
+          var words = ((first ? lead : "") + m[2]).trim();
+          first = false;
+          mark(marks.chords, { text: chord });
+          if (words) mark(marks.lyrics, { text: words });
+          pattern.split(/\s+/).forEach(function (tok) {
+            tokens.push(tok);
+          });
+          beat += feel.beats;
+          if (Math.abs(beat % perBar) < 1e-9) tokens.push("|");
+        }
+      });
+    });
+    if (tokens[tokens.length - 1] === "|") tokens.pop();
+    var tab = parseTab(tokens.join(" "), perBar);
+    return {
+      id: song.id,
+      title: song.title,
+      notes: tab.notes,
+      bars: tab.bars,
+      perBar: perBar,
+      meter: song.meter.slice(),
+      bpm: song.bpm,
+      frets: tab.notes.map(function (n) {
+        return n.rest ? null : { string: n.string, fret: n.fret };
+      }),
+      marks: marks,
+    };
+  }
+
   var DUR_BEATS = { w: 4, "h.": 3, h: 2, "q.": 1.5, q: 1, "e.": 0.75, e: 0.5, s: 0.25 };
   var DUR_PATTERN = "(w|h\\.|h|q\\.|q|e\\.|e|s)";
 
@@ -334,6 +520,7 @@
   }
 
   function parseSong(song) {
+    if (song.sections) return buildChordSong(song);
     var perBar = song.meter[0] * (4 / song.meter[1]);
     var pos = song.pickup ? perBar - song.pickup : 0;
     var bar = 0;

@@ -39,7 +39,7 @@ def main():
     )
     parser.add_argument('--music-source', default=None, help='PipeWire source for headset channel 2 (background music)')
     parser.add_argument('--rate', type=int, default=48000)
-    parser.add_argument('--blocksize', type=int, default=256)
+    parser.add_argument('--blocksize', type=int, default=512)
     parser.add_argument('--drive', type=float, default=18.0)
     parser.add_argument('--delay-ms', type=float, default=380.0)
     parser.add_argument('--feedback', type=float, default=0.35)

@@ -2,6 +2,30 @@
   "_readme": "Riffs, leads, and a recommended amp tone for each backing track in tracks.json, keyed by track id. Original phrases, CC0. tab is one token per note: string (e B G D A E, high e lowercase), fret, optional techniques (hN hammer, pN pull-off, bN bend to fret N, sN or /N slide to fret N, ~ vibrato), duration (w h. h q. q e. e s; default q). Double-stops: B5+G7e. r plus a duration is a rest. | marks a bar line and must match the track's bars. tone.slot is a factory preset; overrides replace its delay, feedback, mix, drive, or cabinet IR.",
   "version": 1,
   "tracks": {
+    "paradise-road": {
+      "tone": {
+        "slot": 17,
+        "name": "Essex A30",
+        "overrides": { "delay_ms": 319, "feedback": 0.28, "mix": 0.18 },
+        "why": "AC30 chime for the Sam Sounds ballad, through the LX TDR Marshall 2 cab IR. A half-note delay at 94 BPM (319 ms) widens the picked arpeggios without washing the vocal pocket."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Picked verse pattern",
+          "tip": "Same picked shape as Staff Lab Paradise Road: root on the A string, then open G, B string, G again. One bar per chord.",
+          "tab": "A3q G0q B1q G0q | E3q D0q G0q B0q | A0q G0q B1q G0q | D3q D2q G0q B1q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Open-position hook",
+          "tip": "Land on chord tones: C on the I, G on the V, A on vi, F on the IV. Keep it singable — this is the melody under the vocal.",
+          "tab": "e0q e1q G0q rq | D0q D2q G0q rq | e0q e1q A0q rq | D2q D3q G0q rq"
+        }
+      ]
+    },
     "a-minor-blues": {
       "tone": {
         "slot": 85,

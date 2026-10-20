@@ -1904,7 +1904,7 @@ class AmpSession:
             octave_down=config.get("octave_down", 0.0),
         )
         rate = int(config.get("rate", 48000))
-        blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 256)
+        blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 512)
         input_device, output_device, dev_meta = resolve_audio_devices(config)
         pw_sink = dev_meta["pw_sink"]
         input_info = sd.query_devices(input_device)

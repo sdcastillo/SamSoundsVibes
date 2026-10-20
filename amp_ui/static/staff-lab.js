@@ -614,9 +614,55 @@
             return { x: b.x + 18, text: state.piece.chords[b.bar] || "" };
           })
         : null,
+      marks: state.piece.marks ? songMarks(page, layout) : null,
       meter: page.from === 0 ? state.piece.meter : null,
       pageLabel: state.pages.length > 1 ? "Line " + (state.pages.indexOf(page) + 1) + " of " + state.pages.length : "",
     };
+  }
+
+  /* Chord names, section names, and lyrics of a chord song, placed on the beat they fall on. */
+  function songMarks(page, layout) {
+    var m = state.piece.marks;
+    var item = state.seq[Math.min(state.index, state.seq.length - 1)];
+    var nowBeat = state.timed && state.cursorBeat != null ? state.cursorBeat : state.running && item ? item.beat : null;
+    function place(list) {
+      return list
+        .filter(function (x) {
+          return x.bar >= page.from && x.bar < page.to;
+        })
+        .map(function (x) {
+          return { x: layout.xFor(x.bar, x.pos), beat: x.beat, text: x.text };
+        });
+    }
+    var lyrics = place(m.lyrics);
+    var right = STAFF_W - 14;
+    lyrics.forEach(function (l, i) {
+      var next = lyrics[i + 1];
+      l.room = (next ? next.x : right) - l.x - 8;
+      l.now = nowBeat != null && nowBeat >= l.beat - 1e-9 && (!next || nowBeat < next.beat - 1e-9);
+    });
+    return { chords: place(m.chords), sections: place(m.sections), lyrics: lyrics };
+  }
+
+  var LYRIC_ROW = 26;
+
+  function drawSongMarks(svg, geo, marks) {
+    marks.sections.forEach(function (s) {
+      svg.appendChild(el("text", { class: "lab-section", x: s.x, y: 32 }, s.text));
+    });
+    marks.chords.forEach(function (c) {
+      svg.appendChild(el("text", { class: "lab-chord", x: c.x, y: 14 }, c.text));
+    });
+    var y = geo.height + 16;
+    marks.lyrics.forEach(function (l) {
+      var attrs = { class: "lab-lyric" + (l.now ? " is-now" : ""), x: l.x, y: y };
+      if (l.text.length * 6.6 > l.room && l.room > 20) {
+        attrs.textLength = Math.round(l.room);
+        attrs.lengthAdjust = "spacingAndGlyphs";
+      }
+      svg.appendChild(el("text", attrs, l.text));
+    });
+    svg.setAttribute("viewBox", "0 0 " + STAFF_W + " " + (geo.height + LYRIC_ROW));
   }
 
   function renderStaff() {
@@ -646,6 +692,7 @@
     (scene.chords || []).forEach(function (c) {
       svg.appendChild(el("text", { class: "lab-chord", x: c.x, y: 14 }, c.text));
     });
+    if (scene.marks) drawSongMarks(svg, geo, scene.marks);
     scene.items.forEach(function (item) {
       drawNote(svg, geo, item);
     });
@@ -1104,6 +1151,8 @@
       state.seq = song.notes;
       state.piece = { perBar: song.perBar, meter: song.meter, pickup: currentSong().pickup || 0, bars: song.bars, bpm: song.bpm };
       state.frets = C.assignFrets(state.seq, [0, 4]);
+      if (song.frets) state.frets = song.frets;
+      if (song.marks) state.piece.marks = song.marks;
     } else if (state.mode === "riff" && riffPhrase()) {
       var track = riffTrack();
       var perBar = perBarOf(track);
