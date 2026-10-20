@@ -32,7 +32,7 @@
     <div class="mode-tabs" role="tablist" aria-label="Amp sections">
       <button type="button" id="tab-rig" role="tab" aria-selected="true">Amp</button>
       <button type="button" id="tab-practice" role="tab" aria-selected="false">Practice</button>
-      <button type="button" id="tab-song" role="tab" aria-selected="false">Song Studio · Sunset Redline</button>
+      <button type="button" id="tab-song" role="tab" aria-selected="false">Song Studio · Sunrise Redline</button>
     </div>
 
     <section class="panel tuner" aria-label="Tuner">
@@ -482,10 +482,10 @@
       <p id="practice-error" class="error" hidden></p>
     </section>
 
-    <section id="song-panel" class="panel song-studio" hidden aria-label="Song Studio: Sunset Redline">
+    <section id="song-panel" class="panel song-studio" hidden aria-label="Song Studio: Sunrise Redline">
       <div class="song-header">
         <div>
-          <h2>Sunset Redline — Melodic Metal Song &amp; Multi-Track Guitar Recorder</h2>
+          <h2>Sunrise Redline — Melodic Metal / Hard Rock Song &amp; Multi-Track Guitar Recorder</h2>
           <p class="lede">Fast cars racing down the shoreline at sunset. Select any part below to view its notation, guitar tab, and lyrics, load its amp tone, toggle the Down-Octave button so your guitar sounds like a bass, and record your takes over the metal drum machine.</p>
         </div>
         <div class="song-badges">
@@ -520,6 +520,7 @@
 
       <div class="song-control-bar" aria-label="Recording and playback controls">
         <button type="button" id="song-play-btn">▶ Play Backing &amp; Guide</button>
+        <button type="button" id="song-guitar-midi-btn" class="secondary" hidden>▶ Play Guitar MIDI (follow tab)</button>
         <button type="button" id="song-record-btn" class="song-rec-btn">● Record My Rhythm Guitar Take</button>
         <button type="button" id="song-load-tone-btn" class="secondary">Load Part Amp Tone + IR</button>
         <button type="button" id="song-octave-btn" class="octave-down-btn" aria-pressed="false" title="Shift guitar down 1 octave so it sounds like a bass">
@@ -594,7 +595,7 @@
       </div>
 
       <div class="song-box" style="margin-top: 14px;">
-        <h3>5) Complete Lyrics: Notes + Words ("Sunset Redline" — Fast Cars Racing on the Beach at Sunset)</h3>
+        <h3>5) Complete Lyrics: Notes + Words ("Sunrise Redline" — Fast Cars Racing on the Beach at Sunset)</h3>
         <div id="song-lyrics-sheet" class="song-lyrics-sheet"></div>
       </div>
     </section>
@@ -604,6 +605,7 @@
   <script src="static/app.js?v=theme4"></script>
   <script src="static/staff-lab.js?v=theme4"></script>
   <script src="static/practice.js?v=theme4"></script>
+  <script src="static/song-midi.js?v=theme4"></script>
   <script src="static/song-studio.js?v=theme4"></script>
 <style>
 #google_translate_element{position:fixed;bottom:12px;right:12px;z-index:1000;font-size:13px;line-height:1.2;max-width:240px}

@@ -1,4 +1,4 @@
-/* Song Studio: "Sunset Redline" — Melodic Metal / Hard Rock Song & Multi-Track Guitar Recorder.
+/* Song Studio: "Sunrise Redline" — Melodic Metal / Hard Rock Song & Multi-Track Guitar Recorder.
    Safe to load in the browser (window.SongStudio) or in Node for unit tests (module.exports). */
 (function (root, factory) {
   var C = typeof module === "object" && module.exports ? require("./staff-core.js") : root.StaffCore;
@@ -12,8 +12,8 @@
   "use strict";
 
   var SONG_DATA = {
-    id: "sunset-redline",
-    title: "Sunset Redline",
+    id: "sunrise-redline",
+    title: "Sunrise Redline",
     subtitle: "Melodic Metal / Hard Rock — Fast Cars Racing on the Beach at Sunset",
     key: "E minor",
     bpm: 132,
@@ -55,7 +55,7 @@
       },
       {
         id: "chorus",
-        label: "3 · Chorus: Sunset Redline (Bars 9–12)",
+        label: "3 · Chorus: Sunrise Redline (Bars 9–12)",
         shortLabel: "Chorus (9–12)",
         startBar: 8,
         endBar: 12,
@@ -340,7 +340,7 @@
             chords: "Em · C · G · D",
             lines: [
               {
-                words: "SUNSET REDLINE roar! Flying down the shore!",
+                words: "SUNRISE REDLINE roar! Flying down the shore!",
                 notes: "E5 B4 A4 G4 E4 (Em) · G4 A4 G4 E4 D4 (C)"
               },
               {
@@ -410,8 +410,56 @@
           kick:  [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
         }
       }
+    },
+
+    /* Full-song drum arrangement: 16th-note grids → WebAudio synth (playDrumHit → audio.master). No external drum files. */
+    drumProgram: {
+      engine: "sixteenth-synth",
+      kitRows: ["crash", "ride", "hihat", "snare", "kick"],
+      barPatternKeys: [
+        "verse", "verse", "verse", "verse",
+        "prechorus", "prechorus", "prechorus", "prechorus",
+        "chorus", "chorus", "chorus", "chorus",
+        "solo", "solo", "solo", "solo"
+      ]
     }
   };
+
+  var DRUM_KIT_ROWS = ["crash", "ride", "hihat", "snare", "kick"];
+
+  function drumPatternKeyForBarIndex(barIdx) {
+    var prog = SONG_DATA.drumProgram;
+    if (prog && prog.barPatternKeys && prog.barPatternKeys[barIdx]) {
+      return prog.barPatternKeys[barIdx];
+    }
+    if (barIdx < 4) return "verse";
+    if (barIdx < 8) return "prechorus";
+    if (barIdx < 12) return "chorus";
+    return "solo";
+  }
+
+  /** Expand hard-coded drumPatterns into absolute-beat hits for the whole song. */
+  function buildDrumHitTimeline(songData, patternSource) {
+    var hits = [];
+    var rows = (songData.drumProgram && songData.drumProgram.kitRows) || DRUM_KIT_ROWS;
+    var bars = songData.bars || 16;
+    var patterns = patternSource || songData.drumPatterns;
+    for (var bar = 0; bar < bars; bar++) {
+      var patKey = drumPatternKeyForBarIndex(bar);
+      var pat = patterns[patKey];
+      if (!pat || !pat.rows) continue;
+      for (var s = 0; s < 16; s++) {
+        var beat = bar * 4 + s * 0.25;
+        rows.forEach(function (kind) {
+          var row = pat.rows[kind];
+          if (row && row[s]) {
+            hits.push({ beat: beat, kind: kind, id: beat.toFixed(3) + ":" + kind });
+          }
+        });
+      }
+    }
+    return hits;
+  }
 
   /* Build parsed notes for each part and attach lyric syllables to notes in each bar */
   function parsePartNotes(partId) {
@@ -460,6 +508,7 @@
         noteCount: parsed.notes.length
       };
     });
+    summary.drumHitCount = buildDrumHitTimeline(SONG_DATA, SONG_DATA.drumPatterns).length;
     return summary;
   }
 
@@ -476,6 +525,7 @@
       bpm: SONG_DATA.bpm,
       octaveDown: false,
       playing: false,
+      midiPlaying: false,
       recording: false,
       recPart: null,
       countInBeatsLeft: 0,
@@ -504,6 +554,14 @@
 
     /* Deep copy drum patterns so the user can edit steps live */
     var customDrumPatterns = JSON.parse(JSON.stringify(SONG_DATA.drumPatterns));
+    var drumHitTimeline = buildDrumHitTimeline(SONG_DATA, customDrumPatterns);
+    var DRUM_LOOKAHEAD_SEC = 0.45;
+    var NOTE_LOOKAHEAD_SEC = 0.35;
+    var NOTE_LATE_SEC = 0.06;
+
+    function rebuildDrumHitTimeline() {
+      drumHitTimeline = buildDrumHitTimeline(SONG_DATA, customDrumPatterns);
+    }
 
     function $(id) {
       return document.getElementById(id);
@@ -533,8 +591,21 @@
       countInBeats: 0,
       scheduledStep: -1,
       scheduledNotes: {},
+      scheduledDrumHits: {},
+      drumLoopEpoch: 0,
       activeSources: [],
       noiseBuffer: null
+    };
+
+    var midiTransport = {
+      noteEvents: [],
+      scheduledKeys: {},
+      loopEpoch: 0,
+      timer: null,
+      raf: null,
+      startTime: 0,
+      loopStartBeat: 0,
+      loopEndBeat: 64
     };
 
     function ensureAudio() {
@@ -676,7 +747,7 @@
       if (!ctx) return;
       if (!alsoToRecorder && !stemAudible(partId)) return;
       /* If the user has already recorded a real take for this part and we're not currently re-recording it, let the recorded audio stem play instead of the guide synth */
-      if (!alsoToRecorder && state.takeBuffers[partId] && state.recPart !== partId) return;
+      if (!alsoToRecorder && !state.midiPlaying && state.takeBuffers[partId] && state.recPart !== partId) return;
 
       var t = Math.max(ctx.currentTime, when);
       var dur = Math.max(0.08, durationSec);
@@ -743,10 +814,25 @@
 
     function sectionPatternForBar(bar) {
       if (state.sectionId !== "all") return state.drumPatternKey;
-      if (bar < 4) return "verse";
-      if (bar < 8) return "prechorus";
-      if (bar < 12) return "chorus";
-      return "solo";
+      return drumPatternKeyForBarIndex(bar);
+    }
+
+    /** Schedule hard-coded drum hits through playDrumHit (same master bus as guide synths). */
+    function scheduleHardcodedDrums(songSec, countInSec, loopStartBeat, loopEndBeat) {
+      if (!audio.scheduledDrumHits) audio.scheduledDrumHits = {};
+      var spb = 60 / state.bpm;
+      drumHitTimeline.forEach(function (hit) {
+        if (hit.beat < loopStartBeat - 1e-6 || hit.beat >= loopEndBeat - 1e-6) return;
+        var relSec = (hit.beat - loopStartBeat) * spb;
+        if (relSec < songSec - NOTE_LATE_SEC || relSec > songSec + DRUM_LOOKAHEAD_SEC) return;
+        var loopKey = String(audio.drumLoopEpoch) + ":" + hit.id;
+        if (audio.scheduledDrumHits[loopKey]) return;
+        audio.scheduledDrumHits[loopKey] = true;
+        var when = audio.startTime + countInSec + relSec;
+        var gainScale =
+          hit.kind === "hihat" ? 0.85 : hit.kind === "crash" ? 0.9 : hit.kind === "ride" ? 0.8 : 1.0;
+        playDrumHit(hit.kind, when, gainScale);
+      });
     }
 
     /* Sync Octave-Down state across Song Studio, Amp panel, and backend server */
@@ -822,6 +908,8 @@
     var mic = { on: false, timer: null, ctx: null, stream: null, analyser: null, buf: null, last: null, lastAt: 0 };
     var INPUT_LATENCY = 0.15;
     var TAB_PARTS = { rhythm: true, lead: true, bass: true, vocals: true }; /* vocals: words under their melody notes */
+    var GUITAR_MIDI_PARTS = { rhythm: true, lead: true, bass: true };
+    var SongMidiApi = typeof SongMidi !== "undefined" ? SongMidi : null;
 
     function sectionLabelForBar(rowStartBar) {
       if (rowStartBar === 0) return "VERSE (Bars 1–4)";
@@ -1216,6 +1304,7 @@
               if (pat.rows[rowKey][stepIndex]) {
                 playDrumHit(rowKey, 0, 0.9);
               }
+              rebuildDrumHitTimeline();
               renderDrumGrid();
             });
             container.appendChild(btn);
@@ -1346,7 +1435,7 @@
           if (take && take.url) {
             var a = document.createElement("a");
             a.href = take.url;
-            a.download = "sunset-redline-" + stemId + "-take.wav";
+            a.download = "sunrise-redline-" + stemId + "-take.wav";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1427,6 +1516,14 @@
       var playBtn = $("song-play-btn");
       if (playBtn) {
         playBtn.textContent = state.playing && !state.recording ? "■ Stop Backing" : "▶ Play Backing & Guide";
+      }
+      var midiBtn = $("song-guitar-midi-btn");
+      if (midiBtn) {
+        var showMidi = !!GUITAR_MIDI_PARTS[state.partId];
+        midiBtn.hidden = !showMidi;
+        midiBtn.textContent = state.midiPlaying
+          ? "■ Stop Guitar MIDI"
+          : "▶ Play Guitar MIDI (follow tab)";
       }
     }
 
@@ -1632,6 +1729,8 @@
         audio.startTime += loopDur;
         audio.scheduledStep = -1;
         audio.scheduledNotes = {};
+        audio.scheduledDrumHits = {};
+        audio.drumLoopEpoch += 1;
         songSec -= loopDur;
         takeSources = scheduleTakes(ctx, audio.master, audio.startTime + countInSec, audio.loopStartBeat, audio.loopEndBeat, null);
       }
@@ -1641,23 +1740,7 @@
       var totalSteps = Math.floor(( currentBeat - audio.loopStartBeat ) * 4);
       state.currentStep = ((totalSteps % 16) + 16) % 16;
 
-      /* Schedule 16th-note drum steps up to 100ms ahead */
-      var lookaheadSteps = Math.floor((songSec + 0.10) / stepDur);
-      while (audio.scheduledStep < lookaheadSteps && (audio.scheduledStep + 1) < loopBeats * 4) {
-        audio.scheduledStep += 1;
-        var stepIdx = audio.scheduledStep;
-        var stepWhen = audio.startTime + countInSec + stepIdx * stepDur;
-        var absBeat = audio.loopStartBeat + stepIdx * 0.25;
-        var barIdx = Math.floor(absBeat / 4);
-        var patKey = sectionPatternForBar(barIdx);
-        var pat = customDrumPatterns[patKey] || customDrumPatterns.verse;
-        var s16 = stepIdx % 16;
-        if (pat.rows.kick[s16]) playDrumHit("kick", stepWhen, 1.0);
-        if (pat.rows.snare[s16]) playDrumHit("snare", stepWhen, 1.0);
-        if (pat.rows.hihat[s16]) playDrumHit("hihat", stepWhen, 0.85);
-        if (pat.rows.crash[s16]) playDrumHit("crash", stepWhen, 0.9);
-        if (pat.rows.ride && pat.rows.ride[s16]) playDrumHit("ride", stepWhen, 0.8);
-      }
+      scheduleHardcodedDrums(songSec, countInSec, audio.loopStartBeat, audio.loopEndBeat);
 
       /* Schedule Guide Synth notes for Rhythm, Lead, Bass, and Vocals */
       ["rhythm", "lead", "bass", "vocals"].forEach(function (partId) {
@@ -1668,7 +1751,7 @@
           var key = partId + ":" + idx;
           if (audio.scheduledNotes[key]) return;
           var noteRelSec = (n.beat - audio.loopStartBeat) * spb;
-          if (noteRelSec <= songSec + 0.11 && noteRelSec >= songSec - 0.04) {
+          if (noteRelSec <= songSec + NOTE_LOOKAHEAD_SEC && noteRelSec >= songSec - NOTE_LATE_SEC) {
             audio.scheduledNotes[key] = true;
             var when = audio.startTime + countInSec + noteRelSec;
             var durSec = n.beats * spb * 0.92;
@@ -1683,9 +1766,130 @@
       }
     }
 
+    function stopGuitarMidiPlayback() {
+      if (midiTransport.timer) clearInterval(midiTransport.timer);
+      if (midiTransport.raf) cancelAnimationFrame(midiTransport.raf);
+      midiTransport.timer = null;
+      midiTransport.raf = null;
+      midiTransport.scheduledKeys = {};
+      midiTransport.noteEvents = [];
+      state.midiPlaying = false;
+      if (!state.playing) state.cursorBeat = null;
+      var midiBtn = $("song-guitar-midi-btn");
+      if (midiBtn) midiBtn.textContent = "▶ Play Guitar MIDI (follow tab)";
+      var readout = $("song-score-readout");
+      if (readout && !state.playing && !state.recording) {
+        readout.textContent = state.scoreText;
+      }
+      renderSongScore();
+      updateBanner();
+    }
+
+    function scheduleMidiGuitarWindow() {
+      if (!state.midiPlaying || !audio.ctx || !midiTransport.noteEvents.length) return;
+      var ctx = audio.ctx;
+      var spb = 60 / state.bpm;
+      var elapsed = ctx.currentTime - midiTransport.startTime;
+      if (elapsed < 0) return;
+      var loopBeats = midiTransport.loopEndBeat - midiTransport.loopStartBeat;
+      var loopDur = loopBeats * spb;
+      var songSec = elapsed;
+      if (songSec >= loopDur) {
+        midiTransport.startTime += loopDur;
+        midiTransport.scheduledKeys = {};
+        midiTransport.loopEpoch += 1;
+        songSec -= loopDur;
+      }
+      state.cursorBeat = midiTransport.loopStartBeat + songSec / spb;
+
+      midiTransport.noteEvents.forEach(function (ev, idx) {
+        if (ev.beat < midiTransport.loopStartBeat - 1e-6 || ev.beat >= midiTransport.loopEndBeat - 1e-6) return;
+        var relSec = (ev.beat - midiTransport.loopStartBeat) * spb;
+        if (relSec < songSec - NOTE_LATE_SEC || relSec > songSec + NOTE_LOOKAHEAD_SEC) return;
+        var key = midiTransport.loopEpoch + ":" + idx;
+        if (midiTransport.scheduledKeys[key]) return;
+        midiTransport.scheduledKeys[key] = true;
+        var when = midiTransport.startTime + relSec;
+        playPartNote(state.partId, ev.midi, when, (ev.durBeats || 0.25) * spb * 0.92, false);
+      });
+
+      renderSongScore();
+    }
+
+    function startGuitarMidiPlayback() {
+      if (!GUITAR_MIDI_PARTS[state.partId]) return;
+      if (state.midiPlaying) {
+        stopGuitarMidiPlayback();
+        return;
+      }
+      stopTransport();
+      var ctx = ensureAudio();
+      if (!ctx || !SongMidiApi) return;
+
+      var sec = currentSection();
+      midiTransport.loopStartBeat = sec.startBar * 4;
+      midiTransport.loopEndBeat = sec.endBar * 4;
+      midiTransport.scheduledKeys = {};
+      midiTransport.loopEpoch = 0;
+      midiTransport.startTime = ctx.currentTime + 0.05;
+
+      function beginWithEvents(events) {
+        midiTransport.noteEvents = events.filter(function (ev) {
+          return ev.beat >= midiTransport.loopStartBeat - 1e-6 && ev.beat < midiTransport.loopEndBeat - 1e-6;
+        });
+        if (!midiTransport.noteEvents.length) {
+          var readout = $("song-score-readout");
+          if (readout) readout.textContent = "No guitar notes in this section to play.";
+          return;
+        }
+        state.midiPlaying = true;
+        state.scoreText = "Guitar MIDI — " + SONG_DATA.parts[state.partId].title + " (" + sec.shortLabel + ")";
+        var readout = $("song-score-readout");
+        if (readout) readout.textContent = state.scoreText + " — tab playhead follows MIDI.";
+        updateBanner();
+        midiTransport.timer = setInterval(scheduleMidiGuitarWindow, 25);
+        scheduleMidiGuitarWindow();
+        (function midiUiLoop() {
+          if (!state.midiPlaying) return;
+          renderLyricSheet();
+          midiTransport.raf = requestAnimationFrame(midiUiLoop);
+        })();
+      }
+
+      var midUrl =
+        "/static/song/sunrise-redline-" + state.partId + ".mid";
+      fetch(midUrl)
+        .then(function (r) {
+          if (!r.ok) throw new Error("missing midi");
+          return r.arrayBuffer();
+        })
+        .then(function (buf) {
+          var parsed = SongMidiApi.parseSmf(buf);
+          beginWithEvents(parsed.notes);
+        })
+        .catch(function () {
+          fetch("/static/song/generic-guitar.mid")
+            .then(function (r) { return r.ok ? r.arrayBuffer() : Promise.reject(); })
+            .then(function (buf) {
+              var parsed = SongMidiApi.parseSmf(buf);
+              beginWithEvents(parsed.notes);
+            })
+            .catch(function () {
+              beginWithEvents(
+                SongMidiApi.noteEventsFromParsedTab(
+                  parsedParts[state.partId],
+                  sec.startBar,
+                  sec.endBar
+                )
+              );
+            });
+        });
+    }
+
     function startTransport(isRecording, partToRecord) {
       var ctx = ensureAudio();
       if (!ctx) return;
+      stopGuitarMidiPlayback();
       if (state.playing) stopTransport();
 
       var sec = currentSection();
@@ -1695,6 +1899,8 @@
       audio.startTime = ctx.currentTime + 0.05;
       audio.scheduledStep = -1;
       audio.scheduledNotes = {};
+      audio.scheduledDrumHits = {};
+      audio.drumLoopEpoch = 0;
 
       state.playing = true;
       state.recording = !!isRecording;
@@ -1757,6 +1963,7 @@
       renderMixerRows();
 
       audio.timer = setInterval(scheduleAudioWindow, 25);
+      scheduleAudioWindow();
       (function uiLoop() {
         if (!state.playing) return;
         renderSongScore();
@@ -1898,7 +2105,7 @@
         var blob = encodeWavFromFloat32(rendered.getChannelData(0), rendered.getChannelData(1), rendered.sampleRate);
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "sunset-redline-" + (sec.id === "all" ? "full" : sec.id) + "-" + (onlyStem || "mix") + ".wav";
+        a.download = "sunrise-redline-" + (sec.id === "all" ? "full" : sec.id) + "-" + (onlyStem || "mix") + ".wav";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1933,6 +2140,13 @@
       playBtn.addEventListener("click", function () {
         if (state.playing && !state.recording) stopTransport();
         else startTransport(false);
+      });
+    }
+
+    var guitarMidiBtn = $("song-guitar-midi-btn");
+    if (guitarMidiBtn) {
+      guitarMidiBtn.addEventListener("click", function () {
+        startGuitarMidiPlayback();
       });
     }
 
@@ -2040,6 +2254,8 @@
     SONG_DATA: SONG_DATA,
     parsePartNotes: parsePartNotes,
     validateSong: validateSong,
+    buildDrumHitTimeline: buildDrumHitTimeline,
+    drumPatternKeyForBarIndex: drumPatternKeyForBarIndex,
     controller: function () { return controller; },
     isSongTabActive: songTabVisible,
     onAmpStatus: onAmpStatus,

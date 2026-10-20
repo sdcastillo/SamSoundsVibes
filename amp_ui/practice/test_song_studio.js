@@ -54,7 +54,7 @@ var SPEC_LINES = [
   "Chrome burns gold and red, sun sets a-head!",
   "Shift gears, feel the roar, turbos shake the shore",
   "Headlights cut the foam — full speed for home!",
-  "SUNSET REDLINE roar! Flying down the shore!",
+  "SUNRISE REDLINE roar! Flying down the shore!",
   "Wheels ignite where breakers crash — outrun the night!",
   "Burn the horizon, chase the sinking sun",
   "Thunder in the tide — Redline sunset ride!"
@@ -87,6 +87,8 @@ Object.keys(pats).forEach(function (k) {
     assert.strictEqual(pats[k].rows[row].length, 16, k + " " + row + " has 16 steps");
   });
 });
+assert.ok(summary.drumHitCount > 200, "hard-coded drum timeline has many hits");
+assert.strictEqual(studio.SONG_DATA.id, "sunrise-redline", "song id is sunrise-redline");
 
 /* Tones name real presets; IR files are only requested, never assumed */
 assert.strictEqual(studio.SONG_DATA.parts.rhythm.tone.name, "Revv Gen Red");
