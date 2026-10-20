@@ -66,12 +66,9 @@ def main():
         input_device, output_device, dev_meta = resolve_audio_devices(dev_config)
         pw_sink = dev_meta['pw_sink']
         input_info = sd.query_devices(input_device)
-        if 'scarlett' in input_info['name'].lower():
-            input_channels = 2
-        elif input_info['max_input_channels'] >= 2:
-            input_channels = 2
-        else:
-            input_channels = 1
+        from guitar_amp_engine import input_stream_channels
+
+        input_channels = input_stream_channels(input_info)
         if pw_sink:
             resolved = resolve_pipewire_sink(pw_sink)
             if resolved:

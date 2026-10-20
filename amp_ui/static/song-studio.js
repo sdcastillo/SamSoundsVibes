@@ -2230,14 +2230,29 @@
     return p && !p.hidden;
   }
 
+  function bootSongStudio() {
+    try {
+      return initBrowserStudio();
+    } catch (err) {
+      console.error("Song Studio init failed:", err);
+      var readout = document.getElementById("song-score-readout");
+      if (readout) {
+        readout.textContent =
+          "Song Studio failed to load (tab/notation will be blank). Open the browser console for details: " +
+          (err && err.message ? err.message : String(err));
+      }
+      return null;
+    }
+  }
+
   var controller = null;
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function () {
-        controller = initBrowserStudio();
+        controller = bootSongStudio();
       });
     } else {
-      controller = initBrowserStudio();
+      controller = bootSongStudio();
     }
   }
 
