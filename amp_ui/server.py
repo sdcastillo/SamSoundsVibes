@@ -68,6 +68,11 @@ PARAM_DEFAULTS = {
     "low_cut": 80.0,
     "high_cut": 8000.0,
     "octave_down": 0.0,
+    "autowah": 0.0,
+    "aw_sens": 0.6,
+    "aw_range": 0.7,
+    "aw_q": 5.0,
+    "aw_mix": 0.8,
 }
 
 
@@ -144,6 +149,11 @@ async def api_start(payload: dict):
             low_cut=config["low_cut"],
             high_cut=config["high_cut"],
             octave_down=config["octave_down"],
+            autowah=config["autowah"],
+            aw_sens=config["aw_sens"],
+            aw_range=config["aw_range"],
+            aw_q=config["aw_q"],
+            aw_mix=config["aw_mix"],
         )
         session.start(config)
     except (ValueError, RuntimeError) as error:

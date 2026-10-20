@@ -654,6 +654,11 @@ class FastAmp:
         high_cut=8000.0,
         preset="",
         octave_down=0.0,
+        autowah=0.0,
+        aw_sens=0.6,
+        aw_range=0.7,
+        aw_q=5.0,
+        aw_mix=0.8,
     ):
         self.rate = rate
         self.drive = drive
@@ -673,6 +678,13 @@ class FastAmp:
         self.high_cut = float(high_cut)
         self.preset = str(preset or "")
         self.octave_down = float(np.clip(float(octave_down or 0.0), 0.0, 1.0))
+        self.autowah = float(autowah or 0.0)
+        self.aw_sens = float(aw_sens)
+        self.aw_range = float(aw_range)
+        self.aw_q = float(aw_q)
+        self.aw_mix = float(aw_mix)
+        self._aw_env = 0.0
+        self._aw_state = (np.float32(0.0),) * 4
         self._oct_lp1 = np.float32(0.0)
         self._oct_prev = np.float32(0.0)
         self._oct_sign = np.float32(1.0)
@@ -799,6 +811,11 @@ class FastAmp:
             self.preset = str(kwargs["preset"])
         if "octave_down" in kwargs and kwargs["octave_down"] is not None:
             self.octave_down = float(np.clip(float(kwargs["octave_down"]), 0.0, 1.0))
+        for name in ("autowah", "aw_sens", "aw_range", "aw_mix"):
+            if name in kwargs and kwargs[name] is not None:
+                setattr(self, name, float(np.clip(float(kwargs[name]), 0.0, 1.0)))
+        if "aw_q" in kwargs and kwargs["aw_q"] is not None:
+            self.aw_q = float(np.clip(float(kwargs["aw_q"]), 1.0, 12.0))
 
     def params_snapshot(self):
         return {
@@ -820,6 +837,11 @@ class FastAmp:
             "high_cut": self.high_cut,
             "preset": self.preset,
             "octave_down": self.octave_down,
+            "autowah": self.autowah,
+            "aw_sens": self.aw_sens,
+            "aw_range": self.aw_range,
+            "aw_q": self.aw_q,
+            "aw_mix": self.aw_mix,
         }
 
     def _cab_nfft(self, frames, kernel_len):
@@ -970,6 +992,51 @@ class FastAmp:
         wet = out * np.float32(1.35)
         dry = source
         return (np.float32(1.0 - mix) * dry + np.float32(mix) * wet).astype(np.float32, copy=False)
+
+    def _bandpass_coeffs(self, freq, q):
+        w0 = 2.0 * np.pi * float(freq) / float(self.rate)
+        alpha = np.sin(w0) / (2.0 * float(q))
+        inv = 1.0 / (1.0 + alpha)
+        return (
+            np.float32(alpha * inv),
+            np.float32(-alpha * inv),
+            np.float32(-2.0 * np.cos(w0) * inv),
+            np.float32((1.0 - alpha) * inv),
+        )
+
+    def _apply_autowah(self, source):
+        """Envelope wah: RMS of each 32-sample slice sweeps a resonant bandpass (~400 Hz–2.5 kHz)."""
+        if self.autowah < 0.5 or source.size == 0:
+            return source
+        mix = float(np.clip(self.aw_mix, 0.0, 1.0))
+        q = float(np.clip(self.aw_q, 1.0, 12.0))
+        sens = float(np.clip(self.aw_sens, 0.0, 1.0))
+        rng = float(np.clip(self.aw_range, 0.0, 1.0))
+        lo = 400.0
+        hi = lo + (2500.0 - lo) * max(0.1, rng)
+        gain = 2.0 + 28.0 * sens
+        slice_len = 32
+        att = 1.0 - np.exp(-slice_len / (0.004 * self.rate))
+        rel = 1.0 - np.exp(-slice_len / (0.120 * self.rate))
+        env = self._aw_env
+        x1, x2, y1, y2 = self._aw_state
+        out = np.empty_like(source)
+        for start in range(0, source.size, slice_len):
+            seg = source[start:start + slice_len]
+            rms = float(np.sqrt(np.mean(seg * seg))) if seg.size else 0.0
+            target = min(1.0, rms * gain)
+            env += (target - env) * (att if target > env else rel)
+            freq = lo * (hi / lo) ** env
+            b0, b2, a1, a2 = self._bandpass_coeffs(freq, q)
+            for i, x0 in enumerate(seg):
+                y0 = _ftz(b0 * x0 + b2 * x2 - a1 * y1 - a2 * y2)
+                out[start + i] = y0
+                x2, x1 = x1, x0
+                y2, y1 = y1, y0
+        self._aw_env = env
+        self._aw_state = (_ftz(x1), _ftz(x2), _ftz(y1), _ftz(y2))
+        wet = out * np.float32(1.0 + 0.25 * q)
+        return (np.float32(1.0 - mix) * source + np.float32(mix) * wet).astype(np.float32, copy=False)
 
     def _biquad(self, kind, freq, db, q=0.707):
         if abs(db) < 0.25:
@@ -1252,8 +1319,9 @@ class FastAmp:
             source = source * np.clip((self.gate - np.float32(0.015)) / np.float32(0.04), 0.0, 1.0)
         # Sub-octave divider (-1 octave) so a regular guitar can track bass parts.
         source = self._apply_octave_down(source)
-        # Wah / resonant EQ before drive (Cry Baby-style into the amp).
+        # Manual wah, then envelope Wah Wah, both before drive.
         source = self._apply_wah(source)
+        source = self._apply_autowah(source)
         distorted = self._distort(source)
         distorted = self._apply_tone(distorted)
         distorted = self._apply_cab(distorted)
@@ -1792,6 +1860,11 @@ def validate_params(
     low_cut=None,
     high_cut=None,
     octave_down=None,
+    autowah=None,
+    aw_sens=None,
+    aw_range=None,
+    aw_q=None,
+    aw_mix=None,
 ):
     if not 0.0 <= feedback <= 0.9 or not 0.0 <= mix <= 1.0 or not 0.0 <= volume <= 4.0:
         raise ValueError("feedback must be 0-0.9; mix must be 0-1; volume must be 0-4")
@@ -1808,9 +1881,15 @@ def validate_params(
         ("presence", presence),
         ("ir_mix", ir_mix),
         ("octave_down", octave_down),
+        ("autowah", autowah),
+        ("aw_sens", aw_sens),
+        ("aw_range", aw_range),
+        ("aw_mix", aw_mix),
     ):
         if value is not None and not 0.0 <= float(value) <= 1.0:
             raise ValueError(f"{name} must be 0-1")
+    if aw_q is not None and not 1.0 <= float(aw_q) <= 12.0:
+        raise ValueError("aw_q must be 1-12")
     if low_cut is not None and not 20.0 <= float(low_cut) <= 800.0:
         raise ValueError("low_cut must be 20-800 Hz")
     if high_cut is not None and not 1000.0 <= float(high_cut) <= 20000.0:
@@ -1881,6 +1960,11 @@ class AmpSession:
             low_cut = kwargs["low_cut"] if kwargs.get("low_cut") is not None else self.amp.low_cut
             high_cut = kwargs["high_cut"] if kwargs.get("high_cut") is not None else self.amp.high_cut
             octave_down = kwargs["octave_down"] if kwargs.get("octave_down") is not None else self.amp.octave_down
+            autowah = kwargs["autowah"] if kwargs.get("autowah") is not None else self.amp.autowah
+            aw_sens = kwargs["aw_sens"] if kwargs.get("aw_sens") is not None else self.amp.aw_sens
+            aw_range = kwargs["aw_range"] if kwargs.get("aw_range") is not None else self.amp.aw_range
+            aw_q = kwargs["aw_q"] if kwargs.get("aw_q") is not None else self.amp.aw_q
+            aw_mix = kwargs["aw_mix"] if kwargs.get("aw_mix") is not None else self.amp.aw_mix
             validate_params(
                 feedback,
                 mix,
@@ -1896,6 +1980,11 @@ class AmpSession:
                 low_cut=low_cut,
                 high_cut=high_cut,
                 octave_down=octave_down,
+                autowah=autowah,
+                aw_sens=aw_sens,
+                aw_range=aw_range,
+                aw_q=aw_q,
+                aw_mix=aw_mix,
             )
             self.amp.apply_params(**kwargs)
 
@@ -1919,6 +2008,11 @@ class AmpSession:
             low_cut=config.get("low_cut", 80.0),
             high_cut=config.get("high_cut", 8000.0),
             octave_down=config.get("octave_down", 0.0),
+            autowah=config.get("autowah", 0.0),
+            aw_sens=config.get("aw_sens", 0.6),
+            aw_range=config.get("aw_range", 0.7),
+            aw_q=config.get("aw_q", 5.0),
+            aw_mix=config.get("aw_mix", 0.8),
         )
         rate = int(config.get("rate", 48000))
         blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 512)
@@ -1960,6 +2054,11 @@ class AmpSession:
             high_cut=float(config.get("high_cut", 8000.0)),
             preset=str(config.get("preset") or ""),
             octave_down=float(config.get("octave_down", 0.0)),
+            autowah=float(config.get("autowah", 0.0)),
+            aw_sens=float(config.get("aw_sens", 0.6)),
+            aw_range=float(config.get("aw_range", 0.7)),
+            aw_q=float(config.get("aw_q", 5.0)),
+            aw_mix=float(config.get("aw_mix", 0.8)),
         )
         stored = {
             "device": dev_meta["device"],

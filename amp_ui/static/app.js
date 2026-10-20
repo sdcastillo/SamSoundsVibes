@@ -1,5 +1,5 @@
 (function () {
-  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix", "octave_down"];
+  const PARAMS = ["drive", "delay_ms", "feedback", "mix", "volume", "wah_freq", "wah_q", "wah_mix", "bass", "mid", "treble", "presence", "ir_mix", "octave_down", "autowah", "aw_sens", "aw_range", "aw_q", "aw_mix"];
   let toneExtra = { low_cut: 80, high_cut: 8000, preset: "" };
   let presetCatalog = [];
   const runState = document.querySelector("#run-state");
@@ -71,6 +71,7 @@
     if (params.octave_down !== undefined) {
       syncOctaveButtons(Number(params.octave_down) >= 0.5);
     }
+    if (params.autowah !== undefined) syncAutowah(Number(params.autowah) >= 0.5);
   }
 
   function syncOctaveButtons(on) {
@@ -96,6 +97,31 @@
       clearTimeout(paramTimer);
       paramTimer = setTimeout(pushParams, 30);
     }
+  }
+
+  function syncAutowah(on) {
+    const btn = document.getElementById("autowah-btn");
+    if (!btn) return;
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+    const txt = btn.querySelector(".autowah-btn-text");
+    if (txt) txt.textContent = on ? "Wah Wah: ON" : "Wah Wah: OFF";
+  }
+
+  function setAutowah(on) {
+    const el = document.querySelector("#autowah");
+    if (el) el.value = on ? "1" : "0";
+    const label = document.querySelector("#out-autowah");
+    if (label) label.textContent = formatParam("autowah", on ? 1 : 0);
+    syncAutowah(on);
+    clearTimeout(paramTimer);
+    paramTimer = setTimeout(pushParams, 30);
+  }
+
+  const autowahBtn = document.getElementById("autowah-btn");
+  if (autowahBtn) {
+    autowahBtn.addEventListener("click", function () {
+      setAutowah(autowahBtn.getAttribute("aria-pressed") !== "true");
+    });
   }
 
   let tunerCents = 0;
@@ -314,6 +340,9 @@
       readParams();
       if (name === "octave_down") {
         syncOctaveButtons(parseFloat(el.value) >= 0.5);
+      }
+      if (name === "autowah") {
+        syncAutowah(parseFloat(el.value) >= 0.5);
       }
       clearTimeout(paramTimer);
       paramTimer = setTimeout(pushParams, 80);
