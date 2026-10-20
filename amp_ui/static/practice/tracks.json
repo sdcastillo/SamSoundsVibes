@@ -2855,6 +2855,501 @@
           ]
         }
       ]
+    },
+    {
+      "id": "moonlit-echo-piano",
+      "title": "Moonlit Echo",
+      "genre": "Classical",
+      "file": "audio/moonlit-echo-piano.wav",
+      "key": "C major",
+      "tonic": "C",
+      "mode": "major",
+      "bpm": 76,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "C",
+        "Am",
+        "F",
+        "G"
+      ],
+      "scales": [
+        {
+          "id": "c-major",
+          "name": "C major",
+          "root": "C",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "B"
+          ],
+          "home": true,
+          "why": "The romantic piano key. Every chord in the loop is a C major chord tone set."
+        }
+      ]
+    },
+    {
+      "id": "c-gentle-evening-piano",
+      "title": "Gentle Evening",
+      "genre": "Classical",
+      "file": "audio/c-gentle-evening-piano.wav",
+      "key": "F major",
+      "tonic": "F",
+      "mode": "major",
+      "bpm": 70,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "F",
+        "C",
+        "Dm",
+        "Bb"
+      ],
+      "scales": [
+        {
+          "id": "f-major",
+          "name": "F major",
+          "root": "F",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "F",
+            "G",
+            "A",
+            "Bb",
+            "C",
+            "D",
+            "E"
+          ],
+          "home": true,
+          "why": "Soft evening key. Bb is the chord tone that keeps the IV bar inside F major."
+        }
+      ]
+    },
+    {
+      "id": "bach-prelude-d",
+      "title": "Bach Prelude D",
+      "genre": "Classical",
+      "file": "audio/bach-prelude-d.wav",
+      "key": "D major",
+      "tonic": "D",
+      "mode": "major",
+      "bpm": 66,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "D",
+        "A",
+        "Bm",
+        "A"
+      ],
+      "scales": [
+        {
+          "id": "d-major",
+          "name": "D major",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C#"
+          ],
+          "home": true,
+          "why": "Baroque D major. F# and C# name the D and A chords."
+        }
+      ]
+    },
+    {
+      "id": "mozart-k545",
+      "title": "Mozart K.545",
+      "genre": "Classical",
+      "file": "audio/mozart-k545.wav",
+      "key": "C major",
+      "tonic": "C",
+      "mode": "major",
+      "bpm": 108,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "C",
+        "G",
+        "Am",
+        "G"
+      ],
+      "scales": [
+        {
+          "id": "c-major-k545",
+          "name": "C major",
+          "root": "C",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "C",
+            "D",
+            "E",
+            "F",
+            "G",
+            "A",
+            "B"
+          ],
+          "home": true,
+          "why": "K.545's home key. The loop is a short Alberti skeleton, not a copy of the sonata."
+        }
+      ]
+    },
+    {
+      "id": "paganini-caprice-24",
+      "title": "Paganini Caprice 24",
+      "genre": "Classical",
+      "file": "audio/paganini-caprice-24.wav",
+      "key": "A harmonic minor",
+      "tonic": "A",
+      "mode": "minor",
+      "bpm": 120,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "Am",
+        "E",
+        "Am",
+        "E"
+      ],
+      "scales": [
+        {
+          "id": "a-harmonic-minor",
+          "name": "A harmonic minor",
+          "root": "A",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G#"
+          ],
+          "home": true,
+          "why": "Caprice 24's key. G# is the 3rd of the E chord."
+        }
+      ]
+    },
+    {
+      "id": "paganini-caprice-5",
+      "title": "Paganini Caprice 5",
+      "genre": "Classical",
+      "file": "audio/paganini-caprice-5.wav",
+      "key": "A harmonic minor",
+      "tonic": "A",
+      "mode": "minor",
+      "bpm": 112,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "Am",
+        "Dm",
+        "E",
+        "Am"
+      ],
+      "scales": [
+        {
+          "id": "a-harmonic-minor-cap5",
+          "name": "A harmonic minor",
+          "root": "A",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G#"
+          ],
+          "home": true,
+          "why": "Caprice 5's key. F is the 3rd of Dm and G# is the 3rd of E."
+        }
+      ]
+    },
+    {
+      "id": "chopin-nocturne-e-major",
+      "title": "Chopin Nocturne",
+      "genre": "Classical",
+      "file": "audio/chopin-nocturne-e-major.wav",
+      "key": "E major",
+      "tonic": "E",
+      "mode": "major",
+      "bpm": 72,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "E",
+        "C#m",
+        "A",
+        "B"
+      ],
+      "scales": [
+        {
+          "id": "e-major",
+          "name": "E major",
+          "root": "E",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#",
+            "D#"
+          ],
+          "home": true,
+          "why": "Nocturne key on guitar. D# belongs to the B chord."
+        }
+      ]
+    },
+    {
+      "id": "chopin-prelude-e-minor",
+      "title": "Chopin Prelude",
+      "genre": "Classical",
+      "file": "audio/chopin-prelude-e-minor.wav",
+      "key": "E minor",
+      "tonic": "E",
+      "mode": "minor",
+      "bpm": 52,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "Em",
+        "Am",
+        "B",
+        "Em"
+      ],
+      "scales": [
+        {
+          "id": "e-harmonic-minor",
+          "name": "E harmonic minor",
+          "root": "E",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C",
+            "D#"
+          ],
+          "home": true,
+          "why": "Prelude key. D# is the leading tone over the B chord."
+        }
+      ]
+    },
+    {
+      "id": "debussy-clair-d-major",
+      "title": "Debussy Clair de lune",
+      "genre": "Classical",
+      "file": "audio/debussy-clair-d-major.wav",
+      "key": "D major",
+      "tonic": "D",
+      "mode": "major",
+      "bpm": 60,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "D",
+        "G",
+        "A",
+        "D"
+      ],
+      "scales": [
+        {
+          "id": "d-major-clair",
+          "name": "D major",
+          "root": "D",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "D",
+            "E",
+            "F#",
+            "G",
+            "A",
+            "B",
+            "C#"
+          ],
+          "home": true,
+          "why": "Clair de lune moved to D major so the open strings agree with the key."
+        }
+      ]
+    },
+    {
+      "id": "vivaldi-spring-e-major",
+      "title": "Vivaldi Spring",
+      "genre": "Classical",
+      "file": "audio/vivaldi-spring-e-major.wav",
+      "key": "E major",
+      "tonic": "E",
+      "mode": "major",
+      "bpm": 132,
+      "timeSignature": "4/4",
+      "feel": "strings",
+      "progression": [
+        "E",
+        "B",
+        "C#m",
+        "B"
+      ],
+      "scales": [
+        {
+          "id": "e-major-spring",
+          "name": "E major",
+          "root": "E",
+          "intervals": [
+            0,
+            2,
+            4,
+            5,
+            7,
+            9,
+            11
+          ],
+          "notes": [
+            "E",
+            "F#",
+            "G#",
+            "A",
+            "B",
+            "C#",
+            "D#"
+          ],
+          "home": true,
+          "why": "Spring's key. G# and D# are the violin leading tones."
+        }
+      ]
+    },
+    {
+      "id": "beethoven-moonlight-a-minor",
+      "title": "Moonlight Sonata",
+      "genre": "Classical",
+      "file": "audio/beethoven-moonlight-a-minor.wav",
+      "key": "A minor",
+      "tonic": "A",
+      "mode": "minor",
+      "bpm": 56,
+      "timeSignature": "4/4",
+      "feel": "ambient",
+      "progression": [
+        "Am",
+        "E",
+        "Am",
+        "Dm"
+      ],
+      "scales": [
+        {
+          "id": "a-harmonic-minor-moon",
+          "name": "A harmonic minor",
+          "root": "A",
+          "intervals": [
+            0,
+            2,
+            3,
+            5,
+            7,
+            8,
+            11
+          ],
+          "notes": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "E",
+            "F",
+            "G#"
+          ],
+          "home": true,
+          "why": "Moonlight in A minor. G# is the 3rd of E, and the tone stays clean."
+        }
+      ]
     }
   ]
 }

@@ -266,6 +266,324 @@
           "tab": "B3h e2h | B5h e5h | e4h. B5q | e2w | B2h e2h | B5q e4q e5h | e4h G4h | B3w"
         }
       ]
+    },
+    "moonlit-echo-piano": {
+      "tone": {
+        "slot": 110,
+        "name": "Dreamy Lead",
+        "overrides": {
+          "delay_ms": 592,
+          "feedback": 0.42,
+          "mix": 0.28
+        },
+        "why": "Dreamy Lead for a romantic piano loop at 76 BPM. A dotted-eighth delay (592 ms) blooms the arpeggios through the preset Mesa cab IR."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Open arpeggio",
+          "tip": "Root on beat 1, then the rest of the chord. Let each note ring into the pad.",
+          "tab": "A3q E0q G0q E0q | A0q A3q E0q A0q | E1q A3q A0q E1q | E3q D0q B0q E3q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Singing top line",
+          "tip": "Stay in open position. Land on a chord tone of the current bar and let the delay answer.",
+          "tab": "e0q e1q G0q e3q | e0q e1q A0q e0q | e1q e3q A0q e1q | e3q D0q B0q e3q"
+        }
+      ]
+    },
+    "c-gentle-evening-piano": {
+      "tone": {
+        "slot": 108,
+        "name": "Nothing Clean",
+        "overrides": {
+          "delay_ms": 429,
+          "feedback": 0.22,
+          "mix": 0.16
+        },
+        "why": "Nothing Clean for a soft evening loop at 70 BPM. An eighth-note delay (429 ms) sits under the melody through the preset Marshall cab IR."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Soft chord tones",
+          "tip": "One shape per bar. Keep the pick quiet so the clean preset stays glassy.",
+          "tab": "E1q A3q A0q E1q | A3q E0q G0q A3q | A5q E1q A0q A5q | A1q D3q A3q A1q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Evening melody",
+          "tip": "Longer notes on the high strings. Bb on the A string is the color of the last bar.",
+          "tab": "e1q e3q A0q e1q | e0q e3q G0q e0q | e1q e3q A0q e1q | A1q D3q e1q A1q"
+        }
+      ]
+    },
+    "bach-prelude-d": {
+      "tone": {
+        "slot": 73,
+        "name": "Open Chordus PH",
+        "ir": "106 Mesa MKIIC+ TM1.wav",
+        "overrides": {
+          "ir_mix": 1.0,
+          "delay_ms": 455,
+          "feedback": 0.2,
+          "mix": 0.14
+        },
+        "why": "Open Chordus PH through the Mesa Mark IIC+ cab IR for a D major prelude at 66 BPM. An eighth-note delay (455 ms) leaves the broken chords clear."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Broken-chord prelude",
+          "tip": "Continuous eighths would be the real prelude. These quarters outline the same D–A–Bm–A skeleton.",
+          "tab": "D0q A0q D2q A0q | A0q E0q A2q E0q | A2q D0q D4q A2q | A0q E0q A2q E0q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Upper voice",
+          "tip": "The top note of each bar is a chord tone. Keep the left hand in first position.",
+          "tab": "e2q B3q G2q e2q | e0q B2q e2q e0q | B0q G2q D4q B0q | e0q B2q e2q e0q"
+        }
+      ]
+    },
+    "mozart-k545": {
+      "tone": {
+        "slot": 17,
+        "name": "Essex A30",
+        "overrides": {
+          "delay_ms": 417,
+          "feedback": 0.28,
+          "mix": 0.18
+        },
+        "why": "Essex A30 for the K.545 allegro at 108 BPM. A dotted-eighth delay (417 ms) through the preset Marshall cab IR adds a little Alberti shimmer."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Alberti outline",
+          "tip": "Root, third or fifth, then back. Even quarters, light pick.",
+          "tab": "A3q E0q G0q E0q | E3q D0q B0q E3q | A0q A3q E0q A0q | E3q D0q B0q E3q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Allegro hook",
+          "tip": "Stepwise in C major. The G bars want G or B on a strong beat.",
+          "tab": "e0q e3q G0q e0q | e3q D0q B0q e3q | e0q e1q A0q e0q | e3q D0q B0q e3q"
+        }
+      ]
+    },
+    "paganini-caprice-24": {
+      "tone": {
+        "slot": 7,
+        "name": "MK IV lead 2",
+        "overrides": {
+          "delay_ms": 250,
+          "feedback": 0.22,
+          "mix": 0.16
+        },
+        "why": "MK IV lead 2 for the Caprice 24 theme at 120 BPM. An eighth-note delay (250 ms) through the preset Mesa cab IR keeps the lead tight."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Theme roots",
+          "tip": "Am and E, two bars each pair. The G# on the E string is the harmonic-minor leading tone.",
+          "tab": "A0q A3q E0q A0q | E0q E4q A2q E0q | A0q A3q E0q A0q | E0q E4q A2q E0q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Theme on top",
+          "tip": "Sing the A minor theme shape, then answer on G# over E.",
+          "tab": "e0q e1q A0q e0q | e4q B0q e0q e4q | e0q e1q A0q e0q | e4q B0q e0q e4q"
+        }
+      ]
+    },
+    "paganini-caprice-5": {
+      "tone": {
+        "slot": 7,
+        "name": "MK IV lead 2",
+        "overrides": {
+          "delay_ms": 268,
+          "feedback": 0.16,
+          "mix": 0.1
+        },
+        "why": "The same MK IV lead 2 voice, drier, for Caprice 5 at 112 BPM. An eighth-note delay (268 ms) through the preset Mesa cab IR."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Am–Dm–E outline",
+          "tip": "Four chords, one bar each. F on the E string is the third of Dm.",
+          "tab": "A0q A3q E0q A0q | A5q E1q A0q A5q | E0q E4q A2q E0q | A0q A3q E0q A0q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Caprice fragment",
+          "tip": "Stay high and even. G# only happens on the E bar.",
+          "tab": "e0q e1q A0q e0q | e1q A3q A0q e1q | e4q B0q e0q e4q | e0q e1q A0q e0q"
+        }
+      ]
+    },
+    "chopin-nocturne-e-major": {
+      "tone": {
+        "slot": 7,
+        "name": "MK IV lead 2",
+        "overrides": {
+          "drive": 12,
+          "delay_ms": 625,
+          "feedback": 0.35,
+          "mix": 0.22
+        },
+        "why": "MK IV lead 2 with the drive pulled down to 12 for a lyrical nocturne at 72 BPM. A dotted-eighth delay (625 ms) through the preset Mesa cab IR."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Nocturne changes",
+          "tip": "E, C#m, A, B. Hold the bass note and let the pad carry the bar.",
+          "tab": "E0q E4q B0q E0q | A4q E0q E4q A4q | A0q A4q E0q A0q | A2q D1q D4q A2q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Lyrical line",
+          "tip": "Slow vibrato. D# on the B string belongs only to the B bar.",
+          "tab": "e0q e2q B0q e0q | e4q e2q B2q e4q | e0q e2q A0q e0q | B0q B2q B4q B0q"
+        }
+      ]
+    },
+    "chopin-prelude-e-minor": {
+      "tone": {
+        "slot": 108,
+        "name": "Nothing Clean",
+        "ir": "102_Dtar_small_fingerstyle-_ir.wav",
+        "overrides": {
+          "ir_mix": 1.0,
+          "delay_ms": 577,
+          "feedback": 0.12,
+          "mix": 0.08
+        },
+        "why": "Nothing Clean on the small fingerstyle acoustic IR for the E minor prelude at 52 BPM. A quiet eighth-note delay (577 ms) stays almost dry."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Slow prelude chords",
+          "tip": "One chord per bar. D# is the leading tone into Em, not a note to hold.",
+          "tab": "E0q E3q B0q E0q | A0q A3q E0q A0q | A2q D1q D4q A0q | E0q E3q B0q E0q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Chorale top voice",
+          "tip": "Very slow. Fingerstyle, no pick attack if you can help it.",
+          "tab": "e0q e3q B0q e0q | e0q A3q A0q e0q | e2q B4q e0q e2q | e0q e3q B0q e0q"
+        }
+      ]
+    },
+    "debussy-clair-d-major": {
+      "tone": {
+        "slot": 110,
+        "name": "Dreamy Lead",
+        "overrides": {
+          "delay_ms": 750,
+          "feedback": 0.5,
+          "mix": 0.34
+        },
+        "why": "Dreamy Lead for Clair de lune at 60 BPM. A long dotted-eighth delay (750 ms) through the preset Mesa cab IR gives the impressionist bloom."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "D major bloom",
+          "tip": "Let every note overlap. The delay is doing half of the impressionist work.",
+          "tab": "D0q A0q D2q A0q | E3q D0q B0q E3q | A0q E0q A2q E0q | D0q A0q D4q A0q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Moonlight melody",
+          "tip": "Half the notes are chord tones, the rest are steps. Do not rush the 60 BPM.",
+          "tab": "e2q B3q G2q e2q | e3q B0q G0q e3q | e0q B2q e2q e0q | e2q B3q G2q e2q"
+        }
+      ]
+    },
+    "vivaldi-spring-e-major": {
+      "tone": {
+        "slot": 7,
+        "name": "MK IV lead 2",
+        "ir": "107 Mesa MKIIC+ TM 2.wav",
+        "overrides": {
+          "ir_mix": 1.0,
+          "delay_ms": 227,
+          "feedback": 0.18,
+          "mix": 0.12
+        },
+        "why": "MK IV lead 2 with the second Mesa cab IR for Spring at 132 BPM, a high-gain violin lead. An eighth-note delay (227 ms) keeps the allegro articulate."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Spring changes",
+          "tip": "E, B, C#m, B. Even quarters so the 132 BPM stays countable.",
+          "tab": "E0q E4q B0q E0q | A2q D1q D4q A2q | A4q E0q E4q A4q | A2q D1q D4q A2q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Violin figure",
+          "tip": "Alternate pick. G# and D# are the bright notes of E major.",
+          "tab": "e0q e2q B0q e0q | B0q B2q B4q B0q | e4q e2q B2q e4q | B0q B2q B4q B0q"
+        }
+      ]
+    },
+    "beethoven-moonlight-a-minor": {
+      "tone": {
+        "slot": 3,
+        "name": "Taylor LIVE",
+        "ir": "102_Dtar_small_fingerstyle-_ir.wav",
+        "overrides": {
+          "drive": 0,
+          "ir_mix": 1.0,
+          "delay_ms": 536,
+          "feedback": 0.15,
+          "mix": 0.08
+        },
+        "why": "Taylor LIVE with the drive at 0, on the small fingerstyle acoustic IR, for Moonlight at 56 BPM. No distortion, and a tiny eighth-note delay (536 ms)."
+      },
+      "phrases": [
+        {
+          "id": "riff",
+          "kind": "riff",
+          "title": "Triplet-hymn chords",
+          "tip": "The famous pattern is triplets. These quarters are the same Am–E–Am–Dm skeleton, slow enough to add the triplets yourself.",
+          "tab": "A0q A3q E0q A0q | E0q E4q A2q E0q | A0q A3q E0q A0q | A5q E1q A0q A5q"
+        },
+        {
+          "id": "lead",
+          "kind": "lead",
+          "title": "Sustained melody",
+          "tip": "One quiet note per beat. G# only on the E bar.",
+          "tab": "e0q e1q A0q e0q | e4q B0q e0q e4q | e0q e1q A0q e0q | e1q A3q A0q e1q"
+        }
+      ]
     }
   }
 }
