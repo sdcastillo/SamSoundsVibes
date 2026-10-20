@@ -625,7 +625,26 @@
           "chord": "C"
         }
       ],
-      "chordsNote": "Timed from the recording's bassline (librosa beat grid ~94.5 bpm, low-pass <250 Hz CQT, Viterbi-smoothed); see ~/tools/paradise_bass."
+      "chordsNote": "Timed from the recording's bassline (librosa beat grid ~94.5 bpm, low-pass <250 Hz CQT, Viterbi-smoothed); see ~/tools/paradise_bass.",
+      "scales": [
+        {
+          "id": "c-major-scale",
+          "name": "C major",
+          "root": "C",
+          "intervals": [0, 2, 4, 5, 7, 9, 11],
+          "notes": ["C", "D", "E", "F", "G", "A", "B"],
+          "home": true,
+          "why": "The song key. Every chord in C–G–Am–F is diatonic to C major."
+        },
+        {
+          "id": "c-major-pentatonic",
+          "name": "C major pentatonic",
+          "root": "C",
+          "intervals": [0, 2, 4, 7, 9],
+          "notes": ["C", "D", "E", "G", "A"],
+          "why": "C major without F and B — safe over the IV and V without leaning on the leading tone."
+        }
+      ]
     },
     {
       "id": "a-minor-blues",

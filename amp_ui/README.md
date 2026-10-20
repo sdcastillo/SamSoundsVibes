@@ -14,7 +14,7 @@ The tuner reads the string before this bend. It hears the series the string actu
 
 ## The chain, in order
 
-Each block is 256 samples, about 5.3 milliseconds at 48 kHz.
+Each block is 512 samples by default, about 10.7 milliseconds at 48 kHz.
 
 1. Pick the guitar channel on the Solo. The instrument jack is usually the louder of the two inputs.
 2. Copy that clean wave into the tuner.

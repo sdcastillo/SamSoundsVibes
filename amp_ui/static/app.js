@@ -287,7 +287,7 @@
     showError("");
     const body = readAdvancedStartBody(readParams());
     const blockSize = document.querySelector("#blocksize");
-    if (blockSize) body.blocksize = Number(blockSize.value) === 512 ? 512 : 256;
+    if (blockSize) body.blocksize = Number(blockSize.value) === 256 ? 256 : 512;
     api("/api/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

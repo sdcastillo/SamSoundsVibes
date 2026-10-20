@@ -39,7 +39,7 @@ def main():
     )
     parser.add_argument('--music-source', default=None, help='PipeWire source for headset channel 2 (background music)')
     parser.add_argument('--rate', type=int, default=48000)
-    parser.add_argument('--blocksize', type=int, default=256)
+    parser.add_argument('--blocksize', type=int, default=512)
     parser.add_argument('--drive', type=float, default=18.0)
     parser.add_argument('--delay-ms', type=float, default=380.0)
     parser.add_argument('--feedback', type=float, default=0.35)
@@ -66,12 +66,9 @@ def main():
         input_device, output_device, dev_meta = resolve_audio_devices(dev_config)
         pw_sink = dev_meta['pw_sink']
         input_info = sd.query_devices(input_device)
-        if 'scarlett' in input_info['name'].lower():
-            input_channels = 2
-        elif input_info['max_input_channels'] >= 2:
-            input_channels = 2
-        else:
-            input_channels = 1
+        from guitar_amp_engine import input_stream_channels
+
+        input_channels = input_stream_channels(input_info)
         if pw_sink:
             resolved = resolve_pipewire_sink(pw_sink)
             if resolved:

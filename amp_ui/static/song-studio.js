@@ -1,4 +1,4 @@
-/* Song Studio: "Sunset Redline" — Melodic Metal / Hard Rock Song & Multi-Track Guitar Recorder.
+/* Song Studio — multi-song guitar recorder (catalog-driven song data).
    Safe to load in the browser (window.SongStudio) or in Node for unit tests (module.exports). */
 (function (root, factory) {
   var C = typeof module === "object" && module.exports ? require("./staff-core.js") : root.StaffCore;
@@ -11,407 +11,59 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function (C) {
   "use strict";
 
-  var SONG_DATA = {
-    id: "sunset-redline",
-    title: "Sunset Redline",
-    subtitle: "Melodic Metal / Hard Rock — Fast Cars Racing on the Beach at Sunset",
-    key: "E minor",
-    bpm: 132,
-    meter: [4, 4],
-    bars: 16,
-    chords: [
-      "E5", "G5", "A5", "B5",
-      "C5", "D5", "Em", "B5",
-      "Em", "C", "G", "D",
-      "Em", "C", "G", "B5"
-    ],
-    sections: [
-      {
-        id: "all",
-        label: "Full Song (Bars 1–16)",
-        shortLabel: "Full Song (1–16)",
-        startBar: 0,
-        endBar: 16,
-        drumPattern: "verse",
-        description: "Complete 16-bar arrangement: Verse Riff → Pre-Chorus → Anthemic Chorus → Blistering Guitar Solo."
-      },
-      {
-        id: "verse",
-        label: "1 · Verse Riff: Salt Spray & Chrome (Bars 1–4)",
-        shortLabel: "Verse (1–4)",
-        startBar: 0,
-        endBar: 4,
-        drumPattern: "verse",
-        description: "Palm-muted E5 shoreline gallop with twin-lead melody hook and driving eighth-note bass."
-      },
-      {
-        id: "prechorus",
-        label: "2 · Pre-Chorus: Tachometer Climbing (Bars 5–8)",
-        shortLabel: "Pre-Chorus (5–8)",
-        startBar: 4,
-        endBar: 8,
-        drumPattern: "prechorus",
-        description: "Rising C5–D5–Em–B5 chord climb as the turbo spools against the crimson tide."
-      },
-      {
-        id: "chorus",
-        label: "3 · Chorus: Sunset Redline (Bars 9–12)",
-        shortLabel: "Chorus (9–12)",
-        startBar: 8,
-        endBar: 12,
-        drumPattern: "chorus",
-        description: "Wide-open Em–C–G–D stadium metal chorus with soaring harmonized lead and crash-ride groove."
-      },
-      {
-        id: "solo",
-        label: "4 · Guitar Solo: Twin Turbos in the Tide (Bars 13–16)",
-        shortLabel: "Guitar Solo (13–16)",
-        startBar: 12,
-        endBar: 16,
-        drumPattern: "solo",
-        description: "High-octane melodic metal guitar solo: 16th-note E minor scale bursts, crying bends, and high E5 climax."
-      }
-    ],
+  var SongCatalog = typeof module === "object" && module.exports
+    ? require("./song-catalog.js")
+    : (typeof globalThis !== "undefined" ? globalThis : typeof window !== "undefined" ? window : self).SongCatalog;
+  var activeSongId = SongCatalog.defaultSongId;
+  var SONG_DATA = SongCatalog.load(activeSongId);
 
-    parts: {
-      rhythm: {
-        id: "rhythm",
-        number: "1",
-        title: "1) Rhythm Guitar",
-        subtitle: "Palm-muted E5 beach-race gallop & wide chorus power chords",
-        octaveDown: false,
-        tone: {
-          slot: 18,
-          name: "Revv Gen Red",
-          irWanted: "Mesa_4x12_V30.wav",
-          overrides: {
-            drive: 24.5,
-            bass: 0.56,
-            mid: 0.62,
-            treble: 0.68,
-            presence: 0.64,
-            mix: 0.12,
-            volume: 0.65,
-            octave_down: 0.0
+  function loadSongById(songId) {
+    activeSongId = songId || SongCatalog.defaultSongId;
+    SONG_DATA = SongCatalog.load(activeSongId);
+    return SONG_DATA;
+  }
+
+  var DRUM_KIT_ROWS = ["crash", "ride", "hihat", "snare", "kick"];
+
+  function drumPatternKeyForBarIndex(barIdx) {
+    var prog = SONG_DATA.drumProgram;
+    if (prog && prog.barPatternKeys && prog.barPatternKeys[barIdx]) {
+      return prog.barPatternKeys[barIdx];
+    }
+    var keys = SONG_DATA.drumPatterns ? Object.keys(SONG_DATA.drumPatterns) : [];
+    return keys[0] || "verse";
+  }
+
+  function defaultDrumPatternKey(data) {
+    data = data || SONG_DATA;
+    var sec = (data.sections || []).filter(function (s) { return s.id !== "all"; })[0];
+    if (sec && sec.drumPattern) return sec.drumPattern;
+    var keys = data.drumPatterns ? Object.keys(data.drumPatterns) : [];
+    return keys[0] || "verse";
+  }
+
+  /** Expand hard-coded drumPatterns into absolute-beat hits for the whole song. */
+  function buildDrumHitTimeline(songData, patternSource) {
+    var hits = [];
+    var rows = (songData.drumProgram && songData.drumProgram.kitRows) || DRUM_KIT_ROWS;
+    var bars = songData.bars || 16;
+    var patterns = patternSource || songData.drumPatterns;
+    for (var bar = 0; bar < bars; bar++) {
+      var patKey = drumPatternKeyForBarIndex(bar);
+      var pat = patterns[patKey];
+      if (!pat || !pat.rows) continue;
+      for (var s = 0; s < 16; s++) {
+        var beat = bar * 4 + s * 0.25;
+        rows.forEach(function (kind) {
+          var row = pat.rows[kind];
+          if (row && row[s]) {
+            hits.push({ beat: beat, kind: kind, id: beat.toFixed(3) + ":" + kind });
           }
-        },
-        tip: "Palm-mute the low E string on the eighth-note chugs in Bars 1–4, then let the chorus power chords ring wide open.",
-        tab: [
-          /* Bars 1-4: Verse Riff (E5 - G5 - A5 - B5) */
-          "E0e E0e E3e E0e E5e E0e E7e E5e",
-          "E3e E3e E3e E5e E7e E5e E3e E2e",
-          "A0e A0e A3e A0e A5e A0e A7e A5e",
-          "A2e A2e D4e A2e A5e A2e D4q",
-          /* Bars 5-8: Pre-Chorus (C5 - D5 - Em - B5) */
-          "A3q A3e A3e D5q D5e A3e",
-          "A5q A5e A5e D7q D7e A5e",
-          "E0e E0e E3e E5e A7q D5q",
-          "A2e A2e D4e A2e A6e A2e B0q",
-          /* Bars 9-12: Chorus (Em - C - G - D) */
-          "E0q E0e E0e A7q D9q",
-          "A3q A3e A3e D5q G5q",
-          "E3q E3e E3e A5q D5q",
-          "A5q A5e A5e D7q G7q",
-          /* Bars 13-16: Solo Backing (Em - C - G - B5) */
-          "E0e E0e E3e E0e E5e E0e E7q",
-          "A3e A3e A3e A5e D5e D5e G5q",
-          "E3e E3e E3e E5e A5e A5e D5q",
-          "A2e A2e D4e A2e A6e A2e E0q"
-        ].join(" | ")
-      },
-
-      lead: {
-        id: "lead",
-        number: "2",
-        title: "2) Lead Guitar + Solo",
-        subtitle: "Horizon twin-lead hooks & 4-bar melodic shred solo (Bars 13–16)",
-        octaveDown: false,
-        tone: {
-          slot: 7,
-          name: "MK IV lead 2",
-          irWanted: "Mesa_4x12_V30.wav",
-          overrides: {
-            drive: 27.0,
-            bass: 0.52,
-            mid: 0.68,
-            treble: 0.72,
-            presence: 0.66,
-            delay_ms: 360,
-            feedback: 0.34,
-            mix: 0.26,
-            volume: 0.72,
-            octave_down: 0.0
-          }
-        },
-        tip: "Bars 1–12 weave melodic hooks over the riffs; Bars 13–16 unleash the full Guitar Solo up to the 12th fret high E!",
-        tab: [
-          /* Bars 1-4: Melodic Horizon Lead Hook */
-          "B5q B8e B7e G7q G9q",
-          "B8q B7e B5e G7h",
-          "G5q G7e G9e B8q B10q",
-          "B7q B8e B7e G8h",
-          /* Bars 5-8: Pre-Chorus Arpeggio Climb */
-          "G5e B5e e7e B5e G5e B5e e8q",
-          "G7e B7e e10e B7e G7e B7e e10q",
-          "G9e B8e e12e B8e G9e B8e e12q",
-          "B7e B8e B10e B8e B7q e11q",
-          /* Bars 9-12: Soaring Chorus Counter-Melody */
-          "e12q B12e B10e B8q G9q",
-          "B8q e8e e7e B8q G9q",
-          "B8q B10e B12e e10q B8q",
-          "B10q e10e B10e B7h",
-          /* Bars 13-16: THE GUITAR SOLO ("Twin Turbos in the Tide") */
-          "G9s G11s G12s B12s e12e B15e e12e e15e e12q",
-          "e15e e14e e12e B15e B13e B12e G14e G12e",
-          "B12s B13s B15s e12s e14s e15s e14s e12s B15e B12e G14q",
-          "B12e e12e e14e e15e e12h"
-        ].join(" | ")
-      },
-
-      bass: {
-        id: "bass",
-        number: "3",
-        title: "3) Bass Part (-1 Oct Guitar)",
-        subtitle: "Played on your guitar's E/A/D strings with Down-Octave ON",
-        octaveDown: true,
-        tone: {
-          slot: 50,
-          name: "BAS:SVT Nrm",
-          irWanted: "Ampeg_8x10_SVT.wav",
-          overrides: {
-            drive: 11.5,
-            bass: 0.78,
-            mid: 0.58,
-            treble: 0.42,
-            presence: 0.38,
-            mix: 0.0,
-            volume: 0.78,
-            low_cut: 35.0,
-            high_cut: 4200.0,
-            octave_down: 1.0
-          }
-        },
-        tip: "Turn ON the Down-Octave (Bass Mode) button! Play these fretted notes on your regular guitar's 6th, 5th, and 4th strings and the amp shifts you down 1 octave into sub-bass thunder.",
-        tab: [
-          /* Bars 1-4: Locked-in 8th-note bass drive */
-          "E0e E0e E0e E3e E5e E5e E7e E5e",
-          "E3e E3e E3e E5e E7e E5e E3e E2e",
-          "A0e A0e A0e A3e A5e A5e A7e A5e",
-          "A2e A2e A2e A5e D4e A5e A2q",
-          /* Bars 5-8: Pre-Chorus Bass Walk-up */
-          "A3q A3e A3e A3q D5q",
-          "A5q A5e A5e A5q D7q",
-          "E0q E0e E3e E5q E7q",
-          "A2e A2e A2e A5e A6q A2q",
-          /* Bars 9-12: Chorus Octave-Jumping Bass */
-          "E0q D2e E0e E0q D2q",
-          "A3q D5e A3e A3q G5q",
-          "E3q D5e E3e E3q D5q",
-          "A5q D7e A5e A5q A2q",
-          /* Bars 13-16: Solo Foundation Bass */
-          "E0e E0e E3e E5e E7e E7e D5q",
-          "A3e A3e A5e A7e D5e D5e A3q",
-          "E3e E3e E5e E7e A5e A5e D5q",
-          "A2e A2e D4e A2e A6e A2e E0q"
-        ].join(" | ")
-      },
-
-      drums: {
-        id: "drums",
-        number: "4",
-        title: "4) Drum Machine",
-        subtitle: "16-step synthesized metal kit (double-kick, snare, crash, ride)",
-        octaveDown: false,
-        tone: null,
-        tip: "Switch drum patterns below or click any step in the 16-step grid to customize the kick, double-bass, snare, hi-hat, crash, and ride.",
-        /* Drum groove represented on tab for visual alignment when viewing Drum tab */
-        tab: [
-          "E0e E0e D2e E0e E0e E0e D2e E0e",
-          "E0e E0e D2e E0e E0e D2e D2e E0e",
-          "E0e E0e D2e E0e E0e E0e D2e E0e",
-          "E0e D2e E0e D2e A3e A2e E0q",
-          "E0q D2q E0e E0e D2q",
-          "E0q D2q E0e E0e D2q",
-          "E0e E0e D2q E0e E0e D2q",
-          "D2e D2e D2e D2e A3e A2e E0q",
-          "E0q D2q E0e E0e D2q",
-          "E0q D2q E0e E0e D2q",
-          "E0q D2q E0e E0e D2q",
-          "E0e E0e D2e E0e D2e D2e E0q",
-          "E0e E0e D2e E0e E0e E0e D2e E0e",
-          "E0e E0e D2e E0e E0e E0e D2e E0e",
-          "E0e E0e D2e E0e E0e E0e D2e E0e",
-          "D2e D2e A3e A2e E0e E0e E0q"
-        ].join(" | ")
-      },
-
-      vocals: {
-        id: "vocals",
-        number: "5",
-        title: "5) Lyrics (Notes + Words)",
-        subtitle: "Vocal melody notes & lyrics — Fast cars racing on the beach at sunset",
-        octaveDown: false,
-        tone: {
-          slot: 26,
-          name: "Soldano Lead",
-          overrides: {
-            drive: 16.0,
-            bass: 0.50,
-            mid: 0.65,
-            treble: 0.64,
-            presence: 0.60,
-            mix: 0.28,
-            volume: 0.65,
-            octave_down: 0.0
-          }
-        },
-        tip: "Every lyric word is paired with its exact melody note on the staff and playable on guitar. Follow the gold words and aqua note names under each bar!",
-        tab: [
-          /* Bars 1-4: Verse 1 Vocal Melody */
-          "G9q G9e G7e B8q B7q",
-          "B8q B7e G9e G7h",
-          "G9q B8e B10e B12q B10q",
-          "B8q B7e G9e B7h",
-          /* Bars 5-8: Pre-Chorus Vocal Melody */
-          "B8q B8e B10e B8q G9q",
-          "B10q B10e B12e B10q G11q",
-          "B12q B10e B8e G9q G7q",
-          "B7q B8e B10e B12h",
-          /* Bars 9-12: Chorus Vocal Melody */
-          "e12q B12e B10e B8q G9q",
-          "B8q B10e B8e G9q G7q",
-          "B8q B10e B12e e10q B8q",
-          "B10q B8e B7e G9h",
-          /* Bars 13-16: Outro / Solo Vocal Chant */
-          "e12q B12e B10e B8q G9q",
-          "B8q B10e B12e e10h",
-          "e12q e10e B12e B10q B8q",
-          "B7q B8e B7e G9h"
-        ].join(" | "),
-        lyricsByBar: [
-          /* Bar 1 (5 notes) */ ["V-eights", "howl", "on", "crimson", "sand"],
-          /* Bar 2 (4 notes) */ ["Salt", "spray", "flies", "past!"],
-          /* Bar 3 (5 notes) */ ["Chrome", "burns", "gold", "and", "red"],
-          /* Bar 4 (4 notes) */ ["Sun", "sets", "a-", "head!"],
-          /* Bar 5 (5 notes) */ ["Shift", "gears,", "feel", "the", "roar"],
-          /* Bar 6 (5 notes) */ ["Tur-", "bos", "shake", "the", "shore"],
-          /* Bar 7 (5 notes) */ ["Head-", "lights", "cut", "the", "foam"],
-          /* Bar 8 (4 notes) */ ["Full", "speed", "for", "home!"],
-          /* Bar 9 (5 notes) */ ["SUN-", "SET", "RED-", "LINE", "roar!"],
-          /* Bar 10 (5 notes) */ ["Fly-", "ing", "down", "the", "shore!"],
-          /* Bar 11 (5 notes) */ ["Wheels", "ignite", "where", "breakers", "crash"],
-          /* Bar 12 (4 notes) */ ["Out-", "run", "the", "night!"],
-          /* Bar 13 (5 notes) */ ["Burn", "the", "ho-", "ri-", "zon"],
-          /* Bar 14 (4 notes) */ ["Chase", "the", "sinking", "sun"],
-          /* Bar 15 (5 notes) */ ["Thun-", "der", "in", "the", "tide"],
-          /* Bar 16 (4 notes) */ ["Red-", "line", "sunset", "ride!"]
-        ],
-        lyricSheet: [
-          {
-            section: "Verse 1 (Bars 1–4)",
-            chords: "E5 · G5 · A5 · B5",
-            lines: [
-              {
-                words: "V-eights howl on crimson sand, salt spray flies past!",
-                notes: "E4 E4 D4 G4 F#4 (E5) · G4 F#4 E4 D4 (G5)"
-              },
-              {
-                words: "Chrome burns gold and red, sun sets a-head!",
-                notes: "E4 G4 A4 B4 A4 (A5) · G4 F#4 E4 F#4 (B5)"
-              }
-            ]
-          },
-          {
-            section: "Pre-Chorus (Bars 5–8)",
-            chords: "C5 · D5 · Em · B5",
-            lines: [
-              {
-                words: "Shift gears, feel the roar, turbos shake the shore",
-                notes: "G4 G4 A4 G4 E4 (C5) · A4 A4 B4 A4 F#4 (D5)"
-              },
-              {
-                words: "Headlights cut the foam — full speed for home!",
-                notes: "B4 A4 G4 E4 D4 (Em) · F#4 G4 A4 B4 (B5)"
-              }
-            ]
-          },
-          {
-            section: "Chorus (Bars 9–12)",
-            chords: "Em · C · G · D",
-            lines: [
-              {
-                words: "SUNSET REDLINE roar! Flying down the shore!",
-                notes: "E5 B4 A4 G4 E4 (Em) · G4 A4 G4 E4 D4 (C)"
-              },
-              {
-                words: "Wheels ignite where breakers crash — outrun the night!",
-                notes: "G4 A4 B4 D5 G4 (G) · A4 G4 F#4 E4 (D)"
-              }
-            ]
-          },
-          {
-            section: "Guitar Solo & Outro — Twin Turbos in the Tide (Bars 13–16)",
-            soloNote: "Lead guitar solo plays bars 13–16; the vocal line sits on top as a guide",
-            chords: "Em · C · G · B5",
-            lines: [
-              {
-                words: "Burn the horizon, chase the sinking sun",
-                notes: "E5 B4 A4 G4 E4 (Em) · G4 A4 B4 D5 (C)"
-              },
-              {
-                words: "Thunder in the tide — Redline sunset ride!",
-                notes: "E5 D5 B4 A4 G4 (G) · F#4 G4 F#4 E4 (B5→Em)"
-              }
-            ]
-          }
-        ]
-      }
-    },
-
-    /* 16-step (16th-note) drum machine patterns per section */
-    drumPatterns: {
-      verse: {
-        name: "Verse: Beach Gallop",
-        rows: {
-          crash: [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          ride:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          hihat: [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-          snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
-          kick:  [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1, 1]
-        }
-      },
-      prechorus: {
-        name: "Pre-Chorus: Turbo Build",
-        rows: {
-          crash: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
-          ride:  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          hihat: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-          snare: [0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 1],
-          kick:  [1, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1]
-        }
-      },
-      chorus: {
-        name: "Chorus: Half-Time Crash",
-        rows: {
-          crash: [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],
-          ride:  [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],
-          hihat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1],
-          kick:  [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0]
-        }
-      },
-      solo: {
-        name: "Solo: Double-Kick Overdrive",
-        rows: {
-          crash: [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
-          ride:  [1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-          hihat: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-          snare: [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
-          kick:  [1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1]
-        }
+        });
       }
     }
-  };
+    return hits;
+  }
 
   /* Build parsed notes for each part and attach lyric syllables to notes in each bar */
   function parsePartNotes(partId) {
@@ -460,6 +112,7 @@
         noteCount: parsed.notes.length
       };
     });
+    summary.drumHitCount = buildDrumHitTimeline(SONG_DATA, SONG_DATA.drumPatterns).length;
     return summary;
   }
 
@@ -476,10 +129,11 @@
       bpm: SONG_DATA.bpm,
       octaveDown: false,
       playing: false,
+      midiPlaying: false,
       recording: false,
       recPart: null,
       countInBeatsLeft: 0,
-      drumPatternKey: "verse",
+      drumPatternKey: defaultDrumPatternKey(),
       cursorBeat: null,
       currentStep: -1,
       judge: null,
@@ -504,6 +158,14 @@
 
     /* Deep copy drum patterns so the user can edit steps live */
     var customDrumPatterns = JSON.parse(JSON.stringify(SONG_DATA.drumPatterns));
+    var drumHitTimeline = buildDrumHitTimeline(SONG_DATA, customDrumPatterns);
+    var DRUM_LOOKAHEAD_SEC = 0.45;
+    var NOTE_LOOKAHEAD_SEC = 0.35;
+    var NOTE_LATE_SEC = 0.06;
+
+    function rebuildDrumHitTimeline() {
+      drumHitTimeline = buildDrumHitTimeline(SONG_DATA, customDrumPatterns);
+    }
 
     function $(id) {
       return document.getElementById(id);
@@ -533,8 +195,21 @@
       countInBeats: 0,
       scheduledStep: -1,
       scheduledNotes: {},
+      scheduledDrumHits: {},
+      drumLoopEpoch: 0,
       activeSources: [],
       noiseBuffer: null
+    };
+
+    var midiTransport = {
+      noteEvents: [],
+      scheduledKeys: {},
+      loopEpoch: 0,
+      timer: null,
+      raf: null,
+      startTime: 0,
+      loopStartBeat: 0,
+      loopEndBeat: 64
     };
 
     function ensureAudio() {
@@ -676,7 +351,7 @@
       if (!ctx) return;
       if (!alsoToRecorder && !stemAudible(partId)) return;
       /* If the user has already recorded a real take for this part and we're not currently re-recording it, let the recorded audio stem play instead of the guide synth */
-      if (!alsoToRecorder && state.takeBuffers[partId] && state.recPart !== partId) return;
+      if (!alsoToRecorder && !state.midiPlaying && state.takeBuffers[partId] && state.recPart !== partId) return;
 
       var t = Math.max(ctx.currentTime, when);
       var dur = Math.max(0.08, durationSec);
@@ -743,10 +418,25 @@
 
     function sectionPatternForBar(bar) {
       if (state.sectionId !== "all") return state.drumPatternKey;
-      if (bar < 4) return "verse";
-      if (bar < 8) return "prechorus";
-      if (bar < 12) return "chorus";
-      return "solo";
+      return drumPatternKeyForBarIndex(bar);
+    }
+
+    /** Schedule hard-coded drum hits through playDrumHit (same master bus as guide synths). */
+    function scheduleHardcodedDrums(songSec, countInSec, loopStartBeat, loopEndBeat) {
+      if (!audio.scheduledDrumHits) audio.scheduledDrumHits = {};
+      var spb = 60 / state.bpm;
+      drumHitTimeline.forEach(function (hit) {
+        if (hit.beat < loopStartBeat - 1e-6 || hit.beat >= loopEndBeat - 1e-6) return;
+        var relSec = (hit.beat - loopStartBeat) * spb;
+        if (relSec < songSec - NOTE_LATE_SEC || relSec > songSec + DRUM_LOOKAHEAD_SEC) return;
+        var loopKey = String(audio.drumLoopEpoch) + ":" + hit.id;
+        if (audio.scheduledDrumHits[loopKey]) return;
+        audio.scheduledDrumHits[loopKey] = true;
+        var when = audio.startTime + countInSec + relSec;
+        var gainScale =
+          hit.kind === "hihat" ? 0.85 : hit.kind === "crash" ? 0.9 : hit.kind === "ride" ? 0.8 : 1.0;
+        playDrumHit(hit.kind, when, gainScale);
+      });
     }
 
     /* Sync Octave-Down state across Song Studio, Amp panel, and backend server */
@@ -822,12 +512,119 @@
     var mic = { on: false, timer: null, ctx: null, stream: null, analyser: null, buf: null, last: null, lastAt: 0 };
     var INPUT_LATENCY = 0.15;
     var TAB_PARTS = { rhythm: true, lead: true, bass: true, vocals: true }; /* vocals: words under their melody notes */
+    var GUITAR_MIDI_PARTS = { rhythm: true, lead: true, bass: true };
+    var SongMidiApi = typeof SongMidi !== "undefined" ? SongMidi : null;
 
     function sectionLabelForBar(rowStartBar) {
-      if (rowStartBar === 0) return "VERSE (Bars 1–4)";
-      if (rowStartBar === 4) return "PRE-CHORUS (Bars 5–8)";
-      if (rowStartBar === 8) return "CHORUS (Bars 9–12)";
-      return "GUITAR SOLO (Bars 13–16)";
+      var match = null;
+      SONG_DATA.sections.forEach(function (sec) {
+        if (sec.id === "all") return;
+        if (rowStartBar >= sec.startBar && rowStartBar < sec.endBar) match = sec;
+      });
+      return match ? match.label.toUpperCase() : "SECTION";
+    }
+
+    function refreshSongHeader() {
+      var titleEl = $("song-title");
+      var subEl = $("song-subtitle");
+      var ledeEl = $("song-lede");
+      var keyBadge = $("song-key-badge");
+      var barsBadge = $("song-bars-badge");
+      var tabBtn = $("tab-song");
+      var panel = $("song-panel");
+      if (titleEl) titleEl.textContent = SONG_DATA.title + " — " + (SONG_DATA.subtitle || SONG_DATA.songType || "Song Studio");
+      if (subEl) subEl.textContent = SONG_DATA.subtitle || "";
+      if (ledeEl) {
+        ledeEl.textContent =
+          SONG_DATA.songType === "neo-classical"
+            ? "Harmonic minor themes with classical arpeggios and a high-gain lead solo. Pick a part, load its tone, and record over the lighter neo-classical drum grooves."
+            : "Fast cars racing down the shoreline at sunset. Select any part below to view its notation, guitar tab, and lyrics, load its amp tone, toggle the Down-Octave button so your guitar sounds like a bass, and record your takes over the metal drum machine.";
+      }
+      if (keyBadge) keyBadge.textContent = "Key: " + SONG_DATA.key;
+      if (barsBadge) barsBadge.textContent = SONG_DATA.meter[0] + "/" + SONG_DATA.meter[1] + " · " + SONG_DATA.bars + " Bars";
+      if (tabBtn) tabBtn.textContent = "Song Studio · " + SONG_DATA.title;
+      if (panel) panel.setAttribute("aria-label", "Song Studio: " + SONG_DATA.title);
+      var lyricsHead = $("song-lyrics-heading");
+      if (lyricsHead) {
+        lyricsHead.textContent =
+          "5) Complete Lyrics: Notes + Words (\"" + SONG_DATA.title + "\")";
+      }
+      var tabLabel = $("song-tab-stage-label");
+      if (tabLabel) tabLabel.textContent = "Guitar tab (" + SONG_DATA.bars + " bars · by section)";
+      var bpmSlider = $("song-bpm");
+      if (bpmSlider) {
+        bpmSlider.min = String(Math.max(60, SONG_DATA.bpm - 60));
+        bpmSlider.max = String(SONG_DATA.bpm + 60);
+        bpmSlider.value = String(SONG_DATA.bpm);
+      }
+      var bpmOut = $("song-bpm-out");
+      if (bpmOut) bpmOut.textContent = SONG_DATA.bpm + " BPM";
+    }
+
+    function renderSectionButtons() {
+      var wrap = $("song-sections");
+      if (!wrap) return;
+      while (wrap.firstChild) wrap.removeChild(wrap.firstChild);
+      SONG_DATA.sections.forEach(function (sec) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.dataset.section = sec.id;
+        btn.setAttribute("aria-pressed", sec.id === state.sectionId ? "true" : "false");
+        btn.textContent = sec.shortLabel || sec.label;
+        btn.addEventListener("click", function () {
+          selectSection(sec.id);
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function renderDrumPresetSelect() {
+      var sel = $("song-drum-preset");
+      if (!sel) return;
+      var prev = sel.value;
+      while (sel.firstChild) sel.removeChild(sel.firstChild);
+      Object.keys(SONG_DATA.drumPatterns).forEach(function (key) {
+        var opt = document.createElement("option");
+        opt.value = key;
+        opt.textContent = SONG_DATA.drumPatterns[key].name || key;
+        sel.appendChild(opt);
+      });
+      if (SONG_DATA.drumPatterns[prev]) sel.value = prev;
+      else sel.value = defaultDrumPatternKey();
+      state.drumPatternKey = sel.value;
+    }
+
+    function reparsedSongParts() {
+      parsedParts = {};
+      Object.keys(SONG_DATA.parts).forEach(function (k) {
+        parsedParts[k] = parsePartNotes(k);
+      });
+      customDrumPatterns = JSON.parse(JSON.stringify(SONG_DATA.drumPatterns));
+      rebuildDrumHitTimeline();
+    }
+
+    function switchActiveSong(songId) {
+      if (songId === activeSongId) return;
+      stopTransport();
+      loadSongById(songId);
+      state.bpm = SONG_DATA.bpm;
+      state.sectionId = "all";
+      state.drumPatternKey = defaultDrumPatternKey();
+      state.takes = {};
+      state.takeBuffers = {};
+      reparsedSongParts();
+      refreshSongHeader();
+      renderSectionButtons();
+      renderDrumPresetSelect();
+      var picker = $("song-picker");
+      if (picker) picker.value = activeSongId;
+      selectPart("rhythm");
+      selectSection("all");
+      renderDrumGrid();
+      renderLyricSheet();
+      renderMixerRows();
+      refreshTakes();
+      renderSongScore();
     }
 
     function scoreLayout(svg) {
@@ -1178,7 +975,7 @@
     function renderDrumGrid() {
       var container = $("song-drum-grid");
       if (!container) return;
-      var pat = customDrumPatterns[state.drumPatternKey] || customDrumPatterns.verse;
+      var pat = customDrumPatterns[state.drumPatternKey] || customDrumPatterns[defaultDrumPatternKey()];
       var titleEl = $("song-drum-pattern-name");
       if (titleEl) titleEl.textContent = pat.name;
       container.innerHTML = "";
@@ -1216,6 +1013,7 @@
               if (pat.rows[rowKey][stepIndex]) {
                 playDrumHit(rowKey, 0, 0.9);
               }
+              rebuildDrumHitTimeline();
               renderDrumGrid();
             });
             container.appendChild(btn);
@@ -1346,7 +1144,7 @@
           if (take && take.url) {
             var a = document.createElement("a");
             a.href = take.url;
-            a.download = "sunset-redline-" + stemId + "-take.wav";
+            a.download = SONG_DATA.id + "-" + stemId + "-take.wav";
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -1428,6 +1226,14 @@
       if (playBtn) {
         playBtn.textContent = state.playing && !state.recording ? "■ Stop Backing" : "▶ Play Backing & Guide";
       }
+      var midiBtn = $("song-guitar-midi-btn");
+      if (midiBtn) {
+        var showMidi = !!GUITAR_MIDI_PARTS[state.partId];
+        midiBtn.hidden = !showMidi;
+        midiBtn.textContent = state.midiPlaying
+          ? "■ Stop Guitar MIDI"
+          : "▶ Play Guitar MIDI (follow tab)";
+      }
     }
 
     function selectPart(partId) {
@@ -1446,7 +1252,7 @@
     function selectSection(sectionId) {
       state.sectionId = sectionId;
       var sec = currentSection();
-      state.drumPatternKey = sec.drumPattern || "verse";
+      state.drumPatternKey = sec.drumPattern || defaultDrumPatternKey();
       document.querySelectorAll("#song-sections [data-section]").forEach(function (btn) {
         btn.setAttribute("aria-pressed", btn.dataset.section === sectionId ? "true" : "false");
       });
@@ -1632,6 +1438,8 @@
         audio.startTime += loopDur;
         audio.scheduledStep = -1;
         audio.scheduledNotes = {};
+        audio.scheduledDrumHits = {};
+        audio.drumLoopEpoch += 1;
         songSec -= loopDur;
         takeSources = scheduleTakes(ctx, audio.master, audio.startTime + countInSec, audio.loopStartBeat, audio.loopEndBeat, null);
       }
@@ -1641,23 +1449,7 @@
       var totalSteps = Math.floor(( currentBeat - audio.loopStartBeat ) * 4);
       state.currentStep = ((totalSteps % 16) + 16) % 16;
 
-      /* Schedule 16th-note drum steps up to 100ms ahead */
-      var lookaheadSteps = Math.floor((songSec + 0.10) / stepDur);
-      while (audio.scheduledStep < lookaheadSteps && (audio.scheduledStep + 1) < loopBeats * 4) {
-        audio.scheduledStep += 1;
-        var stepIdx = audio.scheduledStep;
-        var stepWhen = audio.startTime + countInSec + stepIdx * stepDur;
-        var absBeat = audio.loopStartBeat + stepIdx * 0.25;
-        var barIdx = Math.floor(absBeat / 4);
-        var patKey = sectionPatternForBar(barIdx);
-        var pat = customDrumPatterns[patKey] || customDrumPatterns.verse;
-        var s16 = stepIdx % 16;
-        if (pat.rows.kick[s16]) playDrumHit("kick", stepWhen, 1.0);
-        if (pat.rows.snare[s16]) playDrumHit("snare", stepWhen, 1.0);
-        if (pat.rows.hihat[s16]) playDrumHit("hihat", stepWhen, 0.85);
-        if (pat.rows.crash[s16]) playDrumHit("crash", stepWhen, 0.9);
-        if (pat.rows.ride && pat.rows.ride[s16]) playDrumHit("ride", stepWhen, 0.8);
-      }
+      scheduleHardcodedDrums(songSec, countInSec, audio.loopStartBeat, audio.loopEndBeat);
 
       /* Schedule Guide Synth notes for Rhythm, Lead, Bass, and Vocals */
       ["rhythm", "lead", "bass", "vocals"].forEach(function (partId) {
@@ -1668,7 +1460,7 @@
           var key = partId + ":" + idx;
           if (audio.scheduledNotes[key]) return;
           var noteRelSec = (n.beat - audio.loopStartBeat) * spb;
-          if (noteRelSec <= songSec + 0.11 && noteRelSec >= songSec - 0.04) {
+          if (noteRelSec <= songSec + NOTE_LOOKAHEAD_SEC && noteRelSec >= songSec - NOTE_LATE_SEC) {
             audio.scheduledNotes[key] = true;
             var when = audio.startTime + countInSec + noteRelSec;
             var durSec = n.beats * spb * 0.92;
@@ -1683,9 +1475,130 @@
       }
     }
 
+    function stopGuitarMidiPlayback() {
+      if (midiTransport.timer) clearInterval(midiTransport.timer);
+      if (midiTransport.raf) cancelAnimationFrame(midiTransport.raf);
+      midiTransport.timer = null;
+      midiTransport.raf = null;
+      midiTransport.scheduledKeys = {};
+      midiTransport.noteEvents = [];
+      state.midiPlaying = false;
+      if (!state.playing) state.cursorBeat = null;
+      var midiBtn = $("song-guitar-midi-btn");
+      if (midiBtn) midiBtn.textContent = "▶ Play Guitar MIDI (follow tab)";
+      var readout = $("song-score-readout");
+      if (readout && !state.playing && !state.recording) {
+        readout.textContent = state.scoreText;
+      }
+      renderSongScore();
+      updateBanner();
+    }
+
+    function scheduleMidiGuitarWindow() {
+      if (!state.midiPlaying || !audio.ctx || !midiTransport.noteEvents.length) return;
+      var ctx = audio.ctx;
+      var spb = 60 / state.bpm;
+      var elapsed = ctx.currentTime - midiTransport.startTime;
+      if (elapsed < 0) return;
+      var loopBeats = midiTransport.loopEndBeat - midiTransport.loopStartBeat;
+      var loopDur = loopBeats * spb;
+      var songSec = elapsed;
+      if (songSec >= loopDur) {
+        midiTransport.startTime += loopDur;
+        midiTransport.scheduledKeys = {};
+        midiTransport.loopEpoch += 1;
+        songSec -= loopDur;
+      }
+      state.cursorBeat = midiTransport.loopStartBeat + songSec / spb;
+
+      midiTransport.noteEvents.forEach(function (ev, idx) {
+        if (ev.beat < midiTransport.loopStartBeat - 1e-6 || ev.beat >= midiTransport.loopEndBeat - 1e-6) return;
+        var relSec = (ev.beat - midiTransport.loopStartBeat) * spb;
+        if (relSec < songSec - NOTE_LATE_SEC || relSec > songSec + NOTE_LOOKAHEAD_SEC) return;
+        var key = midiTransport.loopEpoch + ":" + idx;
+        if (midiTransport.scheduledKeys[key]) return;
+        midiTransport.scheduledKeys[key] = true;
+        var when = midiTransport.startTime + relSec;
+        playPartNote(state.partId, ev.midi, when, (ev.durBeats || 0.25) * spb * 0.92, false);
+      });
+
+      renderSongScore();
+    }
+
+    function startGuitarMidiPlayback() {
+      if (!GUITAR_MIDI_PARTS[state.partId]) return;
+      if (state.midiPlaying) {
+        stopGuitarMidiPlayback();
+        return;
+      }
+      stopTransport();
+      var ctx = ensureAudio();
+      if (!ctx || !SongMidiApi) return;
+
+      var sec = currentSection();
+      midiTransport.loopStartBeat = sec.startBar * 4;
+      midiTransport.loopEndBeat = sec.endBar * 4;
+      midiTransport.scheduledKeys = {};
+      midiTransport.loopEpoch = 0;
+      midiTransport.startTime = ctx.currentTime + 0.05;
+
+      function beginWithEvents(events) {
+        midiTransport.noteEvents = events.filter(function (ev) {
+          return ev.beat >= midiTransport.loopStartBeat - 1e-6 && ev.beat < midiTransport.loopEndBeat - 1e-6;
+        });
+        if (!midiTransport.noteEvents.length) {
+          var readout = $("song-score-readout");
+          if (readout) readout.textContent = "No guitar notes in this section to play.";
+          return;
+        }
+        state.midiPlaying = true;
+        state.scoreText = "Guitar MIDI — " + SONG_DATA.parts[state.partId].title + " (" + sec.shortLabel + ")";
+        var readout = $("song-score-readout");
+        if (readout) readout.textContent = state.scoreText + " — tab playhead follows MIDI.";
+        updateBanner();
+        midiTransport.timer = setInterval(scheduleMidiGuitarWindow, 25);
+        scheduleMidiGuitarWindow();
+        (function midiUiLoop() {
+          if (!state.midiPlaying) return;
+          renderLyricSheet();
+          midiTransport.raf = requestAnimationFrame(midiUiLoop);
+        })();
+      }
+
+      var midUrl =
+        "/static/song/" + SONG_DATA.id + "-" + state.partId + ".mid";
+      fetch(midUrl)
+        .then(function (r) {
+          if (!r.ok) throw new Error("missing midi");
+          return r.arrayBuffer();
+        })
+        .then(function (buf) {
+          var parsed = SongMidiApi.parseSmf(buf);
+          beginWithEvents(parsed.notes);
+        })
+        .catch(function () {
+          fetch("/static/song/generic-guitar.mid")
+            .then(function (r) { return r.ok ? r.arrayBuffer() : Promise.reject(); })
+            .then(function (buf) {
+              var parsed = SongMidiApi.parseSmf(buf);
+              beginWithEvents(parsed.notes);
+            })
+            .catch(function () {
+              beginWithEvents(
+                SongMidiApi.noteEventsFromParsedTab(
+                  parsedParts[state.partId],
+                  sec.startBar,
+                  sec.endBar
+                )
+              );
+            });
+        });
+    }
+
     function startTransport(isRecording, partToRecord) {
       var ctx = ensureAudio();
       if (!ctx) return;
+      stopGuitarMidiPlayback();
       if (state.playing) stopTransport();
 
       var sec = currentSection();
@@ -1695,6 +1608,8 @@
       audio.startTime = ctx.currentTime + 0.05;
       audio.scheduledStep = -1;
       audio.scheduledNotes = {};
+      audio.scheduledDrumHits = {};
+      audio.drumLoopEpoch = 0;
 
       state.playing = true;
       state.recording = !!isRecording;
@@ -1757,6 +1672,7 @@
       renderMixerRows();
 
       audio.timer = setInterval(scheduleAudioWindow, 25);
+      scheduleAudioWindow();
       (function uiLoop() {
         if (!state.playing) return;
         renderSongScore();
@@ -1868,7 +1784,8 @@
         var stepDur = spb / 4;
         for (var step = 0; step < (endBeat - startBeat) * 4; step++) {
           var absBeat = startBeat + step * 0.25;
-          var pat = customDrumPatterns[sectionPatternForBar(Math.floor(absBeat / 4))] || customDrumPatterns.verse;
+          var pat = customDrumPatterns[sectionPatternForBar(Math.floor(absBeat / 4))] ||
+            customDrumPatterns[defaultDrumPatternKey()];
           var s16 = step % 16;
           var when = step * stepDur;
           if (!include("drums")) break;
@@ -1898,7 +1815,7 @@
         var blob = encodeWavFromFloat32(rendered.getChannelData(0), rendered.getChannelData(1), rendered.sampleRate);
         var a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
-        a.download = "sunset-redline-" + (sec.id === "all" ? "full" : sec.id) + "-" + (onlyStem || "mix") + ".wav";
+        a.download = SONG_DATA.id + "-" + (sec.id === "all" ? "full" : sec.id) + "-" + (onlyStem || "mix") + ".wav";
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1922,17 +1839,32 @@
       });
     });
 
-    document.querySelectorAll("#song-sections [data-section]").forEach(function (btn) {
-      btn.addEventListener("click", function () {
-        selectSection(btn.dataset.section);
+    var songPicker = $("song-picker");
+    if (songPicker && SongCatalog && SongCatalog.list) {
+      SongCatalog.list().forEach(function (entry) {
+        var opt = document.createElement("option");
+        opt.value = entry.id;
+        opt.textContent = entry.title + " (" + entry.songType + ")";
+        songPicker.appendChild(opt);
       });
-    });
+      songPicker.value = activeSongId;
+      songPicker.addEventListener("change", function () {
+        switchActiveSong(songPicker.value);
+      });
+    }
 
     var playBtn = $("song-play-btn");
     if (playBtn) {
       playBtn.addEventListener("click", function () {
         if (state.playing && !state.recording) stopTransport();
         else startTransport(false);
+      });
+    }
+
+    var guitarMidiBtn = $("song-guitar-midi-btn");
+    if (guitarMidiBtn) {
+      guitarMidiBtn.addEventListener("click", function () {
+        startGuitarMidiPlayback();
       });
     }
 
@@ -1988,6 +1920,9 @@
     initHighContrastToggle();
 
     /* Initial render */
+    refreshSongHeader();
+    renderSectionButtons();
+    renderDrumPresetSelect();
     selectPart("rhythm");
     selectSection("all");
     renderDrumGrid();
@@ -2003,6 +1938,7 @@
       startTransport: startTransport,
       stopTransport: stopTransport,
       feedAmpStatus: feedAmpStatus,
+      switchActiveSong: switchActiveSong,
       wantsFastStatus: function () {
         return !panel.hidden && state.playing && !state.recording && TAB_PARTS[state.partId];
       },
@@ -2016,14 +1952,29 @@
     return p && !p.hidden;
   }
 
+  function bootSongStudio() {
+    try {
+      return initBrowserStudio();
+    } catch (err) {
+      console.error("Song Studio init failed:", err);
+      var readout = document.getElementById("song-score-readout");
+      if (readout) {
+        readout.textContent =
+          "Song Studio failed to load (tab/notation will be blank). Open the browser console for details: " +
+          (err && err.message ? err.message : String(err));
+      }
+      return null;
+    }
+  }
+
   var controller = null;
   if (typeof document !== "undefined") {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function () {
-        controller = initBrowserStudio();
+        controller = bootSongStudio();
       });
     } else {
-      controller = initBrowserStudio();
+      controller = bootSongStudio();
     }
   }
 
@@ -2037,9 +1988,17 @@
   }
 
   return {
-    SONG_DATA: SONG_DATA,
+    get SONG_DATA() {
+      return SONG_DATA;
+    },
+    SongCatalog: SongCatalog,
+    activeSongId: function () { return activeSongId; },
+    loadSongById: loadSongById,
     parsePartNotes: parsePartNotes,
     validateSong: validateSong,
+    buildDrumHitTimeline: buildDrumHitTimeline,
+    drumPatternKeyForBarIndex: drumPatternKeyForBarIndex,
+    defaultDrumPatternKey: defaultDrumPatternKey,
     controller: function () { return controller; },
     isSongTabActive: songTabVisible,
     onAmpStatus: onAmpStatus,

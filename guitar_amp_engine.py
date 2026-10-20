@@ -51,6 +51,23 @@ def _channel_count(device, direction):
     return device["max_input_channels"] if direction == "input" else device["max_output_channels"]
 
 
+def input_stream_channels(input_info):
+    """PortAudio channel count for capture — never exceed max_input_channels.
+
+    Scarlett Solo has one instrument input; opening 2 channels raises
+    "Error opening input stream, invalid number of channels".
+    """
+    max_in = int(input_info.get("max_input_channels") or 0)
+    if max_in < 1:
+        raise RuntimeError(
+            f"Device {input_info.get('name', '?')!r} reports no input channels."
+        )
+    name = str(input_info.get("name", "")).lower()
+    if "scarlett" in name and "solo" in name:
+        return 1
+    return min(2, max_in)
+
+
 def choose_device(query, channels, direction):
     api_names = sd.query_hostapis()
     candidates = []
@@ -1904,16 +1921,11 @@ class AmpSession:
             octave_down=config.get("octave_down", 0.0),
         )
         rate = int(config.get("rate", 48000))
-        blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 256)
+        blocksize = int(config.get("blocksize") or os.environ.get("AMP_BLOCKSIZE") or 512)
         input_device, output_device, dev_meta = resolve_audio_devices(config)
         pw_sink = dev_meta["pw_sink"]
         input_info = sd.query_devices(input_device)
-        if "scarlett" in input_info["name"].lower():
-            input_channels = 2
-        elif input_info["max_input_channels"] >= 2:
-            input_channels = 2
-        else:
-            input_channels = 1
+        input_channels = input_stream_channels(input_info)
         if pw_sink:
             resolved = resolve_pipewire_sink(pw_sink)
             if resolved:

@@ -75,6 +75,19 @@ core.SONGS.forEach(function (song) {
 });
 eq(core.parseSong(core.findById(core.SONGS, "mary")).notes[0].note.midi, 52, "written E4 sounds E3");
 
+const paradise = core.parseSong(core.findById(core.SONGS, "paradise-road"));
+eq(paradise.bars, 96, "Paradise Road full form");
+eq(paradise.frets.length, paradise.notes.length, "every tab note keeps its fret");
+eq(paradise.notes.slice(0, 4).map((n) => n.string + ":" + n.fret), ["5:3", "3:0", "2:1", "3:0"], "C picked from the A-string root");
+eq(paradise.marks.chords.slice(0, 4).map((c) => c.text + "@" + c.beat), ["C@0", "G@2", "Am@4", "F@6"], "two beats per chord");
+const roots = { C: 48, G: 43, Am: 45, F: 53 };
+paradise.marks.chords.forEach(function (c) {
+  const first = paradise.notes.filter((n) => Math.abs(n.beat - c.beat) < 1e-9)[0];
+  eq(first.midi, roots[c.text], "Paradise Road " + c.text + " at beat " + c.beat + " starts on its root");
+});
+eq(paradise.marks.lyrics[0].text, "His heart has", "first lyric");
+assert(paradise.marks.sections.some((s) => s.text === "Bridge *"), "bridge marked inferred");
+
 assert(core.matches(40, 40, false));
 assert(!core.matches(40, 52, false));
 assert(core.matches(40, 52, true), "any octave");

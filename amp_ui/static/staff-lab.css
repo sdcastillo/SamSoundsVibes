@@ -783,3 +783,19 @@
 .lab-note.is-missed .lab-head.is-hollow {
   fill: #f5d0d2;
 }
+
+.lab-section {
+  font: italic 600 11px "Segoe UI", system-ui, sans-serif;
+  fill: #1A3567;
+  opacity: 0.75;
+}
+
+.lab-lyric {
+  font: 12px "Segoe UI", system-ui, sans-serif;
+  fill: #1A3567;
+}
+
+.lab-lyric.is-now {
+  font-weight: 700;
+  fill: #C33F45;
+}
